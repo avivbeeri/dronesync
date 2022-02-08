@@ -1,0 +1,6 @@
+[submodule "core"]
+	path = core
+	url = ../parcel-core
+[submodule "extra"]
+	path = extra
+	url = ../parcel-extra
