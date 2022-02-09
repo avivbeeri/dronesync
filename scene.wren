@@ -11,7 +11,7 @@ import "core/director" for ActionStrategy
 import "core/map" for TileMap, Tile
 import "core/entity" for Entity
 
-import "./actions" for MoveAction
+import "./actions" for MoveAction, SleepAction, SowAction
 
 class PlayerEntity is Entity {
   construct new() {
@@ -35,10 +35,17 @@ class PlantScene is Scene {
     for (y in 0...6) {
       for (x in 0...9) {
         map[x, y] = Tile.new({
-          "solid": x == y
+          "solid": x == y,
+          "kind": x == y ? "wall" : "floor"
         })
       }
     }
+    map[4, 2] = Tile.new({
+      "kind": "plant",
+      "solid": true,
+      "watered": false,
+      "stage": 1
+    })
     _world = World.new(strategy)
     _world.pushZone(Zone.new(map))
     var zone = _world.active
@@ -56,6 +63,10 @@ class PlantScene is Scene {
       player.action = MoveAction.new(Vec.new(0, -1))
     } else if (Keyboard["down"].justPressed) {
       player.action = MoveAction.new(Vec.new(0, 1))
+    } else if (Keyboard["return"].justPressed) {
+      player.action = SowAction.new(Vec.new(0, 0))
+    } else if (Keyboard["space"].justPressed) {
+      player.action = SleepAction.new()
     } else {
       player.action = Action.none
     }
@@ -63,18 +74,30 @@ class PlantScene is Scene {
   }
 
   draw() {
+    var xOffset = 2
     Canvas.cls(Display.bg)
     for (y in 0...6) {
       for (x in 0...9) {
         var tile = _world.active.map[x, y]
-        if (tile["solid"]) {
-          Canvas.rectfill(x * 8, y * 8, 8, 8, Display.fg)
+        if (tile["kind"] == "wall") {
+          Canvas.rectfill(xOffset + x * 8  + 1, y * 8 + 1, 6, 6, Display.fg)
+        }
+        if (tile["kind"] == "plant") {
+          var bg = Display.bg
+          var fg = Display.fg
+          if (tile["watered"]) {
+            var temp = bg
+            bg = fg
+            fg = temp
+          }
+          Canvas.rectfill(xOffset + x * 8, y * 8, 8, 8, bg)
+          Canvas.circle(xOffset + x * 8  + 4, y * 8 + 4, tile["stage"], fg)
         }
       }
     }
     for (entity in _world.active.entities) {
-      Canvas.rectfill(entity.pos.x * 8, entity.pos.y * 8, 8, 8, Display.bg)
-      Canvas.print(entity.name[0], entity.pos.x * 8, entity.pos.y * 8, Display.fg)
+      Canvas.rectfill(xOffset + entity.pos.x * 8, entity.pos.y * 8, 8, 8, Display.bg)
+      Canvas.print(entity.name[0], xOffset + entity.pos.x * 8, entity.pos.y * 8, Display.fg)
     }
   }
 }
