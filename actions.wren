@@ -80,7 +80,11 @@ class SleepAction is Action {
       for (x in 0...9) {
         var tile = ctx.map[x, y]
         if (tile["kind"] == "plant") {
+          if (tile["watered"]) {
+            tile["stage"] = tile["stage"] + 1
+          }
           tile["watered"] = false
+          tile["age"] = tile["age"] + 1
         }
       }
     }
@@ -101,7 +105,8 @@ class SowAction is Action {
       tile["solid"] = true
       tile["kind"] = "plant"
       tile["watered"] = false
-      tile["stage"] = 1
+      tile["stage"] = 0
+      tile["age"] = 0
       System.print("sowing...")
     } else {
       result = ActionResult.failure
@@ -119,11 +124,12 @@ class HarvestAction is Action {
   perform() {
     var result = ActionResult.success
     var tile = ctx.map[source.pos + _dir]
-    if (tile["kind"] == "plant" && tile["stage"] > 3) {
+    if (tile["kind"] == "plant" && tile["stage"] >= 3) {
       tile["solid"] = false
       tile["kind"] = "floor"
       tile["watered"] = null
       tile["stage"] = null
+      tile["age"] = null
       // TODO: Emit an event for handling that we picked up something
     } else {
       result = ActionResult.failure
@@ -143,10 +149,9 @@ class WaterAction is Action {
     var result = ActionResult.success
     var tile = ctx.map[source.pos + _dir]
     if (tile["kind"] == "plant") {
-      if (tile["stage"] > 3) {
+      if (tile["stage"] >= 3) {
         result = ActionResult.alternate(HarvestAction.new(_dir))
       } else if (!tile["watered"]) {
-        tile["stage"] = tile["stage"] + 1
         tile["watered"] = true
       }
     } else {

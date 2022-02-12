@@ -44,7 +44,8 @@ class PlantScene is Scene {
       "kind": "plant",
       "solid": true,
       "watered": false,
-      "stage": 1
+      "stage": 0,
+      "age": 0
     })
     _world = World.new(strategy)
     _world.pushZone(Zone.new(map))
@@ -91,7 +92,8 @@ class PlantScene is Scene {
             fg = temp
           }
           Canvas.rectfill(xOffset + x * 8, y * 8, 8, 8, bg)
-          Canvas.circle(xOffset + x * 8  + 4, y * 8 + 4, tile["stage"], fg)
+          // Canvas.circle(xOffset + x * 8  + 4, y * 8 + 4, tile["stage"], fg)
+          Canvas.print(tile["stage"], xOffset + x * 8, y * 8, fg)
         }
       }
     }
