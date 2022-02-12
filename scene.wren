@@ -34,6 +34,7 @@ class PlantScene is Scene {
     var map = TileMap.init()
     var mapHeight = 12
     var mapWidth = 20
+    _toolSelected = 1
     for (y in 0...mapHeight) {
       for (x in 0...mapWidth) {
         var solid = x == 0 || y == 0 || x == mapWidth - 1 || y == mapHeight - 1
@@ -61,6 +62,13 @@ class PlantScene is Scene {
 
   update() {
     var player = _world.active.getEntityByTag("player")
+    if (Keyboard["1"].justPressed) {
+      _toolSelected = 1
+    } else if (Keyboard["2"].justPressed) {
+      _toolSelected = 2
+    } else if (Keyboard["3"].justPressed) {
+      _toolSelected = 3
+    }
     if (Keyboard["right"].justPressed) {
       player.action = MoveAction.new(Vec.new(1, 0))
     } else if (Keyboard["left"].justPressed) {
@@ -69,11 +77,12 @@ class PlantScene is Scene {
       player.action = MoveAction.new(Vec.new(0, -1))
     } else if (Keyboard["down"].justPressed) {
       player.action = MoveAction.new(Vec.new(0, 1))
-    } else if (Keyboard["return"].justPressed) {
-      player.action = SowAction.new(Vec.new(0, 0))
     } else if (Keyboard["space"].justPressed) {
-      player.action = WaterAction.new(Vec.new(0, 0))
-      // player.action = SleepAction.new()
+      if (_toolSelected == 1) {
+        player.action = SowAction.new(Vec.new(0, 0))
+      } else if (_toolSelected == 2) {
+        player.action = WaterAction.new(Vec.new(0, 0))
+      }
     } else {
       player.action = Action.none
     }
@@ -81,17 +90,17 @@ class PlantScene is Scene {
   }
 
   draw() {
-    var xOffset = 2
     Canvas.cls(Display.bg)
     var player = _world.active.getEntityByTag("player")
-    Canvas.offset(38 - player.pos.x * 8 - xOffset, 20 - player.pos.y * 8)
+    var xOff = (Canvas.width - 8 - 12) / 2 + 1
+    Canvas.offset(xOff - player.pos.x * 8, 20 - player.pos.y * 8)
     for (dy in -3..3) {
       for (dx in -5..5) {
         var x = player.pos.x + dx
         var y = player.pos.y + dy
         var tile = _world.active.map[x, y]
         if (tile["kind"] == "wall") {
-          Canvas.rectfill(xOffset + x * 8  + 1, y * 8 + 1, 6, 6, Display.fg)
+          Canvas.rectfill(x * 8  + 1, y * 8 + 1, 6, 6, Display.fg)
         }
         if (tile["kind"] == "plant") {
           var bg = Display.bg
@@ -101,15 +110,24 @@ class PlantScene is Scene {
             bg = fg
             fg = temp
           }
-          Canvas.rectfill(xOffset + x * 8, y * 8, 8, 8, bg)
-          // Canvas.circle(xOffset + x * 8  + 4, y * 8 + 4, tile["stage"], fg)
-          Canvas.print(tile["stage"], xOffset + x * 8, y * 8, fg)
+          Canvas.rectfill(x * 8, y * 8, 8, 8, bg)
+          // Canvas.circle(x * 8  + 4, y * 8 + 4, tile["stage"], fg)
+          Canvas.print(tile["stage"], x * 8, y * 8, fg)
         }
       }
     }
     for (entity in _world.active.entities) {
-      Canvas.rectfill(xOffset + entity.pos.x * 8, entity.pos.y * 8, 8, 8, Display.bg)
-      Canvas.print(entity.name[0], xOffset + entity.pos.x * 8, entity.pos.y * 8, Display.fg)
+      Canvas.rectfill(entity.pos.x * 8, entity.pos.y * 8, 8, 8, Display.bg)
+      Canvas.print(entity.name[0], entity.pos.x * 8, entity.pos.y * 8, Display.fg)
     }
+
+    Canvas.offset()
+    var border = 12
+    Canvas.rectfill(Canvas.width - border, 0, border, Canvas.height, Display.fg)
+    Canvas.line(Canvas.width - border, 0, Canvas.width - border, Canvas.height, Display.bg)
+    Canvas.print("S", Canvas.width - 8, 2, Display.bg)
+    Canvas.print("W", Canvas.width - 8, 2 + 9, Display.bg)
+
+    Canvas.rectfill(Canvas.width - border + 2, 1 + (_toolSelected - 1) * 9, 1, 9, Display.bg)
   }
 }

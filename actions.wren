@@ -41,11 +41,11 @@ class MoveAction is Action {
           solid = solid || occupying.any {|entity| entity.has("solid") }
         }
       }
-      if (ctx.map[source.pos]["kind"] == "plant") {
-        result = ActionResult.alternate(WaterAction.new(_dir))
-      }
       if (solid) {
         source.pos = old
+        if (ctx.map[source.pos]["kind"] == "plant") {
+          result = ActionResult.alternate(WaterAction.new(_dir))
+        }
         if (_alt) {
           result = ActionResult.alternate(_alt)
         }
