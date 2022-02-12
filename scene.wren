@@ -11,7 +11,7 @@ import "core/director" for ActionStrategy
 import "core/map" for TileMap, Tile
 import "core/entity" for Entity
 
-import "./actions" for MoveAction, SleepAction, SowAction
+import "./actions" for MoveAction, SleepAction, SowAction, WaterAction
 
 class PlayerEntity is Entity {
   construct new() {
@@ -32,17 +32,20 @@ class PlantScene is Scene {
     Window.resize(Canvas.width * scale, Canvas.height * scale)
     var strategy = ActionStrategy.new()
     var map = TileMap.init()
-    for (y in 0...6) {
-      for (x in 0...9) {
+    var mapHeight = 12
+    var mapWidth = 20
+    for (y in 0...mapHeight) {
+      for (x in 0...mapWidth) {
+        var solid = x == 0 || y == 0 || x == mapWidth - 1 || y == mapHeight - 1
         map[x, y] = Tile.new({
-          "solid": x == y,
-          "kind": x == y ? "wall" : "floor"
+          "solid": solid,
+          "kind": solid ? "wall" : "floor"
         })
       }
     }
     map[4, 2] = Tile.new({
       "kind": "plant",
-      "solid": true,
+      "solid": false,
       "watered": false,
       "stage": 0,
       "age": 0
@@ -51,6 +54,8 @@ class PlantScene is Scene {
     _world.pushZone(Zone.new(map))
     var zone = _world.active
     var player = PlayerEntity.new()
+    player.pos.x = 1
+    player.pos.y = 1
     zone.addEntity("player", player)
   }
 
@@ -67,7 +72,8 @@ class PlantScene is Scene {
     } else if (Keyboard["return"].justPressed) {
       player.action = SowAction.new(Vec.new(0, 0))
     } else if (Keyboard["space"].justPressed) {
-      player.action = SleepAction.new()
+      player.action = WaterAction.new(Vec.new(0, 0))
+      // player.action = SleepAction.new()
     } else {
       player.action = Action.none
     }
@@ -77,8 +83,12 @@ class PlantScene is Scene {
   draw() {
     var xOffset = 2
     Canvas.cls(Display.bg)
-    for (y in 0...6) {
-      for (x in 0...9) {
+    var player = _world.active.getEntityByTag("player")
+    Canvas.offset(38 - player.pos.x * 8 - xOffset, 20 - player.pos.y * 8)
+    for (dy in -3..3) {
+      for (dx in -5..5) {
+        var x = player.pos.x + dx
+        var y = player.pos.y + dy
         var tile = _world.active.map[x, y]
         if (tile["kind"] == "wall") {
           Canvas.rectfill(xOffset + x * 8  + 1, y * 8 + 1, 6, 6, Display.fg)

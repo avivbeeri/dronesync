@@ -102,7 +102,7 @@ class SowAction is Action {
     var result = ActionResult.success
     var tile = ctx.map[source.pos + _dir]
     if (tile["kind"] != "plant") {
-      tile["solid"] = true
+      tile["solid"] = false
       tile["kind"] = "plant"
       tile["watered"] = false
       tile["stage"] = 0
