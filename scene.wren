@@ -35,15 +35,39 @@ class PlantScene is Scene {
     var mapHeight = 12
     var mapWidth = 20
     _toolSelected = 1
-    for (y in 0...mapHeight) {
-      for (x in 0...mapWidth) {
-        var solid = x == 0 || y == 0 || x == mapWidth - 1 || y == mapHeight - 1
+    for (y in -mapHeight...mapHeight) {
+      for (x in -mapWidth...mapWidth) {
+        var solid = x == -mapWidth || y == -mapHeight || x == mapWidth - 1 || y == mapHeight - 1
         map[x, y] = Tile.new({
           "solid": solid,
           "kind": solid ? "wall" : "floor"
         })
       }
     }
+    var houseWidth = 3
+    for (x in 0...houseWidth) {
+      var door = x == (houseWidth / 2).floor
+      map[x, 0] = Tile.new({
+        "solid": !door,
+        "kind": !door ? "house" : "door"
+      })
+      if (door) {
+        map[x, -1] = Tile.new({
+          "solid": true,
+          "kind": "roof"
+        })
+      }
+    }
+    map[-2, -1] = Tile.new({
+      "solid": true,
+      "kind": "roof"
+    })
+    map[-2, 0] = Tile.new({
+      "solid": false,
+      "kind": "well"
+    })
+
+    /*
     map[4, 2] = Tile.new({
       "kind": "plant",
       "solid": false,
@@ -51,6 +75,7 @@ class PlantScene is Scene {
       "stage": 0,
       "age": 0
     })
+    */
     _world = World.new(strategy)
     _world.pushZone(Zone.new(map))
     var zone = _world.active
@@ -101,6 +126,18 @@ class PlantScene is Scene {
         var tile = _world.active.map[x, y]
         if (tile["kind"] == "wall") {
           Canvas.rectfill(x * 8  + 1, y * 8 + 1, 6, 6, Display.fg)
+        }
+        if (tile["kind"] == "house") {
+          Canvas.print("±", x * 8, y * 8, Display.fg)
+        }
+        if (tile["kind"] == "door") {
+          Canvas.print(" ", x * 8, y * 8, Display.fg)
+        }
+        if (tile["kind"] == "roof") {
+          Canvas.print("^", x * 8, y * 8 + 4, Display.fg)
+        }
+        if (tile["kind"] == "well") {
+          Canvas.print("H", x * 8, y * 8, Display.fg)
         }
         if (tile["kind"] == "plant") {
           var bg = Display.bg

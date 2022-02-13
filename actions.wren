@@ -50,6 +50,9 @@ class MoveAction is Action {
           result = ActionResult.alternate(_alt)
         }
       }
+      if (ctx.map[source.pos]["kind"] == "door") {
+        result = ActionResult.alternate(SleepAction.new())
+      }
     }
 
     if (!result) {
@@ -76,16 +79,13 @@ class SleepAction is Action {
   }
 
   perform() {
-    for (y in 0...6) {
-      for (x in 0...9) {
-        var tile = ctx.map[x, y]
-        if (tile["kind"] == "plant") {
-          if (tile["watered"]) {
-            tile["stage"] = tile["stage"] + 1
-          }
-          tile["watered"] = false
-          tile["age"] = tile["age"] + 1
+    for (tile in ctx.map.tiles.values) {
+      if (tile["kind"] == "plant") {
+        if (tile["watered"]) {
+          tile["stage"] = tile["stage"] + 1
         }
+        tile["watered"] = false
+        tile["age"] = tile["age"] + 1
       }
     }
     return ActionResult.success
