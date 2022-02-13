@@ -24,6 +24,7 @@ class StartScene is Scene {
 
   draw() {
     Canvas.cls(Display.bg)
+    Display.printCentered("Garden", 4, Display.fg, "futile")
     Display.printCentered("Press any", Canvas.height - 24, Display.fg)
     Display.printCentered("key", Canvas.height - 16, Display.fg)
   }
