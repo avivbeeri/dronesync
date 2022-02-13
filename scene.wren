@@ -2,6 +2,8 @@ import "graphics" for Canvas
 import "dome" for Window
 import "input" for Keyboard
 import "math" for Vec
+import "json" for JSON
+import "io" for FileSystem
 
 import "core/action" for Action
 import "core/scene" for Scene
@@ -12,6 +14,7 @@ import "core/map" for TileMap, Tile
 import "core/entity" for Entity
 
 import "./actions" for MoveAction, SleepAction, SowAction, WaterAction
+import "./logic" for SaveHook
 
 class PlayerEntity is Entity {
   construct new() {
@@ -32,58 +35,71 @@ class PlantScene is Scene {
     Window.resize(Canvas.width * scale, Canvas.height * scale)
     var strategy = ActionStrategy.new()
     var map = TileMap.init()
-    var mapHeight = 12
-    var mapWidth = 20
-    _toolSelected = 1
-    for (y in -mapHeight...mapHeight) {
-      for (x in -mapWidth...mapWidth) {
-        var solid = x == -mapWidth || y == -mapHeight || x == mapWidth - 1 || y == mapHeight - 1
-        map[x, y] = Tile.new({
-          "solid": solid,
-          "kind": solid ? "wall" : "floor"
-        })
-      }
-    }
-    var houseWidth = 3
-    for (x in 0...houseWidth) {
-      var door = x == (houseWidth / 2).floor
-      map[x, 0] = Tile.new({
-        "solid": !door,
-        "kind": !door ? "house" : "door"
-      })
-      if (door) {
-        map[x, -1] = Tile.new({
-          "solid": true,
-          "kind": "roof"
-        })
-      }
-    }
-    map[-2, -1] = Tile.new({
-      "solid": true,
-      "kind": "roof"
-    })
-    map[-2, 0] = Tile.new({
-      "solid": false,
-      "kind": "well"
-    })
-
-    /*
-    map[4, 2] = Tile.new({
-      "kind": "plant",
-      "solid": false,
-      "watered": false,
-      "stage": 0,
-      "age": 0
-    })
-    */
     _world = World.new(strategy)
     _world.pushZone(Zone.new(map))
+    _world.active.postUpdate.add(SaveHook)
     var zone = _world.active
     var player = PlayerEntity.new()
-    player.pos.x = 1
-    player.pos.y = 1
-    player["water"] = 20
     zone.addEntity("player", player)
+
+    _toolSelected = 1
+
+    // Is there a save.json?
+    var save = Fiber.new {
+      var result = FileSystem.load("./save.json")
+      return JSON.decode(result)
+    }.try()
+    if (save is Map) {
+      for (key in save["map"].keys) {
+        zone.map.tiles[Num.fromString(key)] = Tile.new(save["map"][key])
+      }
+      player.pos.x = save["player"]["x"]
+      player.pos.y = save["player"]["y"]
+      for (key in save["player"].keys) {
+        if (key != "x" && key != "y") {
+          player.data[key] = save["player"][key]
+        }
+      }
+    } else {
+      // else do the generate
+      var mapHeight = 12
+      var mapWidth = 20
+      for (y in -mapHeight...mapHeight) {
+        for (x in -mapWidth...mapWidth) {
+          var solid = x == -mapWidth || y == -mapHeight || x == mapWidth - 1 || y == mapHeight - 1
+          map[x, y] = Tile.new({
+            "solid": solid,
+            "kind": solid ? "wall" : "floor"
+          })
+        }
+      }
+      var houseWidth = 3
+      for (x in 0...houseWidth) {
+        var door = x == (houseWidth / 2).floor
+        map[x, 0] = Tile.new({
+          "solid": !door,
+          "kind": !door ? "house" : "door"
+        })
+        if (door) {
+          map[x, -1] = Tile.new({
+            "solid": true,
+            "kind": "roof"
+          })
+        }
+      }
+      map[-2, -1] = Tile.new({
+        "solid": true,
+        "kind": "roof"
+      })
+      map[-2, 0] = Tile.new({
+        "solid": false,
+        "kind": "well"
+      })
+
+      player.pos.x = 1
+      player.pos.y = 1
+      player["water"] = 20
+    }
   }
 
   update() {

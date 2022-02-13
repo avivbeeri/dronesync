@@ -1,6 +1,7 @@
 import "math" for Vec
 import "core/action" for Action, ActionResult
 import "./extra/events" for MoveEvent
+import "./events" for SleepEvent
 
 class MoveAction is Action {
   construct new(dir, alwaysSucceed, alt) {
@@ -91,6 +92,7 @@ class SleepAction is Action {
         tile["age"] = tile["age"] + 1
       }
     }
+    ctx.events.add(SleepEvent.new())
     return ActionResult.success
   }
 }
