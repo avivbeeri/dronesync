@@ -53,6 +53,9 @@ class MoveAction is Action {
       if (ctx.map[source.pos]["kind"] == "door") {
         result = ActionResult.alternate(SleepAction.new())
       }
+      if (ctx.map[source.pos]["kind"] == "well") {
+        result = ActionResult.alternate(RefillAction.new())
+      }
     }
 
     if (!result) {
@@ -139,6 +142,19 @@ class HarvestAction is Action {
   }
 }
 
+class RefillAction is Action {
+  construct new() {
+    super()
+  }
+  perform() {
+    var tile = ctx.map[source.pos]
+    if (tile["kind"] == "well") {
+      source["water"] = 20
+      return ActionResult.success
+    }
+    return ActionResult.failure
+  }
+}
 class WaterAction is Action {
   construct new(dir) {
     super()
@@ -147,15 +163,21 @@ class WaterAction is Action {
 
   perform() {
     var result = ActionResult.success
-    var tile = ctx.map[source.pos + _dir]
-    if (tile["kind"] == "plant") {
-      if (tile["stage"] >= 3) {
-        result = ActionResult.alternate(HarvestAction.new(_dir))
-      } else if (!tile["watered"]) {
-        tile["watered"] = true
-      }
-    } else {
+    if (source["water"] <= 0) {
       result = ActionResult.failure
+    } else {
+      var tile = ctx.map[source.pos + _dir]
+      if (tile["kind"] == "plant") {
+        if (tile["stage"] >= 3) {
+          result = ActionResult.alternate(HarvestAction.new(_dir))
+        } else if (!tile["watered"]) {
+          tile["watered"] = true
+          // Kindness to the player
+          source["water"] = source["water"] - 1
+        }
+      } else {
+        result = ActionResult.failure
+      }
     }
 
     return result

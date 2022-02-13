@@ -82,6 +82,7 @@ class PlantScene is Scene {
     var player = PlayerEntity.new()
     player.pos.x = 1
     player.pos.y = 1
+    player["water"] = 20
     zone.addEntity("player", player)
   }
 
@@ -166,5 +167,7 @@ class PlantScene is Scene {
     Canvas.print("W", Canvas.width - 8, 2 + 9, Display.bg)
 
     Canvas.rectfill(Canvas.width - border + 2, 1 + (_toolSelected - 1) * 9, 1, 9, Display.bg)
+    Canvas.rectfill(Canvas.width - border + 2, Canvas.height - player["water"], border - 3, player["water"], Display.bg)
+
   }
 }
