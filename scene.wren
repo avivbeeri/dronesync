@@ -12,6 +12,7 @@ import "core/world" for World, Zone
 import "core/director" for ActionStrategy
 import "core/map" for TileMap, Tile
 import "core/entity" for Entity
+import "core/tilesheet" for Tilesheet
 
 import "./events" for SleepEvent, RefillEvent, EmptyEvent
 import "./actions" for MoveAction, SleepAction, SowAction, WaterAction, HarvestAction
@@ -55,6 +56,7 @@ class PlantScene is Scene {
     Window.resize(Canvas.width * scale, Canvas.height * scale)
     var strategy = ActionStrategy.new()
     var map = TileMap.init()
+    _sheet = Tilesheet.new("res/sprites.png", 8, 1)
     _world = World.new(strategy)
     _world.pushZone(Zone.new(map))
     _world.active.postUpdate.add(SaveHook)
@@ -101,12 +103,10 @@ class PlantScene is Scene {
           "solid": !door,
           "kind": !door ? "house" : "door"
         })
-        if (door) {
-          map[x, -1] = Tile.new({
-            "solid": true,
-            "kind": "roof"
-          })
-        }
+        map[x, -1] = Tile.new({
+          "solid": true,
+          "kind": "roof"
+        })
       }
       map[-2, -1] = Tile.new({
         "solid": true,
@@ -140,7 +140,7 @@ class PlantScene is Scene {
       showbar("Watering Can")
     } else if (Keyboard["3"].justPressed) {
       _toolSelected = 3
-      showbar("Scythe")
+      showbar("Trowel")
     }
     if (Keyboard["right"].justPressed) {
       player.action = MoveAction.new(Vec.new(1, 0))
@@ -186,22 +186,28 @@ class PlantScene is Scene {
         var y = player.pos.y + dy
         var tile = _world.active.map[x, y]
         if (tile["kind"] == "wall") {
-          Canvas.rectfill(x * 8  + 1, y * 8 + 1, 6, 6, Display.fg)
+          // Canvas.rectfill(x * 8  + 1, y * 8 + 1, 6, 6, Display.fg)
+          _sheet.draw(9, x * 8, y * 8, Display.fg, Display.bg)
         }
         if (tile["kind"] == "house") {
-          Canvas.print("±", x * 8, y * 8, Display.fg)
+          // Canvas.print("±", x * 8, y * 8, Display.fg)
+          _sheet.draw(7, x * 8, y * 8, Display.fg, Display.bg)
         }
         if (tile["kind"] == "door") {
-          Canvas.print(" ", x * 8, y * 8, Display.fg)
+         // Canvas.print(" ", x * 8, y * 8, Display.fg)
+          _sheet.draw(8, x * 8, y * 8, Display.fg, Display.bg)
         }
         if (tile["kind"] == "roof") {
-          Canvas.print("^", x * 8, y * 8 + 4, Display.fg)
+          // Canvas.print("^", x * 8, y * 8 + 4, Display.fg)
+          _sheet.draw(6, x * 8, y * 8, Display.fg, Display.bg)
         }
         if (tile["kind"] == "well") {
-          Canvas.print("H", x * 8, y * 8, Display.fg)
+          // Canvas.print("H", x * 8, y * 8, Display.fg)
+          _sheet.draw(5, x * 8, y * 8, Display.fg, Display.bg)
         }
         if (tile["kind"] == "dead") {
-          Canvas.print("=", x * 8, y * 8, Display.fg)
+          //Canvas.print("=", x * 8, y * 8, Display.fg)
+          _sheet.draw(4, x * 8, y * 8, Display.fg, Display.bg)
         }
         if (tile["kind"] == "plant") {
           var bg = Display.bg
@@ -211,24 +217,27 @@ class PlantScene is Scene {
             bg = fg
             fg = temp
           }
-          Canvas.rectfill(x * 8, y * 8, 8, 8, bg)
+          // Canvas.rectfill(x * 8, y * 8, 7, 8, bg)
           // Canvas.circle(x * 8  + 4, y * 8 + 4, tile["stage"], fg)
-          Canvas.print(tile["stage"], x * 8, y * 8, fg)
+          // Canvas.print(tile["stage"], x * 8, y * 8, fg)
+          _sheet.draw(tile["stage"], x * 8, y * 8, fg, bg)
         }
       }
     }
     for (entity in _world.active.entities) {
       Canvas.rectfill(entity.pos.x * 8, entity.pos.y * 8, 8, 8, Display.bg)
-      Canvas.print(entity.name[0], entity.pos.x * 8, entity.pos.y * 8, Display.fg)
+      // Canvas.print(entity.name[0], entity.pos.x * 8, entity.pos.y * 8, Display.fg)
+      _sheet.draw(10, entity.pos.x * 8, entity.pos.y * 8, Display.fg, Display.bg)
+
     }
 
     Canvas.offset()
     var border = 12
     Canvas.rectfill(Canvas.width - border, 0, border, Canvas.height, Display.fg)
     Canvas.line(Canvas.width - border, 0, Canvas.width - border, Canvas.height, Display.bg)
-    Canvas.print("S", Canvas.width - 8, 2, Display.bg)
-    Canvas.print("W", Canvas.width - 8, 2 + 9, Display.bg)
-    Canvas.print("C", Canvas.width - 8, 2 + 18, Display.bg)
+    _sheet.draw(11, Canvas.width - 8, 2, Display.bg, Display.fg)
+    _sheet.draw(12, Canvas.width - 8, 2 + 9, Display.bg, Display.fg)
+    _sheet.draw(13, Canvas.width - 8, 2 + 18, Display.bg, Display.fg)
 
     if (_barTimer > 0) {
       Canvas.rectfill(0, Canvas.height - 8, Canvas.width, 8, Display.fg)
@@ -236,7 +245,7 @@ class PlantScene is Scene {
     }
 
     Canvas.rectfill(Canvas.width - border + 2, 1 + (_toolSelected - 1) * 9, 1, 9, Display.bg)
-    Canvas.rectfill(Canvas.width - border + 3, Canvas.height - player["water"], border - 5, player["water"], Display.bg)
+    Canvas.rectfill(Canvas.width - border + 4, Canvas.height - player["water"], border - 5, player["water"], Display.bg)
     super.draw()
 
   }
