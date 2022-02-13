@@ -13,6 +13,7 @@ import "core/director" for ActionStrategy
 import "core/map" for TileMap, Tile
 import "core/entity" for Entity
 
+import "./events" for SleepEvent, RefillEvent, EmptyEvent
 import "./actions" for MoveAction, SleepAction, SowAction, WaterAction
 import "./logic" for SaveHook
 
@@ -42,6 +43,7 @@ class PlantScene is Scene {
     var player = PlayerEntity.new()
     zone.addEntity("player", player)
 
+    _barTimer = 0
     _toolSelected = 1
 
     // Is there a save.json?
@@ -102,14 +104,23 @@ class PlantScene is Scene {
     }
   }
 
+  showbar(text) {
+    _barTimer = 3 * 60
+    _barText = text
+  }
+
   update() {
+    _barTimer = _barTimer - 1
     var player = _world.active.getEntityByTag("player")
     if (Keyboard["1"].justPressed) {
       _toolSelected = 1
+      showbar("Sow Seeds")
     } else if (Keyboard["2"].justPressed) {
       _toolSelected = 2
+      showbar("Watering Can")
     } else if (Keyboard["3"].justPressed) {
       _toolSelected = 3
+      showbar("Scythe")
     }
     if (Keyboard["right"].justPressed) {
       player.action = MoveAction.new(Vec.new(1, 0))
@@ -129,6 +140,17 @@ class PlantScene is Scene {
       player.action = Action.none
     }
     _world.update()
+    for (event in _world.active.events) {
+      if (event is SleepEvent) {
+        showbar("Slept!")
+      }
+      if (event is RefillEvent) {
+        showbar("Refilled!")
+      }
+      if (event is EmptyEvent) {
+        showbar("Empty!")
+      }
+    }
   }
 
   draw() {
@@ -181,6 +203,11 @@ class PlantScene is Scene {
     Canvas.line(Canvas.width - border, 0, Canvas.width - border, Canvas.height, Display.bg)
     Canvas.print("S", Canvas.width - 8, 2, Display.bg)
     Canvas.print("W", Canvas.width - 8, 2 + 9, Display.bg)
+
+    if (_barTimer > 0) {
+      Canvas.rectfill(0, Canvas.height - 8, Canvas.width, 8, Display.fg)
+      Canvas.print(_barText, 0, Canvas.height - 6, Display.bg, "m3x6")
+    }
 
     Canvas.rectfill(Canvas.width - border + 2, 1 + (_toolSelected - 1) * 9, 1, 9, Display.bg)
     Canvas.rectfill(Canvas.width - border + 2, Canvas.height - player["water"], border - 3, player["water"], Display.bg)

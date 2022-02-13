@@ -1,7 +1,7 @@
 import "math" for Vec
 import "core/action" for Action, ActionResult
 import "./extra/events" for MoveEvent
-import "./events" for SleepEvent
+import "./events" for SleepEvent, RefillEvent, EmptyEvent
 
 class MoveAction is Action {
   construct new(dir, alwaysSucceed, alt) {
@@ -41,6 +41,12 @@ class MoveAction is Action {
         if (occupying.count > 0) {
           solid = solid || occupying.any {|entity| entity.has("solid") }
         }
+        if (ctx.map[source.pos]["kind"] == "door") {
+          result = ActionResult.alternate(SleepAction.new())
+        }
+        if (ctx.map[source.pos]["kind"] == "well") {
+          result = ActionResult.alternate(RefillAction.new())
+        }
       }
       if (solid) {
         source.pos = old
@@ -50,12 +56,6 @@ class MoveAction is Action {
         if (_alt) {
           result = ActionResult.alternate(_alt)
         }
-      }
-      if (ctx.map[source.pos]["kind"] == "door") {
-        result = ActionResult.alternate(SleepAction.new())
-      }
-      if (ctx.map[source.pos]["kind"] == "well") {
-        result = ActionResult.alternate(RefillAction.new())
       }
     }
 
@@ -106,7 +106,7 @@ class SowAction is Action {
   perform() {
     var result = ActionResult.success
     var tile = ctx.map[source.pos + _dir]
-    if (tile["kind"] != "plant") {
+    if (tile["kind"] == "floor") {
       tile["solid"] = false
       tile["kind"] = "plant"
       tile["watered"] = false
@@ -152,6 +152,7 @@ class RefillAction is Action {
     var tile = ctx.map[source.pos]
     if (tile["kind"] == "well") {
       source["water"] = 20
+      ctx.events.add(RefillEvent.new())
       return ActionResult.success
     }
     return ActionResult.failure
@@ -166,6 +167,7 @@ class WaterAction is Action {
   perform() {
     var result = ActionResult.success
     if (source["water"] <= 0) {
+      ctx.events.add(EmptyEvent.new())
       result = ActionResult.failure
     } else {
       var tile = ctx.map[source.pos + _dir]

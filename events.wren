@@ -4,3 +4,13 @@ class SleepEvent is Event {
     super()
   }
 }
+class RefillEvent is Event {
+  construct new() {
+    super()
+  }
+}
+class EmptyEvent is Event {
+  construct new() {
+    super()
+  }
+}
