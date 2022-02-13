@@ -1,7 +1,7 @@
 import "math" for Vec
 import "core/action" for Action, ActionResult
 import "./extra/events" for MoveEvent
-import "./events" for SleepEvent, RefillEvent, EmptyEvent
+import "./events" for SleepEvent, RefillEvent, EmptyEvent, HarvestEvent
 
 class MoveAction is Action {
   construct new(dir, alwaysSucceed, alt) {
@@ -87,9 +87,19 @@ class SleepAction is Action {
       if (tile["kind"] == "plant") {
         if (tile["watered"]) {
           tile["stage"] = tile["stage"] + 1
+        } else {
+          tile["fail"] = tile["fail"] + 1
         }
         tile["watered"] = false
         tile["age"] = tile["age"] + 1
+
+        if (tile["fail"] > 3) {
+          tile["kind"] = "dead"
+          tile["watered"] = null
+          tile["stage"] = null
+          tile["age"] = null
+          tile["fail"] = null
+        }
       }
     }
     ctx.events.add(SleepEvent.new())
@@ -112,6 +122,7 @@ class SowAction is Action {
       tile["watered"] = false
       tile["stage"] = 0
       tile["age"] = 0
+      tile["fail"] = 0
       System.print("sowing...")
     } else {
       result = ActionResult.failure
@@ -129,13 +140,15 @@ class HarvestAction is Action {
   perform() {
     var result = ActionResult.success
     var tile = ctx.map[source.pos + _dir]
-    if (tile["kind"] == "plant" && tile["stage"] >= 3) {
+    if (tile["kind"] == "plant" || tile["kind"] == "dead") {
       tile["solid"] = false
       tile["kind"] = "floor"
       tile["watered"] = null
       tile["stage"] = null
       tile["age"] = null
+      tile["fail"] = null
       // TODO: Emit an event for handling that we picked up something
+      ctx.events.add(HarvestEvent.new())
     } else {
       result = ActionResult.failure
     }
@@ -151,7 +164,7 @@ class RefillAction is Action {
   perform() {
     var tile = ctx.map[source.pos]
     if (tile["kind"] == "well") {
-      source["water"] = 20
+      source["water"] = 18
       ctx.events.add(RefillEvent.new())
       return ActionResult.success
     }

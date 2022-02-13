@@ -6,7 +6,7 @@ import "json" for JSON
 import "io" for FileSystem
 
 import "core/action" for Action
-import "core/scene" for Scene
+import "core/scene" for Scene, View
 import "core/display" for Display
 import "core/world" for World, Zone
 import "core/director" for ActionStrategy
@@ -14,8 +14,27 @@ import "core/map" for TileMap, Tile
 import "core/entity" for Entity
 
 import "./events" for SleepEvent, RefillEvent, EmptyEvent
-import "./actions" for MoveAction, SleepAction, SowAction, WaterAction
+import "./actions" for MoveAction, SleepAction, SowAction, WaterAction, HarvestAction
 import "./logic" for SaveHook
+
+class SleepAnimation is View {
+  construct new() {
+    _t = 2 * 60
+  }
+
+  update() {
+    _t = _t - 1
+    if (_t <= 0) {
+      parent.removeViewChild(this)
+    }
+  }
+
+  draw() {
+    Canvas.cls(Display.fg)
+    Canvas.print("Sleeping...", 0, 8, Display.bg, "m3x6")
+    Canvas.print("Game was saved.", 0, Canvas.height - 7, Display.bg, "m3x6")
+  }
+}
 
 class PlayerEntity is Entity {
   construct new() {
@@ -100,7 +119,7 @@ class PlantScene is Scene {
 
       player.pos.x = 1
       player.pos.y = 1
-      player["water"] = 20
+      player["water"] = 18
     }
   }
 
@@ -110,6 +129,7 @@ class PlantScene is Scene {
   }
 
   update() {
+    super.update()
     _barTimer = _barTimer - 1
     var player = _world.active.getEntityByTag("player")
     if (Keyboard["1"].justPressed) {
@@ -135,6 +155,8 @@ class PlantScene is Scene {
         player.action = SowAction.new(Vec.new(0, 0))
       } else if (_toolSelected == 2) {
         player.action = WaterAction.new(Vec.new(0, 0))
+      } else if (_toolSelected == 3) {
+        player.action = HarvestAction.new(Vec.new(0, 0))
       }
     } else {
       player.action = Action.none
@@ -142,7 +164,7 @@ class PlantScene is Scene {
     _world.update()
     for (event in _world.active.events) {
       if (event is SleepEvent) {
-        showbar("Slept!")
+        addViewChild(SleepAnimation.new())
       }
       if (event is RefillEvent) {
         showbar("Refilled!")
@@ -178,6 +200,9 @@ class PlantScene is Scene {
         if (tile["kind"] == "well") {
           Canvas.print("H", x * 8, y * 8, Display.fg)
         }
+        if (tile["kind"] == "dead") {
+          Canvas.print("=", x * 8, y * 8, Display.fg)
+        }
         if (tile["kind"] == "plant") {
           var bg = Display.bg
           var fg = Display.fg
@@ -203,6 +228,7 @@ class PlantScene is Scene {
     Canvas.line(Canvas.width - border, 0, Canvas.width - border, Canvas.height, Display.bg)
     Canvas.print("S", Canvas.width - 8, 2, Display.bg)
     Canvas.print("W", Canvas.width - 8, 2 + 9, Display.bg)
+    Canvas.print("C", Canvas.width - 8, 2 + 18, Display.bg)
 
     if (_barTimer > 0) {
       Canvas.rectfill(0, Canvas.height - 8, Canvas.width, 8, Display.fg)
@@ -210,7 +236,8 @@ class PlantScene is Scene {
     }
 
     Canvas.rectfill(Canvas.width - border + 2, 1 + (_toolSelected - 1) * 9, 1, 9, Display.bg)
-    Canvas.rectfill(Canvas.width - border + 2, Canvas.height - player["water"], border - 3, player["water"], Display.bg)
+    Canvas.rectfill(Canvas.width - border + 3, Canvas.height - player["water"], border - 5, player["water"], Display.bg)
+    super.draw()
 
   }
 }

@@ -14,3 +14,8 @@ class EmptyEvent is Event {
     super()
   }
 }
+class HarvestEvent is Event {
+  construct new() {
+    super()
+  }
+}
