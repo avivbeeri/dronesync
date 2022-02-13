@@ -10,7 +10,8 @@ class SaveHook {
       if (event is SleepEvent) {
         // do sleep
         var path = FileSystem.prefPath("avivbeeri", "garden")
-        path = "."
+        // For debug only
+        // path = "."
 
         var player = zone.getEntityByTag("player")
 
@@ -26,7 +27,7 @@ class SaveHook {
         for (tileKey in zone.map.tiles.keys) {
           data["map"][tileKey.toString] = zone.map.tiles[tileKey].data
         }
-        JSON.save("%(path)/save.json", data)
+        JSON.save("%(path)save.json", data)
       }
     }
   }

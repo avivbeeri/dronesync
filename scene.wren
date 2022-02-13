@@ -69,7 +69,8 @@ class PlantScene is Scene {
 
     // Is there a save.json?
     var save = Fiber.new {
-      var result = FileSystem.load("./save.json")
+      var path = FileSystem.prefPath("avivbeeri", "garden")
+      var result = FileSystem.load("%(path)save.json")
       return JSON.decode(result)
     }.try()
     if (save is Map) {
@@ -247,6 +248,5 @@ class PlantScene is Scene {
     Canvas.rectfill(Canvas.width - border + 2, 1 + (_toolSelected - 1) * 9, 1, 9, Display.bg)
     Canvas.rectfill(Canvas.width - border + 4, Canvas.height - player["water"], border - 5, player["water"], Display.bg)
     super.draw()
-
   }
 }
