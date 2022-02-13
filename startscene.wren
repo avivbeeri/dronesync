@@ -1,4 +1,4 @@
-import "graphics" for Canvas
+import "graphics" for Canvas, Font
 import "dome" for Window
 import "input" for Keyboard
 import "json" for JSON
@@ -17,12 +17,14 @@ class StartScene is Scene {
   }
 
   update() {
-    if (Keyboard["space"].justPressed) {
+    if (Keyboard.allPressed.count > 0) {
       game.push(PlantScene)
     }
   }
 
   draw() {
     Canvas.cls(Display.bg)
+    Display.printCentered("Press any", Canvas.height - 24, Display.fg)
+    Display.printCentered("key", Canvas.height - 16, Display.fg)
   }
 }

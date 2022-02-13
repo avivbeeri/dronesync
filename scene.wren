@@ -62,11 +62,11 @@ class PlantScene is Scene {
       }
     } else {
       // else do the generate
-      var mapHeight = 12
-      var mapWidth = 20
-      for (y in -mapHeight...mapHeight) {
+      var mapHeight = 10
+      var mapWidth = 10
+      for (y in -5...mapHeight) {
         for (x in -mapWidth...mapWidth) {
-          var solid = x == -mapWidth || y == -mapHeight || x == mapWidth - 1 || y == mapHeight - 1
+          var solid = x == -mapWidth || y == -5 || x == mapWidth - 1 || y == mapHeight - 1
           map[x, y] = Tile.new({
             "solid": solid,
             "kind": solid ? "wall" : "floor"
