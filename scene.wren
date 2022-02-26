@@ -11,12 +11,12 @@ import "core/display" for Display
 import "core/world" for World, Zone
 import "core/director" for ActionStrategy
 import "core/map" for TileMap, Tile
-import "core/entity" for Entity
 import "core/tilesheet" for Tilesheet
 
 import "./events" for SleepEvent, RefillEvent, EmptyEvent
 import "./actions" for MoveAction, SleepAction, SowAction, WaterAction, HarvestAction
 import "./logic" for SaveHook
+import "./entities" for PlayerEntity
 
 class SleepAnimation is View {
   construct new() {
@@ -37,18 +37,6 @@ class SleepAnimation is View {
   }
 }
 
-class PlayerEntity is Entity {
-  construct new() {
-    super()
-  }
-
-  action { _action }
-  action=(v) { _action = v }
-
-  update() { _action }
-}
-
-
 class PlantScene is Scene {
   construct new(args) {
     super(args)
@@ -67,7 +55,7 @@ class PlantScene is Scene {
 
     // Is there a save.json?
     var save = Fiber.new {
-      var path = FileSystem.prefPath("avivbeeri", "garden")
+      var path = FileSystem.prefPath("avivbeeri", "dronesync")
       var result = FileSystem.load("%(path)save.json")
       return JSON.decode(result)
     }.try()

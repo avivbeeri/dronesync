@@ -13,8 +13,9 @@ import "./scene" for PlantScene
 class StartScene is Scene {
   construct new(args) {
     super(args)
-    var scale = 6
+    var scale = 3
     Window.resize(Canvas.width * scale, Canvas.height * scale)
+    Canvas.font = "m3x6"
   }
 
   update() {
@@ -25,9 +26,10 @@ class StartScene is Scene {
 
   draw() {
     Canvas.cls(Display.bg)
+    var title = "Ghost:\nDroneSync"
     for (dy in -1..1) {
       for (dx in -2..1) {
-        Display.print("Garden",{
+        Display.print(title,{
           "color": Display.fg,
           "align": "center",
           "position": Vec.new(dx, 4 + dy),
@@ -36,13 +38,13 @@ class StartScene is Scene {
         })
       }
     }
-        Display.print("Garden",{
-          "color": Display.bg,
-          "align": "center",
-          "position": Vec.new(0, 4),
-          "overflow": true,
-          "font": "futile",
-        })
+    Display.print(title,{
+      "color": Display.bg,
+      "align": "center",
+      "position": Vec.new(0, 4),
+      "overflow": true,
+      "font": "futile",
+    })
     Display.printCentered("Press any", Canvas.height - 24, Display.fg)
     Display.printCentered("key", Canvas.height - 16, Display.fg)
   }

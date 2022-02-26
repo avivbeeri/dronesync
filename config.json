@@ -1,10 +1,10 @@
 {
   "display": {
-    "width": 84,
-    "height": 48,
-    "title": "Garden",
-    "background": "#c7f0d8",
-    "foreground": "#43523d"
+    "width": 320,
+    "height": 180,
+    "title": "DroneSync",
+    "background": "#000000",
+    "foreground": "#AAAAAA"
   }
 
 }
