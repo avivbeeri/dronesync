@@ -18,26 +18,10 @@ import "./actions" for MoveAction, SleepAction, SowAction, WaterAction, HarvestA
 import "./logic" for SaveHook
 import "./entities" for PlayerEntity
 
-class SleepAnimation is View {
-  construct new() {
-    _t = 2 * 60
-  }
+import "./animations" for SleepAnimation
 
-  update() {
-    _t = _t - 1
-    if (_t <= 0) {
-      parent.removeViewChild(this)
-    }
-  }
 
-  draw() {
-    Canvas.cls(Display.fg)
-    Canvas.print("Sleeping...", 0, 8, Display.bg, "m3x6")
-    Canvas.print("Game was saved.", 0, Canvas.height - 7, Display.bg, "m3x6")
-  }
-}
-
-class PlantScene is Scene {
+class PlayScene is Scene {
   construct new(args) {
     super(args)
     var strategy = ActionStrategy.new()

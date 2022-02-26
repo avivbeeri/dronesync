@@ -8,7 +8,7 @@ import "math" for Vec
 import "core/scene" for Scene
 import "core/display" for Display
 
-import "./scene" for PlantScene
+import "./scenes/play" for PlayScene
 
 class StartScene is Scene {
   construct new(args) {
@@ -20,7 +20,7 @@ class StartScene is Scene {
 
   update() {
     if (Keyboard.allPressed.count > 0) {
-      game.push(PlantScene)
+      game.push(PlayScene)
     }
   }
 
