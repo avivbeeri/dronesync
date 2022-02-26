@@ -52,8 +52,6 @@ class PlayerEntity is Entity {
 class PlantScene is Scene {
   construct new(args) {
     super(args)
-    var scale = 6
-    Window.resize(Canvas.width * scale, Canvas.height * scale)
     var strategy = ActionStrategy.new()
     var map = TileMap.init()
     _sheet = Tilesheet.new("res/sprites.png", 8, 1)
@@ -221,7 +219,7 @@ class PlantScene is Scene {
           // Canvas.rectfill(x * 8, y * 8, 7, 8, bg)
           // Canvas.circle(x * 8  + 4, y * 8 + 4, tile["stage"], fg)
           // Canvas.print(tile["stage"], x * 8, y * 8, fg)
-          _sheet.draw(tile["stage"], x * 8, y * 8, fg, bg)
+          _sheet.draw(tile["stage"], x * 8, y * 8, fg, bg, false)
         }
       }
     }

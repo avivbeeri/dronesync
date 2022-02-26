@@ -1,6 +1,6 @@
 [submodule "core"]
 	path = core
-	url = ../parcel-core
+	url = git@github.com:avivbeeri/parcel-core.git
 [submodule "extra"]
 	path = extra
-	url = ../parcel-extra
+	url = git@github.com:avivbeeri/parcel-extra.git
