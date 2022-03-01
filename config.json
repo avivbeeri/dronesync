@@ -1,7 +1,7 @@
 {
   "display": {
-    "width": 320,
-    "height": 180,
+    "width": 480,
+    "height": 320,
     "title": "DroneSync",
     "background": "#000000",
     "foreground": "#AAAAAA"

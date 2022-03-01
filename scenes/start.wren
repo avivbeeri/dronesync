@@ -13,7 +13,7 @@ import "./scenes/play" for PlayScene
 class StartScene is Scene {
   construct new(args) {
     super(args)
-    var scale = 3
+    var scale = 2
     Window.resize(Canvas.width * scale, Canvas.height * scale)
     Canvas.font = "m3x6"
   }
