@@ -10,6 +10,7 @@ import "core/action" for Action
 import "extra/actions" for RestAction
 import "core/scene" for Scene, View
 import "core/display" for Display
+import "core/config" for Config
 import "core/world" for World, Zone
 import "core/director" for EnergyStrategy
 import "core/map" for TileMap, Tile
@@ -23,6 +24,7 @@ import "./palette" for PAL
 
 import "./animations" for SleepAnimation
 import "./scenes/renderer" for WorldRenderer
+import "./scenes/statusbar" for StatusBar
 
 class PlayScene is Scene {
   construct new(args) {
@@ -60,8 +62,8 @@ class PlayScene is Scene {
       }
     } else {
       // else do the generate
-      var mapHeight = 45
-      var mapWidth = 80
+      var mapHeight = Config["map"]["height"]
+      var mapWidth = Config["map"]["width"]
       for (y in 0...mapHeight) {
         for (x in 0...mapWidth) {
           var solid = x == 0 || y == 0 || x == mapWidth - 1 || y == mapHeight - 1
@@ -80,7 +82,8 @@ class PlayScene is Scene {
     var dummy = zone.addEntity("dummy", StackEntity.new())
     dummy.pos.x = 2
     dummy.pos.y = 2
-    addViewChild(WorldRenderer.new(this, _world.active))
+    addViewChild(WorldRenderer.new(this, _world.active, 0, 21))
+    addViewChild(StatusBar.new(this, _world.active))
   }
 
   // TODO: Push this into a seperate View child object

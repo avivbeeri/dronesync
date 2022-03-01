@@ -1,13 +1,16 @@
 import "graphics" for Canvas
 import "core/scene" for Scene, View
 import "core/display" for Display
+import "core/config" for Config
 import "./palette" for PAL
 import "./entities" for PlayerEntity
 
 class WorldRenderer is View {
-  construct new(parent, ctx) {
+  construct new(parent, ctx, x, y) {
     super(parent)
     _ctx = ctx
+    _x = x
+    _y = y
   }
 
   update() {
@@ -19,14 +22,14 @@ class WorldRenderer is View {
   }
 
   draw() {
-    var mapHeight = 45
-    var mapWidth = 80
-    var player = _ctx.getEntityByTag("player")
-    var tileWidth = 6
-    var yOff = 2
-    var xOff = 0
-    var tileHeight = 7
+    var mapHeight = Config["map"]["height"]
+    var mapWidth = Config["map"]["width"]
+    var tileWidth = Config["map"]["tileWidth"]
+    var tileHeight = Config["map"]["tileHeight"]
+    var yOff = _y + 2
+    var xOff = _x + 0
 
+    var player = _ctx.getEntityByTag("player")
     // var xOff = (Canvas.width - 8 - 12) / 2 + 1
     // Canvas.offset(xOff - player.pos.x * 8, 20 - player.pos.y * 8)
     for (y in 0...mapHeight) {
