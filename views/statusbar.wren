@@ -1,9 +1,14 @@
 import "graphics" for Canvas
+
 import "core/scene" for Scene, View
 import "core/display" for Display
 import "core/config" for Config
+
 import "./palette" for PAL
 import "./entities" for PlayerEntity
+
+
+#!inject
 class StatusBar is View {
   construct new(parent, ctx) {
     super(parent)

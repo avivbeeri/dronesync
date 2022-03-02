@@ -2,6 +2,7 @@ import "graphics" for Canvas
 import "core/scene" for Scene, View
 import "core/display" for Display
 
+#!inject
 class SleepAnimation is View {
   construct new() {
     _t = 2 * 60

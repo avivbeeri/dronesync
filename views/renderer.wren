@@ -5,6 +5,7 @@ import "core/config" for Config
 import "./palette" for PAL
 import "./entities" for PlayerEntity
 
+#!inject
 class WorldRenderer is View {
   construct new(parent, ctx, x, y) {
     super(parent)

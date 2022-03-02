@@ -4,6 +4,8 @@ import "core/display" for Display
 import "core/config" for Config
 import "./palette" for PAL
 import "./entities" for PlayerEntity
+
+#!inject
 class Tooltip is View {
   construct new(parent, text) {
     super(parent)
