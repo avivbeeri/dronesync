@@ -21,6 +21,7 @@ import "./actions" for MoveAction, SleepAction, SowAction, WaterAction, HarvestA
 import "./logic" for SaveHook
 import "./entities" for PlayerEntity
 import "./palette" for PAL
+import "./inputs" for InputAction
 
 import "./animations" for SleepAnimation
 import "./scenes/renderer" for WorldRenderer
@@ -98,15 +99,15 @@ class PlayScene is Scene {
 
     var player = _world.active.getEntityByTag("player")
 
-    if (Keyboard["right"].justPressed) {
+    if (InputAction.right.firing) {
       player.action = MoveAction.new(Vec.new(1, 0))
-    } else if (Keyboard["left"].justPressed) {
+    } else if (InputAction.left.firing) {
       player.action = MoveAction.new(Vec.new(-1, 0))
-    } else if (Keyboard["up"].justPressed) {
+    } else if (InputAction.up.firing) {
       player.action = MoveAction.new(Vec.new(0, -1))
-    } else if (Keyboard["down"].justPressed) {
+    } else if (InputAction.down.firing) {
       player.action = MoveAction.new(Vec.new(0, 1))
-    } else if (Keyboard["space"].justPressed) {
+    } else if (InputAction.rest.firing) {
       player.action = RestAction.new()
     }
 

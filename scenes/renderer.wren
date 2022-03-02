@@ -50,7 +50,7 @@ class WorldRenderer is View {
     for (entity in _ctx.entities) {
       Canvas.rectfill(xOff + entity.pos.x * tileWidth, yOff + entity.pos.y * tileHeight, tileWidth - 1, tileHeight - 1, Display.bg)
       if (entity is PlayerEntity) {
-        Canvas.print("@", xOff + entity.pos.x * tileWidth, yOff +  entity.pos.y * tileHeight, Display.fg)
+        Canvas.print("@", xOff + entity.pos.x * tileWidth, yOff +  entity.pos.y * tileHeight, PAL[6])
       } else {
         Canvas.print(entity.name[0], xOff + entity.pos.x * tileWidth, yOff + entity.pos.y * tileHeight, Display.fg)
       }

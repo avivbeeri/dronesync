@@ -3,6 +3,7 @@ import "core/main" for ParcelMain
 
 // import "plugin" for Plugin
 // Plugin.load("synth")
+System.print(42)
 
 import "./scenes/play" for PlayScene
 import "./scenes/start" for StartScene
