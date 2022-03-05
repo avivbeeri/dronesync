@@ -1,5 +1,10 @@
 import "extra/combat" for AttackResult
 import "core/event" for Event
+class EscapeEvent is Event {
+  construct new() {
+    super()
+  }
+}
 class LogEvent is Event {
   construct new(text) {
     super()

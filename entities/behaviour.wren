@@ -1,5 +1,6 @@
 import "math" for Vec
 
+import "core/elegant" for Elegant
 import "core/action" for Action
 import "actions" for MoveAction
 import "core/behaviour" for Behaviour
@@ -7,8 +8,24 @@ import "core/graph" for WeightedZone, BFS, AStar, DijkstraMap, DijkstraSearch
 import "core/dir" for Directions, NSEW
 
 import "core/rng" for RNG
+import "entities/player" for PlayerEntity
 
 var SEARCH = AStar
+
+// Defining this lets us define our own priorities
+class EnemyWeightedZone is WeightedZone {
+  construct new(zone) {
+    super(zone)
+    _zone = zone
+  }
+
+  cost(a, b) {
+    var pos = Elegant.unpair(b)
+    var ok = _zone.getEntitiesAtTile(pos).any {|entity| entity is PlayerEntity }
+    return ok ? 1 : 10
+  }
+}
+
 
 class Seek is Behaviour {
   construct new(self) {
@@ -40,7 +57,7 @@ class Patrol is Behaviour {
   notify(event) {}
 
   isOccupied(dest) {
-    return ctx.getEntitiesAtTile(dest.x, dest.y).where {|entity| entity != self }.count > 0
+    return ctx.getEntitiesAtTile(dest.x, dest.y).where {|entity| entity != self && !(entity is PlayerEntity) }.count > 0
   }
 
   evaluate() {
@@ -49,7 +66,7 @@ class Patrol is Behaviour {
       _search = null
     }
     if (!_search) {
-      _graph = WeightedZone.new(ctx)
+      _graph = EnemyWeightedZone.new(ctx)
       _search = SEARCH.search(_graph, self.pos, _points[_index])
     }
     var path = SEARCH.reconstruct(_search[0], self.pos, _points[_index])

@@ -42,24 +42,26 @@ class PlayScene is Scene {
     super.update()
 
     var player = _world.active.getEntityByTag("player")
-
-    if (InputAction.right.firing) {
-      player.action = MoveAction.new(Vec.new(1, 0))
-    } else if (InputAction.left.firing) {
-      player.action = MoveAction.new(Vec.new(-1, 0))
-    } else if (InputAction.up.firing) {
-      player.action = MoveAction.new(Vec.new(0, -1))
-    } else if (InputAction.down.firing) {
-      player.action = MoveAction.new(Vec.new(0, 1))
-    } else if (InputAction.rest.firing) {
-      player.action = RestAction.new()
+    if (player) {
+      if (InputAction.right.firing) {
+        player.action = MoveAction.new(Vec.new(1, 0))
+      } else if (InputAction.left.firing) {
+        player.action = MoveAction.new(Vec.new(-1, 0))
+      } else if (InputAction.up.firing) {
+        player.action = MoveAction.new(Vec.new(0, -1))
+      } else if (InputAction.down.firing) {
+        player.action = MoveAction.new(Vec.new(0, 1))
+      } else if (InputAction.rest.firing) {
+        player.action = RestAction.new()
+      }
     }
+    if (!_world.gameover) {
+      _world.update()
 
-    _world.update()
-
-    for (event in _world.active.events) {
-      if (event is LogEvent) {
-        System.print(event.text)
+      for (event in _world.active.events) {
+        if (event is LogEvent) {
+          System.print(event.text)
+        }
       }
     }
   }

@@ -24,7 +24,7 @@ class Tooltip is View {
   draw() {
     if (_barTimer > 0) {
       Canvas.rectfill(0, Canvas.height - 8, Canvas.width, 8, Display.fg)
-      Canvas.print(_barText, 0, Canvas.height - 6, Display.bg, "m3x6")
+      Canvas.print(_barText, 0, Canvas.height - 6, Display.bg, "futile")
     }
   }
 }

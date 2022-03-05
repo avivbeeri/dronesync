@@ -27,7 +27,7 @@ class WorldRenderer is View {
     var mapWidth = Config["map"]["width"]
     var tileWidth = Config["map"]["tileWidth"]
     var tileHeight = Config["map"]["tileHeight"]
-    var yOff = _y + 2
+    var yOff = _y + 0
     var xOff = _x + 0
 
     var player = _ctx.getEntityByTag("player")
@@ -37,10 +37,13 @@ class WorldRenderer is View {
       for (x in 0...mapWidth) {
         var tile = _ctx.map[x, y]
         if (tile["kind"] == "floor") {
-          Canvas.print(".", xOff + x * tileWidth + (tileWidth * 0.5).floor, yOff + y * tileHeight, PAL[2])
+          Canvas.print(".", xOff + x * tileWidth, yOff + y * tileHeight, PAL[2])
         }
         if (tile["kind"] == "wall") {
           Canvas.print("#", xOff + x * tileWidth, yOff + y * tileHeight, Display.fg)
+        }
+        if (tile["kind"] == "exit") {
+          Canvas.print(">", xOff + x * tileWidth, yOff + y * tileHeight, Display.fg)
         }
         if (tile["kind"] == "door") {
           Canvas.print("1", xOff + x * tileWidth, yOff + y * tileHeight, Display.fg)

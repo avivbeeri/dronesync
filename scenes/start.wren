@@ -7,6 +7,7 @@ import "math" for Vec
 
 import "core/scene" for Scene
 import "core/display" for Display
+import "core/config" for Config
 
 import "./scenes/play" for PlayScene
 
@@ -15,7 +16,11 @@ class StartScene is Scene {
     super(args)
     var scale = 2
     Window.resize(Canvas.width * scale, Canvas.height * scale)
-    Canvas.font = "m3x6"
+    if (Config["map"]["font"]) {
+      Font.load("terminal", Config["map"]["font"], Config["map"]["fontSize"])
+      Font["terminal"].antialias = false
+      Canvas.font = "terminal"
+    }
   }
 
   update() {

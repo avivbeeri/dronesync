@@ -6,7 +6,7 @@ import "core/config" for Config
 import "core/world" for World, Zone
 import "core/director" for EnergyStrategy
 import "core/map" for TileMap, Tile
-import "./logic" for RemoveDefeated
+import "./logic" for RemoveDefeated, GameEndCheck
 import "./entities/player" for PlayerEntity
 import "./entities/guard" for Guard
 
@@ -16,8 +16,10 @@ class StaticGenerator {
     var map = TileMap.init()
 
     var world = World.new(strategy)
+    world["objective"] = false
     world.pushZone(Zone.new(map))
     world.active.postUpdate.add(RemoveDefeated)
+    world.active.postUpdate.add(GameEndCheck)
     var zone = world.active
     var player = PlayerEntity.new()
     zone.addEntity("player", player)
@@ -61,10 +63,17 @@ class StaticGenerator {
           })
         }
       }
+      map[2, 2] = Tile.new({
+        "solid": false,
+        "kind": "exit"
+      })
+      map[mapWidth - 2, mapHeight - 2] = Tile.new({
+        "solid": true,
+        "kind": "goal"
+      })
 
-      player.pos.x = 10
-      player.pos.y = 15
-      player["water"] = 18
+      player.pos.x = 2
+      player.pos.y = 2
     }
 
     return world

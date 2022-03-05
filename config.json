@@ -7,9 +7,11 @@
     "foreground": "#AAAAAA"
   },
   "map": {
-    "tileWidth": 6,
-    "tileHeight": 7,
-    "width": 80,
+    "font": null,
+    "fontSize": 16,
+    "tileWidth": 8,
+    "tileHeight": 8,
+    "width": 60,
     "height": 25
   }
 }

@@ -1,8 +1,20 @@
 import "math" for Vec, M
 import "core/action" for Action, ActionResult
 import "./extra/events" for MoveEvent
-import "./events" for LogEvent, AttackEvent
+import "./events" for LogEvent, AttackEvent, EscapeEvent
 import "./extra/combat" for Attack, AttackType, AttackResult
+import "./entities/player" for PlayerEntity
+
+class EscapeAction is Action {
+  construct new() {
+    super()
+  }
+  perform() {
+    ctx.events.add(LogEvent.new("%(source) escaped!"))
+    ctx.events.add(EscapeEvent.new())
+    return ActionResult.success
+  }
+}
 
 class MoveAction is Action {
   construct new(dir, alwaysSucceed, alt) {
@@ -44,6 +56,9 @@ class MoveAction is Action {
           solid = solid || occupying.any {|entity| entity.has("solid") }
           target = occupying.any {|entity| entity.has("stats") }
         }
+        if (source is PlayerEntity && ctx.map[source.pos]["kind"] == "exit") {
+          result = ActionResult.alternate(EscapeAction.new())
+        }
       }
       if (solid || target) {
         source.pos = old
@@ -52,8 +67,8 @@ class MoveAction is Action {
         }
       }
       if (!_alt && target) {
-        if (source.has("stats")) { // TODO: consider narrowing condition
-          result = ActionResult.alternate(AttackAction.new(source.pos + _dir, Attack.melee(source)))
+        if (source.has("stats") && source.has("melee")) { // TODO: consider narrowing condition
+          result = ActionResult.alternate(AttackAction.new(source.pos + _dir, source["melee"]))
         }
       }
     }
@@ -102,16 +117,21 @@ class AttackAction is Action {
       attackEvent = target.notify(attackEvent)
       */
 
-      if (_attack.attackType == AttackType.melee && target["awareness"] < 10) {
-        // Attack succeeds and target is stunned
-        target["stunTimer"] = 5
-        ctx.events.add(LogEvent.new("%(source) stunned %(target)"))
-      } else {
+      var attackResult = AttackResult.success
+      if (_attack.attackType == AttackType.stun) {
+        if (target["awareness"] < 10) {
+          // Attack succeeds and target is stunned
+          target["stunTimer"] = 5
+          ctx.events.add(LogEvent.new("%(source) stunned %(target)"))
+        } else {
+          //
+          attackResult = AttackResult.blocked
+        }
+      } else if (_attack.attackType == AttackType.direct) {
         var currentHP = target["stats"].base("hp")
         var defence = target["stats"].get("def")
         var damage = M.max(0, _attack.damage - defence)
 
-        var attackResult = AttackResult.success
         if (_attack.damage <= 0) {
           attackResult = AttackResult.inert
         } else if (damage == 0) {

@@ -1,4 +1,5 @@
 import "entities/creature" for Creature
+import "extra/combat" for Attack
 import "core/graph" for WeightedZone, BFS, AStar, DijkstraMap
 
 class PlayerEntity is Creature {
@@ -11,6 +12,13 @@ class PlayerEntity is Creature {
     super()
     init({})
   }
+
+  init(config) {
+    super.init(config)
+    this["targetGroup"].add("enemy")
+    this["melee"] = Attack.stun(this)
+  }
+
   action { _action }
   action=(v) { _action = v }
 
