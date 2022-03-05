@@ -1,10 +1,21 @@
 import "math" for Vec, M
 import "core/action" for Action, ActionResult
 import "./extra/events" for MoveEvent
-import "./events" for LogEvent, AttackEvent, EscapeEvent
+import "./events" for LogEvent, AttackEvent, EscapeEvent, GoalEvent
 import "./extra/combat" for Attack, AttackType, AttackResult
 import "./entities/player" for PlayerEntity
 
+class ObjectiveAction is Action {
+  construct new() {
+    super()
+  }
+  perform() {
+    ctx.events.add(LogEvent.new("%(source) completed the objective!"))
+    ctx.events.add(GoalEvent.new())
+    ctx.parent["objective"] = true
+    return ActionResult.success
+  }
+}
 class EscapeAction is Action {
   construct new() {
     super()
@@ -62,8 +73,12 @@ class MoveAction is Action {
       }
       if (solid || target) {
         source.pos = old
-        if (_alt) {
-          result = ActionResult.alternate(_alt)
+        if (source is PlayerEntity && ctx.map[source.pos + source.vel]["kind"] == "goal") {
+          result = ActionResult.alternate(ObjectiveAction.new())
+        } else {
+          if (_alt) {
+            result = ActionResult.alternate(_alt)
+          }
         }
       }
       if (!_alt && target) {

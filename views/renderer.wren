@@ -42,6 +42,9 @@ class WorldRenderer is View {
         if (tile["kind"] == "wall") {
           Canvas.print("#", xOff + x * tileWidth, yOff + y * tileHeight, Display.fg)
         }
+        if (tile["kind"] == "goal") {
+          Canvas.print("$", xOff + x * tileWidth, yOff + y * tileHeight, Display.fg)
+        }
         if (tile["kind"] == "exit") {
           Canvas.print(">", xOff + x * tileWidth, yOff + y * tileHeight, Display.fg)
         }

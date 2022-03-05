@@ -3,8 +3,6 @@ TODO for DroneSync
 
 Day 1:
 
-* Target/Goal.
-* Death/Capture fail state
 * enemy Alert behaviour
 * UI
   - health display
@@ -20,4 +18,6 @@ Completed:
 * Combat between enemy and player 
   - (Guards need to stop stunning each other, and hit the player properly)
 * Entrance/Exit tile.
+* Target/Goal.
+* Death/Capture fail state
 

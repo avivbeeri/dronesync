@@ -1,5 +1,10 @@
 import "extra/combat" for AttackResult
 import "core/event" for Event
+class GoalEvent is Event {
+  construct new() {
+    super()
+  }
+}
 class EscapeEvent is Event {
   construct new() {
     super()

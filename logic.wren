@@ -35,7 +35,7 @@ class GameEndCheck {
     var escaped = ctx.events.count > 0 && ctx.events.any {|event| event is EscapeEvent }
     if (escaped) {
       // TODO: Evaluate mission success
-      ctx.events.add(GameEndEvent.new(false))
+      ctx.events.add(GameEndEvent.new(ctx.parent["objective"]))
       ctx.parent.gameover = true
       return
     }

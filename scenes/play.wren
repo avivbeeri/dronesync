@@ -1,5 +1,4 @@
 import "graphics" for Canvas
-import "dome" for Window
 import "input" for Keyboard
 import "math" for Vec
 
@@ -14,6 +13,7 @@ import "core/director" for EnergyStrategy
 import "core/map" for TileMap, Tile
 import "core/tilesheet" for Tilesheet
 
+import "extra/events" for GameEndEvent
 import "./events" for LogEvent
 import "./actions" for MoveAction
 import "./entities/player" for PlayerEntity
@@ -30,7 +30,7 @@ import "./generator" for StaticGenerator
 
 class PlayScene is Scene {
   construct new(args) {
-    super(args)
+    super()
     _world = StaticGenerator.createWorld()
 
     addViewChild(WorldRenderer.new(this, _world.active, 0, 21))
@@ -62,6 +62,10 @@ class PlayScene is Scene {
         if (event is LogEvent) {
           System.print(event.text)
         }
+        if (event is GameEndEvent) {
+          var message = event.won ? "Mission Successful!" : "Mission Bailed"
+          addViewChild(GameEndWindow.new(this, _world.active, message))
+        }
       }
     }
   }
@@ -72,3 +76,4 @@ class PlayScene is Scene {
   }
 }
 
+import "./views/window" for GameEndWindow
