@@ -20,15 +20,11 @@ import "./entities/player" for PlayerEntity
 import "./palette" for PAL
 import "./inputs" for InputAction
 
-import "./bulkLoader" for SleepAnimation, WorldRenderer, StatusBar, Tooltip
-// import "./bulkLoader" for BulkLoader
+// import "./bulkLoader" for SleepAnimation, WorldRenderer, StatusBar, Tooltip
 
-/*
-import "./views/animations" for SleepAnimation
 import "./views/renderer" for WorldRenderer
 import "./views/statusbar" for StatusBar
 import "./views/tooltip" for Tooltip
-*/
 
 import "./generator" for StaticGenerator
 
@@ -70,3 +66,4 @@ class PlayScene is Scene {
     super.draw()
   }
 }
+
