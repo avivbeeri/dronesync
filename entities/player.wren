@@ -1,11 +1,15 @@
-import "core/entity" for Entity
+import "entities/creature" for Creature
 
-class PlayerEntity is Entity {
-  construct new() {
+class PlayerEntity is Creature {
+  construct new(config) {
     super()
-    priority = 12
+    init(config)
   }
 
+  construct new() {
+    super()
+    init({})
+  }
   action { _action }
   action=(v) { _action = v }
 
@@ -17,6 +21,4 @@ class PlayerEntity is Entity {
     return action
   }
 }
-
-
 

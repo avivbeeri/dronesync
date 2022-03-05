@@ -7,7 +7,8 @@ import "core/world" for World, Zone
 import "core/director" for EnergyStrategy
 import "core/map" for TileMap, Tile
 import "./logic" for SaveHook
-import "./entities" for PlayerEntity
+import "./entities/player" for PlayerEntity
+import "./entities/guard" for Guard
 
 class StaticGenerator {
   static createWorld() {
@@ -20,6 +21,9 @@ class StaticGenerator {
     var zone = world.active
     var player = PlayerEntity.new()
     zone.addEntity("player", player)
+    var guard = zone.addEntity(Guard.new())
+    guard.pos.x = 10
+    guard.pos.y = 10
 
     // Is there a save.json?
     var save = Fiber.new {

@@ -3,7 +3,7 @@ import "core/scene" for Scene, View
 import "core/display" for Display
 import "core/config" for Config
 import "./palette" for PAL
-import "./entities" for PlayerEntity
+import "./entities/player" for PlayerEntity
 
 #!inject
 class WorldRenderer is View {
@@ -53,7 +53,8 @@ class WorldRenderer is View {
       if (entity is PlayerEntity) {
         Canvas.print("@", xOff + entity.pos.x * tileWidth, yOff +  entity.pos.y * tileHeight, PAL[6])
       } else {
-        Canvas.print(entity.name[0], xOff + entity.pos.x * tileWidth, yOff + entity.pos.y * tileHeight, Display.fg)
+        var symbol = entity.has("symbol") ? entity["symbol"] : entity.name[0]
+        Canvas.print(symbol, xOff + entity.pos.x * tileWidth, yOff + entity.pos.y * tileHeight, Display.fg)
       }
     }
 

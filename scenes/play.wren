@@ -16,7 +16,7 @@ import "core/tilesheet" for Tilesheet
 
 import "./events" for SleepEvent, RefillEvent, EmptyEvent
 import "./actions" for MoveAction, SleepAction, SowAction, WaterAction, HarvestAction
-import "./entities" for PlayerEntity
+import "./entities/player" for PlayerEntity
 import "./palette" for PAL
 import "./inputs" for InputAction
 
