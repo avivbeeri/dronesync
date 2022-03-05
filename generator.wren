@@ -6,7 +6,7 @@ import "core/config" for Config
 import "core/world" for World, Zone
 import "core/director" for EnergyStrategy
 import "core/map" for TileMap, Tile
-import "./logic" for SaveHook
+import "./logic" for RemoveDefeated
 import "./entities/player" for PlayerEntity
 import "./entities/guard" for Guard
 
@@ -17,13 +17,19 @@ class StaticGenerator {
 
     var world = World.new(strategy)
     world.pushZone(Zone.new(map))
-    world.active.postUpdate.add(SaveHook)
+    world.active.postUpdate.add(RemoveDefeated)
     var zone = world.active
     var player = PlayerEntity.new()
     zone.addEntity("player", player)
     var guard = zone.addEntity(Guard.new())
-    guard.pos.x = 10
-    guard.pos.y = 10
+    guard.pos.x = 1
+    guard.pos.y = 1
+    guard = zone.addEntity(Guard.new())
+    guard.pos.x = 18
+    guard.pos.y = 1
+    guard = zone.addEntity(Guard.new())
+    guard.pos.x = 18
+    guard.pos.y = 18
 
     // Is there a save.json?
     var save = Fiber.new {
@@ -56,14 +62,10 @@ class StaticGenerator {
         }
       }
 
-      player.pos.x = 1
-      player.pos.y = 1
+      player.pos.x = 10
+      player.pos.y = 15
       player["water"] = 18
     }
-
-    var dummy = zone.addEntity("dummy", StackEntity.new())
-    dummy.pos.x = 2
-    dummy.pos.y = 2
 
     return world
   }

@@ -1,7 +1,8 @@
-import "math" for Vec
+import "math" for Vec, M
 import "core/action" for Action, ActionResult
 import "./extra/events" for MoveEvent
-import "./events" for SleepEvent, RefillEvent, EmptyEvent, HarvestEvent
+import "./events" for LogEvent, AttackEvent
+import "./extra/combat" for Attack, AttackType, AttackResult
 
 class MoveAction is Action {
   construct new(dir, alwaysSucceed, alt) {
@@ -36,25 +37,23 @@ class MoveAction is Action {
 
     if (source.pos != old) {
       var solid = ctx.isSolidAt(source.pos)
+      var target = false
       if (!solid) {
         var occupying = getOccupying(source.pos)
         if (occupying.count > 0) {
           solid = solid || occupying.any {|entity| entity.has("solid") }
-        }
-        if (ctx.map[source.pos]["kind"] == "door") {
-          result = ActionResult.alternate(SleepAction.new())
-        }
-        if (ctx.map[source.pos]["kind"] == "well") {
-          result = ActionResult.alternate(RefillAction.new())
+          target = occupying.any {|entity| entity.has("stats") }
         }
       }
-      if (solid) {
+      if (solid || target) {
         source.pos = old
-        if (ctx.map[source.pos]["kind"] == "plant") {
-          result = ActionResult.alternate(WaterAction.new(_dir))
-        }
         if (_alt) {
           result = ActionResult.alternate(_alt)
+        }
+      }
+      if (!_alt && target) {
+        if (source.has("stats")) { // TODO: consider narrowing condition
+          result = ActionResult.alternate(AttackAction.new(source.pos + _dir, Attack.melee(source)))
         }
       }
     }
@@ -77,126 +76,62 @@ class MoveAction is Action {
   }
 }
 
-class SleepAction is Action {
-  construct new() {
+class AttackAction is Action {
+  construct new(location, attack) {
     super()
+    _location = location
+    _attack = attack
   }
 
-  perform() {
-    for (tile in ctx.map.tiles.values) {
-      if (tile["kind"] == "plant") {
-        if (tile["watered"]) {
-          tile["stage"] = tile["stage"] + 1
-        } else {
-          tile["fail"] = tile["fail"] + 1
-        }
-        tile["watered"] = false
-        tile["age"] = tile["age"] + 1
+  location { _location }
 
-        if (tile["fail"] > 3) {
-          tile["kind"] = "dead"
-          tile["watered"] = null
-          tile["stage"] = null
-          tile["age"] = null
-          tile["fail"] = null
-        }
-      }
+  perform() {
+    var location = _location
+    var occupying = ctx.getEntitiesAtTile(location.x, location.y).where {|entity| entity.has("stats") }
+
+    if (occupying.count == 0) {
+      return ActionResult.failure
     }
-    ctx.events.add(SleepEvent.new())
-    return ActionResult.success
-  }
-}
+    occupying.each {|target|
+      // Attack is based on attack type - weapon
 
-class SowAction is Action {
-  construct new(dir) {
-    super()
-    _dir = dir
-  }
+      // Some targets might be immune to an attack, so we
+      // allow it to be cancelled
+      /*
+      var attackEvent = AttackEvent.new(source, target, _attack, attackResult)
+      attackEvent = target.notify(attackEvent)
+      */
 
-  perform() {
-    var result = ActionResult.success
-    var tile = ctx.map[source.pos + _dir]
-    if (tile["kind"] == "floor") {
-      tile["solid"] = false
-      tile["kind"] = "plant"
-      tile["watered"] = false
-      tile["stage"] = 0
-      tile["age"] = 0
-      tile["fail"] = 0
-      System.print("sowing...")
-    } else {
-      result = ActionResult.failure
-    }
-
-    return result
-  }
-}
-class HarvestAction is Action {
-  construct new(dir) {
-    super()
-    _dir = dir
-  }
-
-  perform() {
-    var result = ActionResult.success
-    var tile = ctx.map[source.pos + _dir]
-    if (tile["kind"] == "plant" || tile["kind"] == "dead") {
-      tile["solid"] = false
-      tile["kind"] = "floor"
-      tile["watered"] = null
-      tile["stage"] = null
-      tile["age"] = null
-      tile["fail"] = null
-      // TODO: Emit an event for handling that we picked up something
-      ctx.events.add(HarvestEvent.new())
-    } else {
-      result = ActionResult.failure
-    }
-
-    return result
-  }
-}
-
-class RefillAction is Action {
-  construct new() {
-    super()
-  }
-  perform() {
-    var tile = ctx.map[source.pos]
-    if (tile["kind"] == "well") {
-      source["water"] = 18
-      ctx.events.add(RefillEvent.new())
-      return ActionResult.success
-    }
-    return ActionResult.failure
-  }
-}
-class WaterAction is Action {
-  construct new(dir) {
-    super()
-    _dir = dir
-  }
-
-  perform() {
-    var result = ActionResult.success
-    if (source["water"] <= 0) {
-      ctx.events.add(EmptyEvent.new())
-      result = ActionResult.failure
-    } else {
-      var tile = ctx.map[source.pos + _dir]
-      if (tile["kind"] == "plant") {
-        if (tile["stage"] >= 3) {
-          result = ActionResult.alternate(HarvestAction.new(_dir))
-        } else if (!tile["watered"]) {
-          tile["watered"] = true
-          // Kindness to the player
-          source["water"] = source["water"] - 1
-        }
+      if (_attack.attackType == AttackType.melee && target["awareness"] < 10) {
+        // Attack succeeds and target is stunned
+        target["stunTimer"] = 5
+        ctx.events.add(LogEvent.new("%(source) stunned %(target)"))
       } else {
-        result = ActionResult.failure
+        var currentHP = target["stats"].base("hp")
+        var defence = target["stats"].get("def")
+        var damage = M.max(0, _attack.damage - defence)
+
+        var attackResult = AttackResult.success
+        if (_attack.damage <= 0) {
+          attackResult = AttackResult.inert
+        } else if (damage == 0) {
+          attackResult = AttackResult.blocked
+        }
+
+        var attackEvent = AttackEvent.new(source, target, _attack, attackResult)
+        attackEvent = target.notify(attackEvent)
+
+        if (!attackEvent.cancelled) {
+          ctx.events.add(LogEvent.new("%(source) attacked %(target)"))
+          ctx.events.add(attackEvent)
+          target["stats"].decrease("hp", damage)
+          ctx.events.add(LogEvent.new("%(source) did %(damage) damage."))
+          if (target["stats"].get("hp") <= 0) {
+            ctx.events.add(LogEvent.new("%(target) was defeated."))
+          }
+        }
       }
     }
-
-    return result
+    return ActionResult.success
   }
 }

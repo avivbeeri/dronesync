@@ -13,8 +13,12 @@ class Creature is StackEntity {
   }
 
   init(config) {
+    this["awareness"] = 0
     this["inventory"] = []
+    this["stunTimer"] = 0
     this["stats"] = StatGroup.new({
+      "atk": 1,
+      "def": 0,
       "hp": 2,
       "hpMax": 2,
       "speed": 6
@@ -23,6 +27,15 @@ class Creature is StackEntity {
       for (id in config["stats"].keys) {
         this["stats"].set(id, config["stats"][id])
       }
+    }
+  }
+  speed { this["stats"].get("speed") }
+
+  endTurn() {
+    super.endTurn()
+    if (this["stunTimer"] > 0) {
+      this["stunTimer"] = this["stunTimer"] - 1
+      System.print(this["stunTimer"])
     }
   }
 }

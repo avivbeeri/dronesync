@@ -14,8 +14,8 @@ import "core/director" for EnergyStrategy
 import "core/map" for TileMap, Tile
 import "core/tilesheet" for Tilesheet
 
-import "./events" for SleepEvent, RefillEvent, EmptyEvent
-import "./actions" for MoveAction, SleepAction, SowAction, WaterAction, HarvestAction
+import "./events" for LogEvent
+import "./actions" for MoveAction
 import "./entities/player" for PlayerEntity
 import "./palette" for PAL
 import "./inputs" for InputAction
@@ -58,6 +58,9 @@ class PlayScene is Scene {
     _world.update()
 
     for (event in _world.active.events) {
+      if (event is LogEvent) {
+        System.print(event.text)
+      }
     }
   }
 

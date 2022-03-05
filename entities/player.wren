@@ -1,4 +1,5 @@
 import "entities/creature" for Creature
+import "core/graph" for WeightedZone, BFS, AStar, DijkstraMap
 
 class PlayerEntity is Creature {
   construct new(config) {
@@ -13,12 +14,16 @@ class PlayerEntity is Creature {
   action { _action }
   action=(v) { _action = v }
 
-  speed { 6 }
-
   update() {
     var action = _action
     _action = null
     return action
+  }
+
+  endTurn() {
+    super.endTurn()
+    var graph = WeightedZone.new(ctx)
+    this["dijkstra"] = DijkstraMap.search(graph, pos)
   }
 }
 

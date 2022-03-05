@@ -2,7 +2,8 @@ import "json" for JSON
 import "io" for FileSystem
 
 import "core/dataobject" for DataObject
-import "./events" for SleepEvent
+/*
+import "./events" for GameEndEvent
 
 class SaveHook {
   static update(zone) {
@@ -29,6 +30,26 @@ class SaveHook {
         }
         JSON.save("%(path)save.json", data)
       }
+    }
+  }
+}
+*/
+
+class RemoveDefeated {
+  static update(ctx) {
+    ctx.entities
+    .where {|entity| entity.has("stats") && entity["stats"].get("hp") <= 0 }
+    .each {|entity|
+      entity.alive = false
+      /*
+      if (entity.has("loot") && !entity["loot"].isEmpty) {
+        System.print("dropping loot")
+        System.print(entity["loot"])
+        var loot = RNG.sample(entity["loot"])
+        var lootEntity = ctx.addEntity(Collectible.new(loot))
+        lootEntity.pos = entity.pos
+      }
+      */
     }
   }
 }

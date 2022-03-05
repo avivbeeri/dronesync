@@ -49,7 +49,11 @@ class WorldRenderer is View {
       }
     }
     for (entity in _ctx.entities) {
-      Canvas.rectfill(xOff + entity.pos.x * tileWidth, yOff + entity.pos.y * tileHeight, tileWidth - 1, tileHeight - 1, Display.bg)
+      var color = Display.bg
+      if (entity.has("stunTimer") && entity["stunTimer"] > 0) {
+        color = PAL[4]
+      }
+      Canvas.rectfill(xOff + entity.pos.x * tileWidth, yOff + entity.pos.y * tileHeight, tileWidth - 1, tileHeight - 1, color)
       if (entity is PlayerEntity) {
         Canvas.print("@", xOff + entity.pos.x * tileWidth, yOff +  entity.pos.y * tileHeight, PAL[6])
       } else {
