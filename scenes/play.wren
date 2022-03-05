@@ -20,8 +20,8 @@ import "./entities" for PlayerEntity
 import "./palette" for PAL
 import "./inputs" for InputAction
 
-import "./views" for SleepAnimation, WorldRenderer, StatusBar, Tooltip
-import "./bulkLoader" for BulkLoader
+import "./bulkLoader" for SleepAnimation, WorldRenderer, StatusBar, Tooltip
+// import "./bulkLoader" for BulkLoader
 
 /*
 import "./views/animations" for SleepAnimation
