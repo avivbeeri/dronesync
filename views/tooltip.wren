@@ -23,8 +23,8 @@ class Tooltip is View {
 
   draw() {
     if (_barTimer > 0) {
-      Canvas.rectfill(0, Canvas.height - 8, Canvas.width, 8, Display.fg)
-      Canvas.print(_barText, 0, Canvas.height - 6, Display.bg, "futile")
+      Canvas.rectfill(0, Canvas.height - 9, Canvas.width, 9, Display.fg)
+      Canvas.print(_barText, 0, Canvas.height - 8, Display.bg)
     }
   }
 }

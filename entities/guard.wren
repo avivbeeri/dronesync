@@ -22,7 +22,7 @@ class Guard is Creature {
     this["targetGroup"].add("enemy")
     push(Stunnable)
 //    push(Seek)
-    push(Patrol.new(this, [ Vec.new(10, 20), Vec.new(10, 10) ]))
+    push(Patrol.new(this, [ Vec.new(10, 4), Vec.new(10, 16) ]))
     push(Wait)
   }
 }

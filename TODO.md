@@ -7,7 +7,6 @@ Day 1:
 * UI
   - health display
   - Awareness
-  - Mission Success/Fail State
   - Log
 
 Completed:
@@ -20,4 +19,6 @@ Completed:
 * Entrance/Exit tile.
 * Target/Goal.
 * Death/Capture fail state
+* UI
+  - Mission Success/Fail State
 
