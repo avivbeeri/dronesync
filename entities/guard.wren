@@ -18,8 +18,8 @@ class Guard is Creature {
     this["symbol"] = "g"
     this["awareness"] = 0
     push(Stunnable)
-    push(Seek)
-    push(Patrol.new(this, [ Vec.new(10, 20) ]))
+//    push(Seek)
+    push(Patrol.new(this, [ Vec.new(10, 20), Vec.new(10, 10) ]))
     push(Wait)
   }
 }

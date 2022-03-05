@@ -4,8 +4,11 @@ import "core/action" for Action
 import "actions" for MoveAction
 import "core/behaviour" for Behaviour
 import "core/graph" for WeightedZone, BFS, AStar, DijkstraMap, DijkstraSearch
+import "core/dir" for Directions, NSEW
 
-var SEARCH = DijkstraSearch
+import "core/rng" for RNG
+
+var SEARCH = AStar
 
 class Seek is Behaviour {
   construct new(self) {
@@ -32,9 +35,19 @@ class Patrol is Behaviour {
     super(self)
     _points = points
     _index = 0
+    _attempts = 0
   }
   notify(event) {}
+
+  isOccupied(dest) {
+    return ctx.getEntitiesAtTile(dest.x, dest.y).where {|entity| entity != self }.count > 0
+  }
+
   evaluate() {
+    if (self.pos == _points[_index]) {
+      _index = (_index + 1) % _points.count
+      _search = null
+    }
     if (!_search) {
       _graph = WeightedZone.new(ctx)
       _search = SEARCH.search(_graph, self.pos, _points[_index])
@@ -49,6 +62,23 @@ class Patrol is Behaviour {
     if (path == null || path.count <= 1) {
       return Action.none
     }
+    if (isOccupied(path[1])) {
+      _attempts = _attempts + 1
+      if (_attempts < 2) {
+        return null
+      } else {
+        _attempts = 0
+        // scan for empty space?
+        var available = NSEW.values.where{|dir| !isOccupied(self.pos + dir)}.toList
+        var dir = RNG.sample(available)
+        if (dir != null) {
+          _search = null
+          return MoveAction.new(dir, true, Action.none)
+        }
+        return null
+      }
+    }
+    _attempts = 0
     return MoveAction.new(path[1] - self.pos, true)
   }
 }
