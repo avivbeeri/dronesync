@@ -25,7 +25,6 @@ import "./log" for Log
 // import "./bulkLoader" for SleepAnimation, WorldRenderer, StatusBar, Tooltip
 
 import "./views/renderer" for WorldRenderer
-import "./views/statusbar" for StatusBar
 import "./views/tooltip" for Tooltip
 
 import "./generator" for StaticGenerator
@@ -104,3 +103,4 @@ class PlayScene is Scene {
 }
 
 import "./views/window" for GameEndWindow
+import "./views/statusbar" for StatusBar
