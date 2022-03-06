@@ -32,8 +32,9 @@ class StartScene is Scene {
   draw() {
     Canvas.cls(Display.bg)
     var title = "Ghost:\nDroneSync"
-    for (dy in -1..1) {
-      for (dx in -2..1) {
+    var thick = 2
+    for (dy in -thick..thick) {
+      for (dx in -(1+thick)..(thick+1)) {
         Display.print(title,{
           "color": Display.fg,
           "align": "center",

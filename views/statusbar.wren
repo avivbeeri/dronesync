@@ -29,7 +29,7 @@ class StatusBar is View {
     var tileHeight = Config["map"]["tileHeight"]
 
     for (x in 0...(Canvas.width / tileWidth).ceil) {
-      Canvas.print("-", x * tileWidth, 14, Display.fg)
+      Canvas.print("=", x * tileWidth, 14, Display.fg)
     }
     Canvas.print("HP: %(_hp) / %(_maxHp)", 4, 4, Display.fg)
   }
