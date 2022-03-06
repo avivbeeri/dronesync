@@ -5,6 +5,10 @@ Day 2:
 
 * UI
   - Log
+* Drone
+  - Entity
+  - Control
+  - Switching
 
 # Completed:
 ## Day 1:

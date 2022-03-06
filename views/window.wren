@@ -58,6 +58,30 @@ class Window is View {
   }
 }
 
+class LogWindow is Window {
+  construct new(parent, ctx) {
+    // Assuming default font
+    super(parent, ctx, Vec.new(8 * 20, 8 * 3))
+    var Sub
+    Sub = top.store.subscribe {
+
+      if (top.store.state["logOpen"] == false) {
+        System.print("closing...")
+        parent.removeViewChild(this)
+        Sub.call()
+      }
+    }
+  }
+
+  drawContent() {
+    super.drawContent()
+    //
+    Canvas.print("log line 1", 0, 0, Display.fg)
+    Canvas.print("log line 2", 0, 8, Display.fg)
+    Canvas.print("log line 3", 0, 16, Display.fg)
+  }
+}
+
 class MessageWindow is Window {
   construct new(parent, ctx, message) {
     // Assuming default font

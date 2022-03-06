@@ -2,6 +2,7 @@ import "graphics" for Canvas
 import "input" for Keyboard
 import "math" for Vec
 
+import "core/dataobject" for Store, Reducer
 import "core/entity" for StackEntity
 import "core/action" for Action
 import "extra/actions" for RestAction
@@ -28,15 +29,37 @@ import "./views/tooltip" for Tooltip
 
 import "./generator" for StaticGenerator
 
+class LogReducer is Reducer {
+  construct new() {}
+  reduce(state, action) {
+    if (action["type"] == "open") {
+      state["logOpen"] = true
+    }
+    if (action["type"] == "close") {
+      state["logOpen"] = false
+    }
+    return state
+  }
+}
+
 class PlayScene is Scene {
   construct new(args) {
     super()
+    _store = Store.create({
+      "logOpen": false
+    }, LogReducer.new())
+    _store.subscribe {
+      System.print(_store.state)
+    }
+
     _world = StaticGenerator.createWorld()
 
     addViewChild(WorldRenderer.new(this, _world.active, 0, 21))
     addViewChild(StatusBar.new(this, _world.active))
     addViewChild(Tooltip.new(this, "BEGIN!"))
   }
+
+  store { _store }
 
   update() {
     super.update()
