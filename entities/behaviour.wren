@@ -1,4 +1,4 @@
-import "math" for Vec
+import "math" for Vec, M
 
 import "core/elegant" for Elegant
 import "core/action" for Action
@@ -53,20 +53,41 @@ class Awareness is Behaviour {
   }
   notify(event) {}
   evaluate() {
-    self["awareness"] = 0
+    /*
     if (self["state"] == "alert") {
       return null
     }
+    */
 
     // Is our square visible?
     // Can we see the player?
     var player = ctx.getEntityByTag("player")
     var line = GridWalk.getLine(self.pos, player.pos)
-    self["state"] = "alert"
+    var visible = true
     for (point in line) {
       if (ctx.map[point]["solid"]) {
-        self["state"] = "patrol"
+        visible = false
         break
+      }
+    }
+    var aware = self["awareness"]
+    System.print("%(self): %(visible) - %(aware)")
+    if (self["state"] == "patrol") {
+      if (visible) {
+        self["awareness"] = self["awareness"] + 1
+        if (self["awareness"] > 2) {
+          System.print("%(self) went on alert")
+          self["state"] = "alert"
+        }
+      } else {
+        self["awareness"] = M.max(0, (self["awareness"] - 1))
+      }
+    } else if (self["state"] == "alert") {
+      if (!visible) {
+        self["awareness"] = M.max(0, (self["awareness"] - 1))
+        if (self["awareness"] == 0) {
+          self["state"] = "patrol"
+        }
       }
     }
 
@@ -81,6 +102,8 @@ class Seek is Behaviour {
   notify(event) {}
   evaluate() {
     var map = ctx.map
+    // TODO: Make this behaviour generic by indicating a point of interest
+    // rather than homing on the player
     var player = ctx.getEntityByTag("player")
     if (player) {
       var search = player["dijkstra"]

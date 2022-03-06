@@ -26,6 +26,7 @@ class Guard is Creature {
     this["awareness"] = 0
     this["melee"] = Attack.direct(this)
     this["targetGroup"].add("enemy")
+    this["state"] = "patrol"
 
 
     push(Stunnable)

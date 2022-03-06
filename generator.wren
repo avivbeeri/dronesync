@@ -73,7 +73,7 @@ class StaticGenerator {
         }
       }
 
-      var size = 4
+      var size = 3
       var startX = (mapWidth - size) / 2
       var startY = (mapHeight - size) / 2
       for (dy in 0...size) {
@@ -96,7 +96,7 @@ class StaticGenerator {
       })
 
       player.pos.x = 2
-      player.pos.y = 2
+      player.pos.y = 6
     }
 
 
