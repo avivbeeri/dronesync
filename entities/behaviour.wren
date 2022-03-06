@@ -54,6 +54,9 @@ class Awareness is Behaviour {
   notify(event) {}
   evaluate() {
     self["awareness"] = 0
+    if (self["state"] == "alert") {
+      return null
+    }
 
     // Is our square visible?
     // Can we see the player?

@@ -3,7 +3,6 @@ TODO for DroneSync
 
 Day 2:
 
-* enemy Alert behaviour
 * UI
   - health display
   - Awareness
@@ -25,3 +24,4 @@ Day 2:
 
 ## Day 2
 * field of view
+* enemy Alert behaviour
