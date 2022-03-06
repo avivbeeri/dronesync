@@ -163,6 +163,7 @@ class UpdateVision {
     var tiles = ctx.map
     var start = player.pos
     var distance = -1
+    tiles[start]["visible"] = "visible"
 
     for (octant in 0...8) {
       // refresh octant

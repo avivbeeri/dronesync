@@ -6,7 +6,7 @@ import "core/config" for Config
 import "core/world" for World, Zone
 import "core/director" for EnergyStrategy
 import "core/map" for TileMap, Tile
-import "./logic" for RemoveDefeated, GameEndCheck
+import "./logic" for RemoveDefeated, GameEndCheck, UpdateVision
 import "./entities/player" for PlayerEntity
 import "./entities/guard" for Guard
 
@@ -96,6 +96,8 @@ class StaticGenerator {
       player.pos.y = 2
     }
 
+
+    UpdateVision.update(zone)
     return world
   }
 
