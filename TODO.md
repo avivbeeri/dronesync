@@ -3,7 +3,6 @@ TODO for DroneSync
 
 Day 2:
 
-* field of view
 * enemy Alert behaviour
 * UI
   - health display
@@ -11,7 +10,7 @@ Day 2:
   - Log
 
 # Completed:
-# Day 1:
+## Day 1:
 * Player exists
 * Enemy guards exist
 * patrol behaviour works
@@ -24,3 +23,5 @@ Day 2:
 * UI
   - Mission Success/Fail State
 
+## Day 2
+* field of view

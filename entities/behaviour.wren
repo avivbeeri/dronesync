@@ -9,6 +9,7 @@ import "core/dir" for Directions, NSEW
 
 import "core/rng" for RNG
 import "entities/player" for PlayerEntity
+import "util" for GridWalk
 
 var SEARCH = AStar
 
@@ -26,6 +27,49 @@ class EnemyWeightedZone is WeightedZone {
   }
 }
 
+class State is Behaviour {
+  construct new(self, key, stateMap) {
+    super(self)
+    _map = stateMap
+    _key = key
+    for (entry in _map.keys) {
+      if (_map[entry] is Class) {
+        _map[entry] = _map[entry].new(self)
+      }
+    }
+  }
+  notify(event) {}
+  evaluate() {
+    if (!_map.containsKey(self[_key])) {
+      return null
+    }
+    return _map[self[_key]].evaluate()
+  }
+}
+
+class Awareness is Behaviour {
+  construct new(self) {
+    super(self)
+  }
+  notify(event) {}
+  evaluate() {
+    self["awareness"] = 0
+
+    // Is our square visible?
+    // Can we see the player?
+    var player = ctx.getEntityByTag("player")
+    var line = GridWalk.getLine(self.pos, player.pos)
+    self["state"] = "alert"
+    for (point in line) {
+      if (ctx.map[point]["solid"]) {
+        self["state"] = "patrol"
+        break
+      }
+    }
+
+    return null
+  }
+}
 
 class Seek is Behaviour {
   construct new(self) {
@@ -63,22 +107,14 @@ class Patrol is Behaviour {
   evaluate() {
     if (self.pos == _points[_index]) {
       _index = (_index + 1) % _points.count
-      _search = null
     }
-    if (!_search) {
-      _graph = EnemyWeightedZone.new(ctx)
-      _search = SEARCH.search(_graph, self.pos, _points[_index])
-    }
+    _graph = EnemyWeightedZone.new(ctx)
+    _search = SEARCH.search(_graph, self.pos, _points[_index])
     var path = SEARCH.reconstruct(_search[0], self.pos, _points[_index])
-    /*
-    var dir = (_points[_index] - self.pos).unit
-    if (dir.length < 1) {
-      return null
-    }
-    */
     if (path == null || path.count <= 1) {
       return Action.none
     }
+
     if (isOccupied(path[1])) {
       _attempts = _attempts + 1
       if (_attempts < 2) {
@@ -89,7 +125,6 @@ class Patrol is Behaviour {
         var available = NSEW.values.where{|dir| !isOccupied(self.pos + dir)}.toList
         var dir = RNG.sample(available)
         if (dir != null) {
-          _search = null
           return MoveAction.new(dir, true, Action.none)
         }
         return null

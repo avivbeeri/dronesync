@@ -24,9 +24,12 @@ class StaticGenerator {
     var zone = world.active
     var player = PlayerEntity.new()
     zone.addEntity("player", player)
-    var guard = zone.addEntity(Guard.new())
+    var guard
+    /*
+    guard = zone.addEntity(Guard.new())
     guard.pos.x = 1
     guard.pos.y = 1
+    */
     guard = zone.addEntity(Guard.new())
     guard.pos.x = 18
     guard.pos.y = 1
