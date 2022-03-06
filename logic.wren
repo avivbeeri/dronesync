@@ -1,6 +1,6 @@
 import "json" for JSON
 import "io" for FileSystem
-import "math" for Vec
+import "math" for Vec, M
 
 import "extra/events" for GameEndEvent
 import "./events" for EscapeEvent
@@ -49,6 +49,14 @@ class ShadowLine {
   }
   shadows { _shadows }
 
+  /// Creates a [Shadow] that corresponds to the projected
+  /// silhouette of the tile at [row], [col].
+  static projectTile(row, col) {
+    var topLeft = col / (row + 2)
+    var bottomRight = (col + 1) / (row + 1)
+    return Shadow.new(topLeft, bottomRight)
+  }
+
   isInShadow(projection) {
     for (shadow in _shadows) {
       if (shadow.contains(projection)) {
@@ -64,7 +72,7 @@ class ShadowLine {
     var index = _shadows.count
     for (i in 0..._shadows.count) {
       // Stop when we hit the insertion point.
-      if (_shadows[i].start >= shadow.start) {
+      if (_shadows[i].start > shadow.start) {
         index = i
         break
       }
@@ -87,16 +95,16 @@ class ShadowLine {
     if (overlappingNext != null) {
       if (overlappingPrevious != null) {
         // Overlaps both, so unify one and delete the other.
-        overlappingPrevious.end = overlappingNext.end
+        overlappingPrevious.end = M.max(_shadows[index - 1].end, _shadows[index].end)
         _shadows.removeAt(index)
       } else {
         // Overlaps the next one, so unify it with that.
-        overlappingNext.start = shadow.start
+        overlappingNext.start = M.max(_shadows[index].start, shadow.start)
       }
     } else {
       if (overlappingPrevious != null) {
         // Overlaps the previous one, so unify it with that.
-        overlappingPrevious.end = shadow.end
+        overlappingPrevious.end = M.max(_shadows[index - 1].end, shadow.end)
       } else {
         // Does not overlap anything, so insert.
         _shadows.insert(index, shadow)
@@ -127,13 +135,6 @@ class Shadow {
     return start <= other.start && end >= other.end
   }
 
-  /// Creates a [Shadow] that corresponds to the projected
-  /// silhouette of the tile at [row], [col].
-  static projectTile(row, col) {
-    var topLeft = col / (row + 2)
-    var bottomRight = (col + 1) / (row + 1)
-    return Shadow.new(topLeft, bottomRight)
-  }
 }
 
 class UpdateVision {
@@ -184,7 +185,7 @@ class UpdateVision {
           if (fullShadow) {
             tiles[pos]["visible"] = (unknown ? "unknown" : "hidden")
           } else {
-            var projection = Shadow.projectTile(row, col)
+            var projection = ShadowLine.projectTile(row, col)
             var visible = !line.isInShadow(projection)
             tiles[pos]["visible"] = visible ? "visible" : (unknown ? "unknown" : "hidden")
             if (visible && tiles[pos]["solid"]) {

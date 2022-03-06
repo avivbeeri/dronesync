@@ -70,10 +70,16 @@ class WorldRenderer is View {
       }
       Canvas.rectfill(entity.pos.x * tileWidth, entity.pos.y * tileHeight, tileWidth - 1, tileHeight - 1, color)
       if (entity is PlayerEntity) {
-        Canvas.print("@", entity.pos.x * tileWidth,  entity.pos.y * tileHeight, PAL[6])
+        Canvas.print("@", entity.pos.x * tileWidth,  entity.pos.y * tileHeight, PAL[7])
       } else {
         var symbol = entity.has("symbol") ? entity["symbol"] : entity.name[0]
-        Canvas.print(symbol, entity.pos.x * tileWidth, entity.pos.y * tileHeight, Display.fg)
+        var color = Display.fg
+        if (entity["state"] == "alert") {
+          color = PAL[6]
+        } else if (entity["awareness"] > 0)  {
+          color = PAL[5]
+        }
+        Canvas.print(symbol, entity.pos.x * tileWidth, entity.pos.y * tileHeight, color)
       }
     }
     Canvas.offset()

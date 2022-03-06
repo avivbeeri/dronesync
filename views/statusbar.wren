@@ -14,7 +14,13 @@ class StatusBar is View {
     _ctx = ctx
   }
 
-  update() {}
+  update() {
+    var player = _ctx.getEntityByTag("player", true)
+    if (player) {
+      _hp = player["stats"]["hp"]
+      _maxHp = player["stats"]["hpMax"]
+    }
+  }
   process(event) {}
   draw() {
     var mapHeight = Config["map"]["height"]
@@ -25,6 +31,7 @@ class StatusBar is View {
     for (x in 0...(Canvas.width / tileWidth).ceil) {
       Canvas.print("-", x * tileWidth, 14, Display.fg)
     }
+    Canvas.print("HP: %(_hp) / %(_maxHp)", 4, 4, Display.fg)
   }
 }
 

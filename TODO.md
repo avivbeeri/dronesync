@@ -4,8 +4,6 @@ TODO for DroneSync
 Day 2:
 
 * UI
-  - health display
-  - Awareness
   - Log
 
 # Completed:
@@ -25,3 +23,6 @@ Day 2:
 ## Day 2
 * field of view
 * enemy Alert behaviour
+* UI
+  - health display
+  - Awareness (sort of. Would prefer a no-color solution)
