@@ -5,6 +5,7 @@ import "core/main" for ParcelMain
 // Plugin.load("synth")
 
 Font.load("futile", "res/FutilePro.ttf", 32)
+Font.load("m3x6", "res/m3x6.ttf", 16)
 import "./scenes/play" for PlayScene
 import "./scenes/start" for StartScene
 

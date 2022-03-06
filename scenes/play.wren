@@ -20,6 +20,7 @@ import "./actions" for MoveAction
 import "./entities/player" for PlayerEntity
 import "./palette" for PAL
 import "./inputs" for InputAction
+import "./log" for Log
 
 // import "./bulkLoader" for SleepAnimation, WorldRenderer, StatusBar, Tooltip
 
@@ -45,6 +46,7 @@ class LogReducer is Reducer {
 class PlayScene is Scene {
   construct new(args) {
     super()
+    _log = Log.new()
     _store = Store.create({
       "logOpen": false
     }, LogReducer.new())
@@ -60,6 +62,7 @@ class PlayScene is Scene {
   }
 
   store { _store }
+  log { _log }
 
   update() {
     super.update()
@@ -84,6 +87,7 @@ class PlayScene is Scene {
       for (event in _world.active.events) {
         if (event is LogEvent) {
           System.print(event.text)
+          _log.add(event.text)
         }
         if (event is GameEndEvent) {
           var message = event.won ? "Mission Successful!" : "Mission Bailed"

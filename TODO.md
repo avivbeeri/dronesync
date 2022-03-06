@@ -1,10 +1,10 @@
 TODO for DroneSync
 ===============
 
-Day 2:
+Day 3:
 
 * UI
-  - Log
+  - Windows should be draggable
 * Drone
   - Entity
   - Control
@@ -28,5 +28,6 @@ Day 2:
 * field of view
 * enemy Alert behaviour
 * UI
+  - Log (partial)
   - health display
   - Awareness (sort of. Would prefer a no-color solution)

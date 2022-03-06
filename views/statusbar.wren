@@ -24,7 +24,6 @@ class StatusBar is View {
     }
 
     if (Mouse["left"].justPressed) {
-      System.print("click")
       var pos = Mouse.pos
       var width = 8 * (6)
       var height = 12
