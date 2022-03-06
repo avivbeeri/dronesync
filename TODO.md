@@ -1,15 +1,17 @@
 TODO for DroneSync
 ===============
 
-Day 1:
+Day 2:
 
+* field of view
 * enemy Alert behaviour
 * UI
   - health display
   - Awareness
   - Log
 
-Completed:
+# Completed:
+# Day 1:
 * Player exists
 * Enemy guards exist
 * patrol behaviour works

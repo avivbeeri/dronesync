@@ -4,6 +4,7 @@ var Palette = [
   Display.bg,
   Display.fg,
   Color.hex("#444444"), // - gray for dim floor
+  Color.hex("#222222"), // - gray for dim floor
 
 // UI palette - swappable!
   Color.hex("#ffe8cf"), // - cream

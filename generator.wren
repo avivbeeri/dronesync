@@ -14,6 +14,7 @@ class StaticGenerator {
   static createWorld() {
     var strategy = EnergyStrategy.new()
     var map = TileMap.init()
+    map.default = { "OOB": true }
 
     var world = World.new(strategy)
     world["objective"] = false
@@ -33,12 +34,16 @@ class StaticGenerator {
     guard.pos.x = 18
     guard.pos.y = 18
 
+/*
     // Is there a save.json?
     var save = Fiber.new {
       var path = FileSystem.prefPath("avivbeeri", "dronesync")
       var result = FileSystem.load("%(path)save.json")
       return JSON.decode(result)
     }.try()
+      }
+      */
+      var save = null
     if (save is Map) {
       for (key in save["map"].keys) {
         zone.map.tiles[Num.fromString(key)] = Tile.new(save["map"][key])
@@ -59,16 +64,31 @@ class StaticGenerator {
           var solid = x == 0 || y == 0 || x == mapWidth - 1 || y == mapHeight - 1
           map[x, y] = Tile.new({
             "solid": solid,
+            "visible": "unknown",
             "kind": solid ? "wall" : "floor"
+          })
+        }
+      }
+
+      var size = 4
+      var startX = (mapWidth - size) / 2
+      var startY = (mapHeight - size) / 2
+      for (dy in 0...size) {
+        for (dx in 0...size) {
+          map[startX + dx, startY + dy] = Tile.new({
+            "solid": true,
+            "kind": "wall"
           })
         }
       }
       map[2, 2] = Tile.new({
         "solid": false,
+        "visible": "unknown",
         "kind": "exit"
       })
       map[mapWidth - 2, mapHeight - 2] = Tile.new({
         "solid": true,
+        "visible": "unknown",
         "kind": "goal"
       })
 

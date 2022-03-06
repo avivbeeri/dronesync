@@ -36,25 +36,34 @@ class WorldRenderer is View {
     for (y in 0...mapHeight) {
       for (x in 0...mapWidth) {
         var tile = _ctx.map[x, y]
+        if (tile["visible"] == "unknown") {
+          continue
+        }
+        var seen = tile["visible"] == "visible"
         if (tile["kind"] == "floor") {
-          Canvas.print(".", x * tileWidth, y * tileHeight, PAL[2])
+          Canvas.print(".", x * tileWidth, y * tileHeight, seen ? PAL[2] : PAL[3])
         }
         if (tile["kind"] == "wall") {
-          Canvas.print("#", x * tileWidth, y * tileHeight, Display.fg)
+          Canvas.print("#", x * tileWidth, y * tileHeight, seen ? Display.fg : PAL[3])
         }
         if (tile["kind"] == "goal") {
-          Canvas.print("$", x * tileWidth, y * tileHeight, Display.fg)
+          Canvas.print("$", x * tileWidth, y * tileHeight, seen ? Display.fg : PAL[3])
         }
         if (tile["kind"] == "exit") {
-          Canvas.print(">", x * tileWidth, y * tileHeight, Display.fg)
+          Canvas.print(">", x * tileWidth, y * tileHeight, seen ? Display.fg : PAL[3])
         }
         if (tile["kind"] == "door") {
-          Canvas.print("1", x * tileWidth, y * tileHeight, Display.fg)
           Canvas.rectfill(x * tileWidth, y * tileHeight, tileWidth, tileHeight, Display.bg)
+          Canvas.print("1", x * tileWidth, y * tileHeight, seen ? Display.fg : PAL[3])
         }
       }
     }
     for (entity in _ctx.entities) {
+      // TODO: handle larger entities
+      var tile = _ctx.map[entity.pos]
+      if (tile["visible"] != "visible") {
+        continue
+      }
       var color = Display.bg
       if (entity.has("stunTimer") && entity["stunTimer"] > 0) {
         color = PAL[4]

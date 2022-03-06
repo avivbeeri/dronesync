@@ -1,6 +1,7 @@
 import "entities/creature" for Creature
 import "extra/combat" for Attack
 import "core/graph" for WeightedZone, BFS, AStar, DijkstraMap
+import "logic" for UpdateVision
 
 class PlayerEntity is Creature {
   construct new(config) {
@@ -32,6 +33,7 @@ class PlayerEntity is Creature {
     super.endTurn()
     var graph = WeightedZone.new(ctx)
     this["dijkstra"] = DijkstraMap.search(graph, pos)
+    UpdateVision.update(ctx)
   }
 }
 
