@@ -31,6 +31,9 @@ var REST_KEY = InputGroup.new([
 var NEXT_KEY = InputGroup.new([
   Keyboard["tab"]
 ])
+var SWAP_KEY = InputGroup.new([
+  Keyboard["left shift"], Keyboard["right shift"]
+])
 
 var DIR_KEYS = [ UP_KEY, DOWN_KEY, LEFT_KEY, RIGHT_KEY ]
 // Set frequency for smoother tile movement
@@ -49,5 +52,6 @@ class InputAction {
   static next { NEXT_KEY }
   static inventory { INVENTORY_KEY }
   static confirm { CONFIRM_KEY }
+  static swap { SWAP_KEY }
   static cancel { CANCEL_KEY }
 }

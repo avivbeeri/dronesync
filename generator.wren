@@ -24,8 +24,8 @@ class StaticGenerator {
     world.active.postUpdate.add(CompressLightMap)
     world.active.postUpdate.add(GameEndCheck)
     var zone = world.active
-    var player = PlayerEntity.new()
-    zone.addEntity("player", player)
+
+    var player = zone.addEntity("player", PlayerEntity.new())
     var guard
     /*
     guard = zone.addEntity(Guard.new())
@@ -38,6 +38,7 @@ class StaticGenerator {
     guard = zone.addEntity(Guard.new())
     guard.pos.x = 18
     guard.pos.y = 18
+
 
     var drone = zone.addEntity("drone", DroneEntity.new())
     drone.pos.x = 15
@@ -72,6 +73,7 @@ class StaticGenerator {
           var solid = x == 0 || y == 0 || x == mapWidth - 1 || y == mapHeight - 1
           map[x, y] = Tile.new({
             "solid": solid,
+            "blockSight": solid,
             "visible": "unknown",
             "kind": solid ? "wall" : "floor"
           })
@@ -85,6 +87,7 @@ class StaticGenerator {
         for (dx in 0...size) {
           map[startX + dx, startY + dy] = Tile.new({
             "solid": true,
+            "blockSight": true,
             "kind": "wall"
           })
         }
@@ -97,6 +100,7 @@ class StaticGenerator {
       map[mapWidth - 2, mapHeight - 2] = Tile.new({
         "solid": true,
         "visible": "unknown",
+        "blockSight": false,
         "kind": "goal"
       })
 
@@ -105,7 +109,11 @@ class StaticGenerator {
     }
 
 
-    UpdateVision.update(zone)
+    var lightMaps = [
+      UpdateVision.update(zone),
+      UpdateVision.update(zone, drone, 4)
+    ]
+    CompressLightMap.update(zone)
     return world
   }
 

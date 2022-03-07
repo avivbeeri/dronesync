@@ -67,17 +67,33 @@ class PlayScene is Scene {
     super.update()
 
     var player = _world.active.getEntityByTag("player")
+    var drone = _world.active.getEntityByTag("drone")
     if (player) {
-      if (InputAction.right.firing) {
-        player.action = MoveAction.new(Vec.new(1, 0))
-      } else if (InputAction.left.firing) {
-        player.action = MoveAction.new(Vec.new(-1, 0))
-      } else if (InputAction.up.firing) {
-        player.action = MoveAction.new(Vec.new(0, -1))
-      } else if (InputAction.down.firing) {
-        player.action = MoveAction.new(Vec.new(0, 1))
-      } else if (InputAction.rest.firing) {
-        player.action = RestAction.new()
+      var current = player
+      if (!player["active"] && drone) {
+        current = drone
+      }
+
+      if (current) {
+        if (InputAction.right.firing) {
+          current.action = MoveAction.new(Vec.new(1, 0))
+        } else if (InputAction.left.firing) {
+          current.action = MoveAction.new(Vec.new(-1, 0))
+        } else if (InputAction.up.firing) {
+          current.action = MoveAction.new(Vec.new(0, -1))
+        } else if (InputAction.down.firing) {
+          current.action = MoveAction.new(Vec.new(0, 1))
+        } else if (drone && InputAction.swap.firing) {
+          player["active"] = !player["active"]
+          var aIndex = _world.active.entities.indexOf(player)
+          var bIndex = _world.active.entities.indexOf(drone)
+          _world.active.entities.swap(aIndex, bIndex)
+          drone.priority = 12
+          player.priority = 12
+          return
+        } else if (InputAction.rest.firing) {
+          current.action = RestAction.new()
+        }
       }
     }
     if (!_world.gameover) {

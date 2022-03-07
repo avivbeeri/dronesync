@@ -4,6 +4,7 @@ import "core/display" for Display
 import "core/config" for Config
 import "./palette" for PAL
 import "./entities/player" for PlayerEntity
+import "./entities/drone" for DroneEntity
 
 #!inject
 class WorldRenderer is View {
@@ -47,7 +48,11 @@ class WorldRenderer is View {
           Canvas.print("#", x * tileWidth, y * tileHeight, seen ? Display.fg : PAL[3])
         }
         if (tile["kind"] == "goal") {
-          Canvas.print("$", x * tileWidth, y * tileHeight, seen ? Display.fg : PAL[3])
+          var color = seen ? Display.fg : PAL[3]
+          if (_ctx.parent["objective"]) {
+            color = seen ? PAL[9] : PAL[3]
+          }
+          Canvas.print("$", x * tileWidth, y * tileHeight, color)
         }
         if (tile["kind"] == "exit") {
           Canvas.print(">", x * tileWidth, y * tileHeight, seen ? Display.fg : PAL[3])
@@ -70,7 +75,9 @@ class WorldRenderer is View {
       }
       Canvas.rectfill(entity.pos.x * tileWidth, entity.pos.y * tileHeight, tileWidth - 1, tileHeight - 1, color)
       if (entity is PlayerEntity) {
-        Canvas.print("@", entity.pos.x * tileWidth,  entity.pos.y * tileHeight, PAL[7])
+        Canvas.print("@", entity.pos.x * tileWidth,  entity.pos.y * tileHeight, player["active"] ? PAL[7] : PAL[8])
+      } else if (entity is DroneEntity) {
+        Canvas.print("D", entity.pos.x * tileWidth,  entity.pos.y * tileHeight, !player["active"] ? PAL[7] : PAL[8])
       } else {
         var symbol = entity.has("symbol") ? entity["symbol"] : entity.name[0]
         var color = Display.fg

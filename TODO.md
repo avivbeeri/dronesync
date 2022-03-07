@@ -3,15 +3,16 @@ TODO for DroneSync
 
 # Day 3:
 
-* Drone
-  - Entity
-  - Control
-  - Switching
-* Doors
-* Enhanced The guard detection AI 
 * Items for manipulating the state of the world and influencing guard behavior
   - Smoke grenades
+    * Select an item to use (based on capability and inventory)
+    * Select a target square for use (based on range)
+    * cause a lingering environmental effect which blocks vision
+    * ensure AI responds accordingly
   - ???
+
+
+* Enhanced The guard detection AI 
 
 
 # Completed:
@@ -37,5 +38,10 @@ TODO for DroneSync
   - Awareness (sort of. Would prefer a no-color solution)
 
 ## Day 3
+* Change FoV from using "solid", and use "blocksSight"
 * UI
   - Windows should be draggable
+* Drone
+  - Entity
+  - Control
+  - Switching

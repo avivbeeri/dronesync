@@ -198,7 +198,7 @@ class UpdateVision {
             if (visible) {
               lightMap[Elegant.pair(pos)] = "visible"
             }
-            if (visible && tiles[pos]["solid"]) {
+            if (visible && tiles[pos]["blockSight"]) {
 
               line.add(projection)
               fullShadow = line.isFullShadow
@@ -208,6 +208,7 @@ class UpdateVision {
         row = row + 1
       }
     }
+    entity["lightMap"] = lightMap
     return lightMap
   }
 }
