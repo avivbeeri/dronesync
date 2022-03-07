@@ -6,8 +6,9 @@ import "core/config" for Config
 import "core/world" for World, Zone
 import "core/director" for EnergyStrategy
 import "core/map" for TileMap, Tile
-import "./logic" for RemoveDefeated, GameEndCheck, UpdateVision
+import "./logic" for RemoveDefeated, GameEndCheck, UpdateVision, CompressLightMap
 import "./entities/player" for PlayerEntity
+import "./entities/drone" for DroneEntity
 import "./entities/guard" for Guard
 
 class StaticGenerator {
@@ -20,6 +21,7 @@ class StaticGenerator {
     world["objective"] = false
     world.pushZone(Zone.new(map))
     world.active.postUpdate.add(RemoveDefeated)
+    world.active.postUpdate.add(CompressLightMap)
     world.active.postUpdate.add(GameEndCheck)
     var zone = world.active
     var player = PlayerEntity.new()
@@ -37,6 +39,9 @@ class StaticGenerator {
     guard.pos.x = 18
     guard.pos.y = 18
 
+    var drone = zone.addEntity("drone", DroneEntity.new())
+    drone.pos.x = 15
+    drone.pos.y = 15
 /*
     // Is there a save.json?
     var save = Fiber.new {

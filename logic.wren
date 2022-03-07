@@ -2,9 +2,10 @@ import "json" for JSON
 import "io" for FileSystem
 import "math" for Vec, M
 
+import "core/elegant" for Elegant
+import "core/dataobject" for DataObject
 import "extra/events" for GameEndEvent
 import "./events" for EscapeEvent
-import "core/dataobject" for DataObject
 
 class RemoveDefeated {
   static update(ctx) {
@@ -158,13 +159,19 @@ class UpdateVision {
     }
   }
 
-
   static update(ctx) {
     var player = ctx.getEntityByTag("player")
+    return update(ctx, player, -1)
+  }
+
+  static update(ctx, entity, range) {
     var tiles = ctx.map
-    var start = player.pos
-    var distance = -1
-    tiles[start]["visible"] = "visible"
+    var start = entity.pos
+    var distance = range
+    var lightMap = {}
+    lightMap[Elegant.pair(start)] = "visible"
+
+    // tiles[start]["visible"] = "visible"
 
     for (octant in 0...8) {
       // refresh octant
@@ -181,13 +188,16 @@ class UpdateVision {
           if (tiles[pos]["OOB"]) {
             break
           }
-          var unknown = tiles[pos]["visible"] == "unknown"
           if (fullShadow) {
-            tiles[pos]["visible"] = (unknown ? "unknown" : "hidden")
+            // tiles[pos]["visible"] = (unknown ? "unknown" : "hidden")
+            // lightMap[Elegant.pair(pos)] = "hidden"
           } else {
             var projection = ShadowLine.projectTile(row, col)
             var visible = !line.isInShadow(projection)
-            tiles[pos]["visible"] = visible ? "visible" : (unknown ? "unknown" : "hidden")
+            // tiles[pos]["visible"] = visible ? "visible" : (unknown ? "unknown" : "hidden")
+            if (visible) {
+              lightMap[Elegant.pair(pos)] = "visible"
+            }
             if (visible && tiles[pos]["solid"]) {
 
               line.add(projection)
@@ -196,6 +206,35 @@ class UpdateVision {
           }
         }
         row = row + 1
+      }
+    }
+    return lightMap
+  }
+}
+
+class CompressLightMap {
+  static update(ctx) {
+    var player = ctx.getEntityByTag("player", true)
+    var lightMaps = [ player["lightMap"] ]
+    var drone = ctx.getEntityByTag("drone")
+    if (drone) {
+      lightMaps.add(drone["lightMap"])
+    }
+    var map = ctx.map
+    for (tile in ctx.map.tiles.values) {
+      var unknown = tile["visible"] == "unknown"
+      if (!unknown) {
+        tile["visible"] = "hidden"
+      }
+    }
+
+    for (lightMap in lightMaps) {
+      if (lightMap == null) {
+        continue
+      }
+      for (key in lightMap.keys) {
+        var pos = Elegant.unpair(key)
+        map[pos]["visible"] = "visible"
       }
     }
   }

@@ -1,10 +1,8 @@
 TODO for DroneSync
 ===============
 
-Day 3:
+# Day 3:
 
-* UI
-  - Windows should be draggable
 * Drone
   - Entity
   - Control
@@ -37,3 +35,7 @@ Day 3:
   - Log (partial)
   - health display
   - Awareness (sort of. Would prefer a no-color solution)
+
+## Day 3
+* UI
+  - Windows should be draggable

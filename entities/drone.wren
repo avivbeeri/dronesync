@@ -1,9 +1,10 @@
 import "entities/creature" for Creature
+import "core/action" for Action
 import "extra/combat" for Attack
 import "core/graph" for WeightedZone, BFS, AStar, DijkstraMap
 import "logic" for UpdateVision
 
-class PlayerEntity is Creature {
+class DroneEntity is Creature {
   construct new(config) {
     super()
     init(config)
@@ -16,24 +17,23 @@ class PlayerEntity is Creature {
 
   init(config) {
     super.init(config)
-    this["targetGroup"].add("enemy")
-    this["melee"] = Attack.stun(this)
   }
 
   action { _action }
   action=(v) { _action = v }
 
   update() {
+    return Action.none
+    /*
     var action = _action
     _action = null
     return action
+    */
   }
 
   endTurn() {
     super.endTurn()
-    var graph = WeightedZone.new(ctx)
-    this["dijkstra"] = DijkstraMap.search(graph, pos)
-    this["lightMap"] = UpdateVision.update(ctx)
+    this["lightMap"] = UpdateVision.update(ctx, this, 4)
   }
 }
 
