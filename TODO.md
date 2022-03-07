@@ -9,6 +9,12 @@ Day 3:
   - Entity
   - Control
   - Switching
+* Doors
+* Enhanced The guard detection AI 
+* Items for manipulating the state of the world and influencing guard behavior
+  - Smoke grenades
+  - ???
+
 
 # Completed:
 ## Day 1:

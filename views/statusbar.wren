@@ -11,7 +11,6 @@ import "./views/window" for LogWindow
 class StatusBar is View {
   construct new(parent, ctx) {
     super(parent)
-    System.print(top)
     _ctx = ctx
   }
 

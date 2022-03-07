@@ -1,5 +1,6 @@
 import "graphics" for Canvas
 import "math" for Vec
+import "input" for Mouse
 
 import "core/scene" for Scene, View
 import "core/display" for Display
@@ -14,6 +15,10 @@ import "./inputs" for InputAction
 class Window is View {
   construct new(parent, ctx, size) {
     super(parent)
+    if (!__pref) {
+      __pref = {}
+    }
+
     _ctx = ctx
     _rect = Vec.new()
 
@@ -24,15 +29,64 @@ class Window is View {
     // Pos - centered
     _rect.x = (Canvas.width - _rect.w) / 2
     _rect.y = (Canvas.height - _rect.z) / 2
+    _title = ""
 
     z = 1
   }
 
+  title { _title }
+  title=(v) { _title = v }
+
+  x { _rect.x }
+  x=(v) { _rect.x = v}
+  y { _rect.y }
+  y=(v) { _rect.y = v}
   width { _rect.w }
+  width=(v) { _rect.w = v}
   height { _rect.z }
+  height=(v) { _rect.z = v}
 
   update() {
     super.update()
+    var pos = Mouse.pos
+    if (pos.x >= x + width - 10 && pos.x < x + width && pos.y >= y - 10 && pos.y < y) {
+      _hoverX = true
+      if (Mouse["left"].justPressed) {
+        // TODO: handle window ids for closing and opening stuff like this
+        this.top.store.dispatch({ "type": "close" })
+      }
+      // TODO check click
+    } else {
+      _hoverX = false
+    }
+
+    if (Mouse["left"].justPressed && pos.x >= x - 4 && pos.x < x + width  + 8 && pos.y >= y - 10 && pos.y < y + height) {
+      _held = true
+      _lastMouse = pos
+    }
+    if (_held) {
+      var diff = pos - _lastMouse
+      x = x + diff.x
+      y = y + diff.y
+      _lastMouse = pos
+
+      _held = Mouse["left"].down
+      if (!_held) {
+        onDrop()
+      }
+    }
+  }
+  onDrop() {}
+  storePref(label) {
+    __pref[label] = _rect * 1
+  }
+  restorePref(label) {
+    if (!__pref) {
+      __pref = {}
+    }
+    if (__pref[label]) {
+      _rect = __pref[label]
+    }
   }
   process(event) {
     super.process(event)
@@ -48,7 +102,13 @@ class Window is View {
     Canvas.rectfill(-4, -4, _rect.w + 8, _rect.z + 8, Display.bg)
     Canvas.rect(-1, -1, _rect.w + 2, _rect.z + 2, Display.fg)
     Canvas.rect(-3, -3, _rect.w + 6, _rect.z + 6, Display.fg)
-    Canvas.rectfill(-2, -3, _rect.w + 4, 2, PAL[6])
+    Canvas.rectfill(-4, -10, _rect.w + 8, 10, PAL[6])
+    Canvas.print(_title, (_rect.w - _title.count * 8) / 2, -9, Display.fg)
+    var color = PAL[4]
+    if (_hoverX) {
+      color = PAL[5]
+    }
+    Canvas.print("X", _rect.w - 8, -9, color)
     Canvas.clip(_rect.x, _rect.y, _rect.w, _rect.z)
     // Draw window contents
     drawContent()
@@ -62,6 +122,8 @@ class LogWindow is Window {
   construct new(parent, ctx) {
     // Assuming default font
     super(parent, ctx, Vec.new(8 * 40, 8 * 3))
+    restorePref("log")
+    title = "Log"
     var Sub
     Sub = top.store.subscribe {
 
@@ -75,6 +137,9 @@ class LogWindow is Window {
   update() {
     super.update()
     _text = top.log.getLast(3)
+  }
+  onDrop() {
+    storePref("log")
   }
 
   drawContent() {
