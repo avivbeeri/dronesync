@@ -275,3 +275,19 @@ class CompressLightMap {
     }
   }
 }
+class UpdateMapEffects {
+  static update(ctx) {
+    var map = ctx.map
+    for (tile in ctx.map.tiles.values) {
+      if (!tile["activeEffects"].isEmpty) {
+        tile["activeEffects"] = tile["activeEffects"].where {|effect|
+          effect["duration"] = effect["duration"] - 1
+          if (effect["duration"] <= 0 && effect.containsKey("onComplete")) {
+            effect["onComplete"].call()
+          }
+          return effect["duration"] > 0
+        }.toList
+      }
+    }
+  }
+}

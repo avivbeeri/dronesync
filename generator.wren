@@ -75,7 +75,8 @@ class StaticGenerator {
             "solid": solid,
             "blockSight": solid,
             "visible": "unknown",
-            "kind": solid ? "wall" : "floor"
+            "kind": solid ? "wall" : "floor",
+            "activeEffects": []
           })
         }
       }
@@ -88,19 +89,22 @@ class StaticGenerator {
           map[startX + dx, startY + dy] = Tile.new({
             "solid": true,
             "blockSight": true,
-            "kind": "wall"
+            "kind": "wall",
+            "activeEffects": []
           })
         }
       }
       map[2, 2] = Tile.new({
         "solid": false,
         "visible": "unknown",
+        "activeEffects": [],
         "kind": "exit"
       })
       map[mapWidth - 2, mapHeight - 2] = Tile.new({
         "solid": true,
         "visible": "unknown",
         "blockSight": false,
+        "activeEffects": [],
         "kind": "goal"
       })
 

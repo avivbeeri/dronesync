@@ -18,7 +18,7 @@ import "core/tilesheet" for Tilesheet
 
 import "extra/events" for GameEndEvent
 import "./events" for LogEvent
-import "./actions" for MoveAction
+import "./actions" for MoveAction, SmokeAction
 import "./entities/player" for PlayerEntity
 import "./palette" for PAL
 import "./inputs" for InputAction
@@ -34,7 +34,16 @@ import "core/graph" for DijkstraMap
 
 class TestReducer is Reducer {
   call(x, y) { reduce(x, y) }
-
+}
+class ActionReducer is TestReducer {
+  construct new() {}
+  reduce(state, action) {
+    if (action["type"] == "action") {
+      state["data"] = action["data"]
+      state["selection"] = action["selection"]
+    }
+    return state
+  }
 }
 class SelectionReducer is TestReducer {
   construct new() {}
@@ -58,14 +67,15 @@ class LogReducer is TestReducer {
 }
 
 class RangeSelectorState is State {
-  construct new(ctx, view, range) {
-    init(ctx, view, range, 0)
+  construct new(ctx, view, data, range) {
+    init(ctx, view, data, range, 0)
   }
-  construct new(ctx, view, range, splash) {
-    init(ctx, view, range, splash)
+  construct new(ctx, view, data, range, splash) {
+    init(ctx, view, data, range, splash)
   }
-  init(ctx, view, range, splash) {
+  init(ctx, view, data, range, splash) {
     _ctx = ctx
+    _data = data
     _view = view
     _range = range + 1
     _splash = splash + 1
@@ -120,6 +130,9 @@ class RangeSelectorState is State {
       destination = _center + Vec.new(0, 1)
     } else if (InputAction.cancel.firing) {
       return PlayState.new(_ctx, _view)
+    } else if (InputAction.confirm.firing) {
+      _view.top.store.dispatch({ "type": "action", "data": _data, "selection": _selection })
+      return PlayState.new(_ctx, _view)
     }
     if (destination && _tileList.contains(destination)) {
       _center = destination
@@ -149,27 +162,44 @@ class PlayState is State {
         current = drone
       }
 
+
       if (current) {
-        if (InputAction.right.firing) {
-          current.action = MoveAction.new(Vec.new(1, 0))
-        } else if (InputAction.left.firing) {
-          current.action = MoveAction.new(Vec.new(-1, 0))
-        } else if (InputAction.up.firing) {
-          current.action = MoveAction.new(Vec.new(0, -1))
-        } else if (InputAction.down.firing) {
-          current.action = MoveAction.new(Vec.new(0, 1))
-        } else if (InputAction.next.firing) {
-          return RangeSelectorState.new(_ctx, _view, 3, 2)
-        } else if (drone && InputAction.swap.firing) {
-          player["active"] = !player["active"]
-          var aIndex = _ctx.active.entities.indexOf(player)
-          var bIndex = _ctx.active.entities.indexOf(drone)
-          _ctx.active.entities.swap(aIndex, bIndex)
-          drone.priority = 12
-          player.priority = 12
-          return this
-        } else if (InputAction.rest.firing) {
-          current.action = RestAction.new()
+        if (_view.store.state["action"]["data"]) {
+          var action = _view.store.state["action"]
+          System.print(action)
+          if (action["data"]["id"] == "smokebomb") {
+            current.action = SmokeAction.new(action["selection"])
+          }
+          _view.store.dispatch({ "type": "action", "data": null, "selection": null })
+        } else {
+          if (InputAction.right.firing) {
+            current.action = MoveAction.new(Vec.new(1, 0))
+          } else if (InputAction.left.firing) {
+            current.action = MoveAction.new(Vec.new(-1, 0))
+          } else if (InputAction.up.firing) {
+            current.action = MoveAction.new(Vec.new(0, -1))
+          } else if (InputAction.down.firing) {
+            current.action = MoveAction.new(Vec.new(0, 1))
+          } else if (InputAction.next.firing) {
+            // Get info about item
+            var item = {
+              "id": "smokebomb",
+              "range": 4,
+              "splash": 4
+            }
+
+            return RangeSelectorState.new(_ctx, _view, item, item["range"], item["splash"])
+          } else if (drone && InputAction.swap.firing) {
+            player["active"] = !player["active"]
+            var aIndex = _ctx.active.entities.indexOf(player)
+            var bIndex = _ctx.active.entities.indexOf(drone)
+            _ctx.active.entities.swap(aIndex, bIndex)
+            drone.priority = 12
+            player.priority = 12
+            return this
+          } else if (InputAction.rest.firing) {
+            current.action = RestAction.new()
+          }
         }
       }
     }
@@ -186,10 +216,12 @@ class PlayScene is Scene {
     var logReducer = LogReducer.new()
     var reducer = Store.combineReducers({
       "logOpen": logReducer,
-      "selection": SelectionReducer.new()
+      "selection": SelectionReducer.new(),
+      "action": ActionReducer.new()
     })
     _store = Store.create({
       "logOpen": false,
+      "action": {},
       "selection": {
         "tiles": [],
         "range": []

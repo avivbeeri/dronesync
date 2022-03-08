@@ -26,6 +26,30 @@ class EscapeAction is Action {
     return ActionResult.success
   }
 }
+class SmokeAction is Action {
+  construct new(tiles) {
+    super()
+    _tiles = tiles
+  }
+  perform() {
+    ctx.events.add(LogEvent.new("%(source) detonated a smokebomb!"))
+    // var entities = ctx.getEntitiesAtTile(pos.x, pos.y)
+    for (pos in _tiles) {
+      var tile = ctx.map[pos]
+      var original = tile["blockSight"]
+      tile["blockSight"] = true
+      tile["visible"] = "hidden"
+      tile["activeEffects"].add({
+        "id": "smoke",
+        "duration": 5,
+        "onComplete": Fn.new {
+          ctx.map[pos]["blockSight"] = original
+        }
+      })
+    }
+    return ActionResult.success
+  }
+}
 
 class MoveAction is Action {
   construct new(dir, alwaysSucceed, alt) {

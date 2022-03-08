@@ -59,7 +59,21 @@ class WorldRenderer is View {
         }
         var seen = tile["visible"] == "visible"
         if (tile["kind"] == "floor") {
-          Canvas.print(".", x * tileWidth, y * tileHeight, seen ? PAL[2] : PAL[3])
+          var symbol = "."
+          var color = seen ? PAL[2] : PAL[3]
+          if (!tile["activeEffects"].isEmpty) {
+            var effect = tile["activeEffects"][0]
+            if (effect["id"] == "smoke") {
+              color = seen ? PAL[5] : PAL[3]
+              symbol = null
+            }
+          }
+          if (symbol) {
+            Canvas.print(".", x * tileWidth, y * tileHeight, color)
+          } else {
+            Canvas.rectfill(x * tileWidth, y * tileHeight, tileWidth, tileHeight, color)
+
+          }
         }
         if (tile["kind"] == "wall") {
           Canvas.print("#", x * tileWidth, y * tileHeight, seen ? Display.fg : PAL[3])
