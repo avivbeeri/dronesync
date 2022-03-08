@@ -36,7 +36,7 @@ class WorldRenderer is View {
 
     Canvas.offset(_x + (Canvas.width - (tileWidth*mapWidth)) / 2, _y + (Canvas.height - (tileHeight * mapHeight)) / 2)
 
-    var player = _ctx.getEntityByTag("player")
+    var player = _ctx.getEntityByTag("player", true)
     // var xOff = (Canvas.width - 8 - 12) / 2 + 1
     // Canvas.offset(xOff - player.pos.x * 8, 20 - player.pos.y * 8)
     for (y in 0...mapHeight) {
@@ -82,7 +82,11 @@ class WorldRenderer is View {
       if (entity is PlayerEntity) {
         Canvas.print("@", entity.pos.x * tileWidth,  entity.pos.y * tileHeight, player["active"] ? PAL[7] : PAL[8])
       } else if (entity is DroneEntity) {
-        Canvas.print("D", entity.pos.x * tileWidth,  entity.pos.y * tileHeight, !player["active"] ? PAL[7] : PAL[8])
+        var color = PAL[7]
+        if (player) {
+          color = !player["active"] ? PAL[7] : PAL[8]
+        }
+        Canvas.print("D", entity.pos.x * tileWidth,  entity.pos.y * tileHeight, color)
       } else {
         var symbol = entity.has("symbol") ? entity["symbol"] : entity.name[0]
         var color = Display.fg

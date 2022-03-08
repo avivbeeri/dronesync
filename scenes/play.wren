@@ -131,8 +131,8 @@ class PlayState is State {
           return RangeSelectorState.new(_ctx, _view, 3)
         } else if (drone && InputAction.swap.firing) {
           player["active"] = !player["active"]
-          var aIndex = _world.active.entities.indexOf(player)
-          var bIndex = _world.active.entities.indexOf(drone)
+          var aIndex = _ctx.active.entities.indexOf(player)
+          var bIndex = _ctx.active.entities.indexOf(drone)
           _ctx.active.entities.swap(aIndex, bIndex)
           drone.priority = 12
           player.priority = 12
