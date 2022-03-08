@@ -65,12 +65,14 @@ class Awareness is Behaviour {
     var line = GridWalk.getLine(self.pos, player.pos)
     var visible = true
     for (point in line) {
-      if (ctx.map[point]["solid"]) {
+      if (ctx.map[point]["blockSight"]) {
         visible = false
         break
       }
     }
     var aware = self["awareness"]
+    self["los"] = visible
+
     System.print("%(self): %(visible) - %(aware)")
     if (self["state"] == "patrol") {
       if (visible) {

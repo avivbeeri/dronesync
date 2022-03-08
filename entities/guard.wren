@@ -39,5 +39,10 @@ class Guard is Creature {
     // push(Patrol.new(this, [ Vec.new(10, 4), Vec.new(10, 16) ]))
     push(Wait)
   }
+
+  endTurn() {
+    super.endTurn()
+    Awareness.new(this).evaluate()
+  }
 }
 

@@ -1,10 +1,11 @@
-import "graphics" for Canvas
+import "graphics" for Canvas, Color
 import "core/scene" for Scene, View
 import "core/display" for Display
 import "core/config" for Config
 import "./palette" for PAL
 import "./entities/player" for PlayerEntity
 import "./entities/drone" for DroneEntity
+import "util" for GridWalk
 
 #!inject
 class WorldRenderer is View {
@@ -96,12 +97,23 @@ class WorldRenderer is View {
           color = PAL[5]
         }
         Canvas.print(symbol, entity.pos.x * tileWidth, entity.pos.y * tileHeight, color)
+
+        // Debug rendering
+        if (entity["los"]) {
+          var points = GridWalk.getLine(player.pos, entity.pos)
+          for (point in points) {
+            Canvas.print("*", point.x * tileWidth, point.y * tileHeight, Color.yellow)
+          }
+          Canvas.rectfill(entity.pos.x * tileWidth, entity.pos.y * tileHeight, tileWidth - 1, tileHeight - 1, Display.bg)
+          Canvas.print(symbol, entity.pos.x * tileWidth, entity.pos.y * tileHeight, entity["los"] ? Color.orange : Display.fg)
+        }
       }
     }
 
     for (tile in _selection) {
       Canvas.rect(tile.x * tileWidth, tile.y * tileHeight, tileWidth, tileHeight, PAL[10])
     }
+
 
     Canvas.offset()
   }
