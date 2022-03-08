@@ -15,7 +15,7 @@ class StaticGenerator {
   static createWorld() {
     var strategy = EnergyStrategy.new()
     var map = TileMap.init()
-    map.default = { "OOB": true }
+    map.default = { "OOB": true, "solid": true }
 
     var world = World.new(strategy)
     world["objective"] = false

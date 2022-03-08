@@ -1,7 +1,9 @@
 import "graphics" for Canvas
 import "input" for Keyboard
 import "math" for Vec
+import "./util" for GridWalk
 
+import "core/elegant" for Elegant
 import "core/dataobject" for Store, Reducer
 import "core/entity" for StackEntity
 import "core/action" for Action
@@ -28,6 +30,8 @@ import "./views/renderer" for WorldRenderer
 import "./views/tooltip" for Tooltip
 
 import "./generator" for StaticGenerator
+import "core/graph" for DijkstraMap
+
 class TestReducer is Reducer {
   call(x, y) { reduce(x, y) }
 
@@ -36,7 +40,8 @@ class SelectionReducer is TestReducer {
   construct new() {}
   reduce(state, action) {
     if (action["type"] == "selection") {
-      state = action["tiles"]
+      state["tiles"] = action["tiles"]
+      state["range"] = action["range"]
     }
     return state
   }
@@ -45,8 +50,6 @@ class SelectionReducer is TestReducer {
 class LogReducer is TestReducer {
   construct new() {}
   reduce(state, action) {
-    System.print(state)
-    System.print(action)
     if (action["type"] == "logOpen") {
       state = action["mode"] == "open"
     }
@@ -56,48 +59,76 @@ class LogReducer is TestReducer {
 
 class RangeSelectorState is State {
   construct new(ctx, view, range) {
+    init(ctx, view, range, 0)
+  }
+  construct new(ctx, view, range, splash) {
+    init(ctx, view, range, splash)
+  }
+  init(ctx, view, range, splash) {
     _ctx = ctx
     _view = view
     _range = range + 1
+    _splash = splash + 1
+    _center = null
+  }
+
+  getRangeFromPoint(point, range) {
+    var tileList = []
+    for (dy in -range...range) {
+      for (dx in -range...range) {
+        var d = Vec.new(dx, dy)
+        var pos = point + d
+        if (d.manhattan >= range) {
+          continue
+        }
+        var visible = GridWalk.checkLoS(_ctx.active.map, pos, point)
+        if (!visible) {
+          continue
+        }
+
+        tileList.add(pos)
+      }
+    }
+    return tileList
   }
 
   onEnter() {
     var player = _ctx.active.getEntityByTag("player")
-    _selection = player.pos
-    _tileList = []
-    for (dy in -_range..._range) {
-      for (dx in -_range..._range) {
-        if (Vec.new(dx, dy).manhattan >= _range) {
-        // if ((dx.abs + dy.abs) > _range) {
-          continue
-        }
-        _tileList.add(player.pos + Vec.new(dx, dy))
-      }
-    }
-    _view.top.store.dispatch({ "type": "selection", "tiles": [ _selection ] })
+    _center = player.pos
+    _tileList = getRangeFromPoint(_center, _range)
+    _selection = getRangeFromPoint(_center, _splash)
+    _view.top.store.dispatch({ "type": "selection", "tiles": _selection, "range": _tileList })
   }
 
   onExit() {
-    _view.top.store.dispatch({ "type": "selection", "tiles": [] })
+    _view.top.store.dispatch({ "type": "selection", "tiles": [], "range": [] })
   }
 
   update() {
+    if (!_center) {
+      return
+    }
     // TODO: handle mouse or keyboard input
     var destination = null
     if (InputAction.right.firing) {
-      destination = _selection + Vec.new(1, 0)
+      destination = _center + Vec.new(1, 0)
     } else if (InputAction.left.firing) {
-      destination = _selection + Vec.new(-1, 0)
+      destination = _center + Vec.new(-1, 0)
     } else if (InputAction.up.firing) {
-      destination = _selection + Vec.new(0, -1)
+      destination = _center + Vec.new(0, -1)
     } else if (InputAction.down.firing) {
-      destination = _selection + Vec.new(0, 1)
+      destination = _center + Vec.new(0, 1)
     } else if (InputAction.cancel.firing) {
       return PlayState.new(_ctx, _view)
     }
     if (destination && _tileList.contains(destination)) {
-      _selection = destination
-      _view.top.store.dispatch({ "type": "selection", "tiles": [ _selection ] })
+      _center = destination
+      _selection = getRangeFromPoint(_center, _splash)
+      _view.top.store.dispatch({
+        "type": "selection",
+        "tiles": _selection,
+        "range": _tileList,
+      })
     }
     return this
   }
@@ -128,7 +159,7 @@ class PlayState is State {
         } else if (InputAction.down.firing) {
           current.action = MoveAction.new(Vec.new(0, 1))
         } else if (InputAction.next.firing) {
-          return RangeSelectorState.new(_ctx, _view, 3)
+          return RangeSelectorState.new(_ctx, _view, 3, 2)
         } else if (drone && InputAction.swap.firing) {
           player["active"] = !player["active"]
           var aIndex = _ctx.active.entities.indexOf(player)
@@ -159,7 +190,10 @@ class PlayScene is Scene {
     })
     _store = Store.create({
       "logOpen": false,
-      "selection": []
+      "selection": {
+        "tiles": [],
+        "range": []
+      }
     }, reducer)
 
     _world = StaticGenerator.createWorld()

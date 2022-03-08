@@ -17,8 +17,10 @@ class WorldRenderer is View {
     _x = x
     _y = y
     _selection = []
+    _range = []
     parent.top.store.subscribe {
-      _selection = parent.top.store.state["selection"]
+      _selection = parent.top.store.state["selection"]["tiles"]
+      _range = parent.top.store.state["selection"]["range"]
     }
   }
 
@@ -42,6 +44,13 @@ class WorldRenderer is View {
     var player = _ctx.getEntityByTag("player", true)
     // var xOff = (Canvas.width - 8 - 12) / 2 + 1
     // Canvas.offset(xOff - player.pos.x * 8, 20 - player.pos.y * 8)
+    for (tile in _range) {
+      Canvas.rectfill(tile.x * tileWidth, tile.y * tileHeight, tileWidth, tileHeight, PAL[2])
+    }
+    for (tile in _selection) {
+      Canvas.rectfill(tile.x * tileWidth, tile.y * tileHeight, tileWidth, tileHeight, PAL[6])
+    }
+
     for (y in 0...mapHeight) {
       for (x in 0...mapWidth) {
         var tile = _ctx.map[x, y]
@@ -124,9 +133,6 @@ class WorldRenderer is View {
       }
     }
 
-    for (tile in _selection) {
-      Canvas.rect(tile.x * tileWidth, tile.y * tileHeight, tileWidth, tileHeight, PAL[10])
-    }
 
 
     Canvas.offset()

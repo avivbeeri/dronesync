@@ -1,6 +1,27 @@
 import "math" for Vec
 
 class GridWalk {
+  static checkLoS(map, p0, p1) {
+    var line = GridWalk.getLine(p0, p1)
+    var visible = true
+    var previous = null
+    for (point in line) {
+      // Prevent tunnelling
+      if (previous && (previous - point).manhattan > 1) {
+        if (map[previous.x, point.y]["blockSight"] &&
+            map[point.x, previous.y]["blockSight"]) {
+          visible = false
+          break
+        }
+      }
+      if (map[point]["blockSight"]) {
+        visible = false
+        break
+      }
+    }
+    return visible
+  }
+
   static getLine(p0, p1) { getLine_Interpolate(p0, p1) }
   static getLine_Bresenham_low(p0, p1) {
     var points = []

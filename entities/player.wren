@@ -26,6 +26,11 @@ class PlayerEntity is Creature {
   action=(v) { _action = v }
 
   update() {
+    if (!this["dijkstra"]) {
+      var graph = WeightedZone.new(ctx)
+      this["dijkstra"] = DijkstraMap.search(graph, pos)
+    }
+
     if (this["active"]) {
       var action = _action
       _action = null

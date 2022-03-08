@@ -1,7 +1,7 @@
 TODO for DroneSync
 ===============
 
-# Day 3:
+# Day 4:
 
 * Items for manipulating the state of the world and influencing guard behavior
   - Smoke grenades
@@ -10,7 +10,6 @@ TODO for DroneSync
     * cause a lingering environmental effect which blocks vision
     * ensure AI responds accordingly
   - ???
-
 
 * Enhanced The guard detection AI 
 
@@ -45,3 +44,5 @@ TODO for DroneSync
   - Entity
   - Control
   - Switching
+
+## Day 4

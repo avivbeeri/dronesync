@@ -65,23 +65,7 @@ class Awareness is Behaviour {
     // Is our square visible?
     // Can we see the player?
     var player = ctx.getEntityByTag("player")
-    var line = GridWalk.getLine(self.pos, player.pos)
-    var visible = true
-    var previous = null
-    for (point in line) {
-      // Prevent tunnelling
-      if (previous && (previous - point).manhattan > 1) {
-        if (ctx.map[previous.x, point.y]["blockSight"] &&
-            ctx.map[point.x, previous.y]["blockSight"]) {
-          visible = false
-          break
-        }
-      }
-      if (ctx.map[point]["blockSight"]) {
-        visible = false
-        break
-      }
-    }
+    var visible = GridWalk.checkLoS(ctx.map, self.pos, player.pos)
     var aware = self["awareness"]
     self["los"] = visible
 
