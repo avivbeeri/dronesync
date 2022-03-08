@@ -56,11 +56,15 @@ class SelectionReducer is TestReducer {
   }
 }
 
-class LogReducer is TestReducer {
+class WindowReducer is TestReducer {
   construct new() {}
   reduce(state, action) {
-    if (action["type"] == "logOpen") {
-      state = action["mode"] == "open"
+    if (action["type"] == "window") {
+      if (action["mode"] == "open") {
+        state[action["id"]] = true
+      } else {
+        state[action["id"]] = false
+      }
     }
     return state
   }
@@ -213,14 +217,13 @@ class PlayScene is Scene {
   construct new(args) {
     super()
     _log = Log.new()
-    var logReducer = LogReducer.new()
     var reducer = Store.combineReducers({
-      "logOpen": logReducer,
+      "window": WindowReducer.new(),
       "selection": SelectionReducer.new(),
       "action": ActionReducer.new()
     })
     _store = Store.create({
-      "logOpen": false,
+      "window": {},
       "action": {},
       "selection": {
         "tiles": [],

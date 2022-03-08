@@ -53,7 +53,7 @@ class Window is View {
       _hoverX = true
       if (Mouse["left"].justPressed) {
         // TODO: handle window ids for closing and opening stuff like this
-        this.top.store.dispatch({ "type": "logOpen", "mode": "close" })
+        onRequestClose()
       }
       // TODO check click
     } else {
@@ -76,6 +76,8 @@ class Window is View {
       }
     }
   }
+  onRequestClose() {}
+  onClose() {}
   onDrop() {}
   storePref(label) {
     __pref[label] = _rect * 1
@@ -117,6 +119,32 @@ class Window is View {
     Canvas.offset()
   }
 }
+class InventoryWindow is Window {
+  construct new(parent, ctx) {
+    // Assuming default font
+    super(parent, ctx, Vec.new(8 * 20, 8 * 6))
+    restorePref("inventory")
+    title = "Inventory"
+    var Sub
+    Sub = top.store.subscribe {
+      if (top.store.state["inventoryOpen"] == false) {
+        parent.removeViewChild(this)
+        Sub.call()
+      }
+    }
+  }
+
+  update() {
+    super.update()
+  }
+  onDrop() {
+    storePref("inventory")
+  }
+
+  drawContent() {
+    super.drawContent()
+  }
+}
 
 class LogWindow is Window {
   construct new(parent, ctx) {
@@ -127,7 +155,8 @@ class LogWindow is Window {
     var Sub
     Sub = top.store.subscribe {
 
-      if (top.store.state["logOpen"] == false) {
+      if (!top.store.state["window"]["log"]) {
+        onClose()
         parent.removeViewChild(this)
         Sub.call()
       }
@@ -137,6 +166,9 @@ class LogWindow is Window {
   update() {
     super.update()
     _text = top.log.getLast(3)
+  }
+  onRequestClose() {
+    this.top.store.dispatch({ "type": "window", "mode": "close", "id": "log" })
   }
   onDrop() {
     storePref("log")

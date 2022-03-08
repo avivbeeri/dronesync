@@ -29,11 +29,11 @@ class StatusBar is View {
       var left = Canvas.width -  width
       var top = 2
       if (pos.x >= left && pos.x < left + width && pos.y >= top && pos.y < top + height) {
-        if (this.top.store.state["logOpen"] == false) {
-          this.top.store.dispatch({ "type": "logOpen", "mode": "open" })
+        if (!this.top.store.state["window"]["log"]) {
+          this.top.store.dispatch({ "type": "window", "mode": "open", "id": "log" })
           parent.addViewChild(LogWindow.new(parent, _ctx))
         } else {
-          this.top.store.dispatch({ "type": "logOpen", "mode": "close" })
+          this.top.store.dispatch({ "type": "window", "mode": "close", "id": "log" })
         }
       }
     }
