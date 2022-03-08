@@ -7,7 +7,7 @@ TODO for DroneSync
   - Smoke grenades
     * DONE: Select a target square for use (based on range)
     * DONE: cause a lingering environmental effect which blocks vision
-    * Select an item to use (based on capability and inventory)
+    * CLOSE: Select an item to use (based on capability and inventory)
     * ensure AI responds accordingly
   - ???
 
@@ -46,3 +46,5 @@ TODO for DroneSync
   - Switching
 
 ## Day 4
+* Fixed LoS issues
+* Text display underflow fixed

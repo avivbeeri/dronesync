@@ -1,10 +1,10 @@
 import "graphics" for Canvas
-import "math" for Vec
+import "math" for Vec, M
 import "input" for Mouse
 
-import "core/scene" for Scene, View
-import "core/display" for Display
 import "core/config" for Config
+import "core/display" for Display
+import "core/scene" for Scene, View
 
 import "./palette" for PAL
 import "./inputs" for InputAction
@@ -36,6 +36,7 @@ class Window is View {
 
   title { _title }
   title=(v) { _title = v }
+  ctx { _ctx }
 
   x { _rect.x }
   x=(v) { _rect.x = v}
@@ -134,10 +135,27 @@ class InventoryWindow is Window {
         Sub.call()
       }
     }
+
+    _hover = -1
+    _contents = []
   }
 
   update() {
     super.update()
+    var player = ctx.getEntityByTag("player", true)
+    if (player) {
+      var inventory = player["inventory"]
+      _contents = []
+      for (entry in inventory) {
+        _contents.add(entry)
+      }
+    }
+    var pos = Mouse.pos
+    _hover = -1
+    if (pos.x >= x && pos.x < x + width && pos.y >= y && pos.y < y + height) {
+      _hover = ((((pos.y) - (y+4))) / 8).floor
+      _hover = M.max(0, _hover)
+    }
   }
   onRequestClose() {
     this.top.store.dispatch({ "type": "window", "mode": "close", "id": "inventory" })
@@ -148,6 +166,23 @@ class InventoryWindow is Window {
 
   drawContent() {
     super.drawContent()
+    var y = 4
+    var i = 0
+    for (entry in _contents) {
+      var color = Display.fg
+      var bg = PAL[0]
+      if (i == _hover) {
+        color = PAL[0]
+        bg = PAL[6]
+      }
+
+      Canvas.rectfill(0, y-2, width, 8, bg)
+      Canvas.print(entry["displayName"], 2, y, color, "m3x6")
+      var quantity = "x" + entry["quantity"].toString
+      Canvas.print(quantity, width - quantity.count*7, y, color, "m3x6")
+      y = y + 8
+      i = i + 1
+    }
   }
 }
 

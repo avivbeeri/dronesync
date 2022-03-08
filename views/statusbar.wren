@@ -1,9 +1,9 @@
 import "graphics" for Canvas
 import "input" for Mouse
 
-import "core/scene" for Scene, View
-import "core/display" for Display
 import "core/config" for Config
+import "core/display" for Display
+import "core/scene" for Scene, View
 
 import "./palette" for PAL
 import "./views/window" for LogWindow, InventoryWindow

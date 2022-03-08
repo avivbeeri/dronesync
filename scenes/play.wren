@@ -9,8 +9,9 @@ import "core/entity" for StackEntity
 import "core/action" for Action
 import "extra/actions" for RestAction
 import "core/scene" for Scene, View, State
-import "core/display" for Display
 import "core/config" for Config
+import "core/display" for Display
+import "./palette" for PAL
 import "core/world" for World, Zone
 import "core/director" for EnergyStrategy
 import "core/map" for TileMap, Tile
@@ -20,7 +21,6 @@ import "extra/events" for GameEndEvent
 import "./events" for LogEvent
 import "./actions" for MoveAction, SmokeAction
 import "./entities/player" for PlayerEntity
-import "./palette" for PAL
 import "./inputs" for InputAction
 import "./log" for Log
 

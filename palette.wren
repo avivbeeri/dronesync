@@ -1,10 +1,12 @@
 import "graphics" for Color
 import "core/display" for Display
 
+System.print(Display.bg)
+
 // UI palette - swappable!
 var Palette = [
-  Display.bg,
-  Display.fg,
+  Color.hex("#000000"), // -
+  Color.hex("#000000"), // -
   Color.hex("#666666"), // - gray for dim floor
   Color.hex("#222222"), // - darker gray for dim floor
   Color.hex("#AAAAAA"), // white
@@ -18,6 +20,5 @@ var Palette = [
   Color.hex("#040404"), // black
 ]
 var PAL = Palette
-
 
 // TODO: Color map based on use, for easy switching

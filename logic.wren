@@ -76,8 +76,6 @@ class Fraction {
     return str
   }
 }
-System.print(Fraction.new(234).round(5))
-System.print(Fraction.new(1, 3).round(5))
 
 class ShadowLine {
   construct new() {

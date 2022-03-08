@@ -20,6 +20,22 @@ class PlayerEntity is Creature {
     this["targetGroup"].add("enemy")
     this["melee"] = Attack.stun(this)
     this["active"] = true
+    this["inventory"] = [
+      {
+        "id": "smokebomb",
+        "displayName": "Smoke Bombs",
+        "quantity": 3,
+        "range": 4,
+        "splash": 4
+      },
+      {
+        "id": "water",
+        "displayName": "Water",
+        "quantity": 1,
+        "range": 10,
+        "splash": 2
+      }
+    ]
   }
 
   action { _action }
