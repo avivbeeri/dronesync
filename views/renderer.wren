@@ -7,6 +7,8 @@ import "./entities/player" for PlayerEntity
 import "./entities/drone" for DroneEntity
 import "util" for GridWalk
 
+var DEBUG = false
+
 #!inject
 class WorldRenderer is View {
   construct new(parent, ctx, x, y) {
@@ -98,14 +100,26 @@ class WorldRenderer is View {
         }
         Canvas.print(symbol, entity.pos.x * tileWidth, entity.pos.y * tileHeight, color)
 
-        // Debug rendering
-        if (entity["los"]) {
-          var points = GridWalk.getLine(player.pos, entity.pos)
-          for (point in points) {
-            Canvas.print("*", point.x * tileWidth, point.y * tileHeight, Color.yellow)
+        if (DEBUG) {
+          // Debug rendering
+          if (entity["los"]) {
+            var points = GridWalk.getLine_Bresenham(entity.pos, player.pos)
+            for (point in points) {
+              if (_ctx.map[point]["blockSight"]) {
+                break
+              }
+              Canvas.print("*", point.x * tileWidth, point.y * tileHeight, Color.yellow)
+            }
+            points = GridWalk.getLine_Interpolate(entity.pos, player.pos)
+            for (point in points) {
+              if (_ctx.map[point]["blockSight"]) {
+                break
+              }
+              Canvas.print("*", point.x * tileWidth, point.y * tileHeight, Color.green)
+            }
+            Canvas.rectfill(entity.pos.x * tileWidth, entity.pos.y * tileHeight, tileWidth - 1, tileHeight - 1, Display.bg)
+            Canvas.print(symbol, entity.pos.x * tileWidth, entity.pos.y * tileHeight, entity["los"] ? Color.orange : Display.fg)
           }
-          Canvas.rectfill(entity.pos.x * tileWidth, entity.pos.y * tileHeight, tileWidth - 1, tileHeight - 1, Display.bg)
-          Canvas.print(symbol, entity.pos.x * tileWidth, entity.pos.y * tileHeight, entity["los"] ? Color.orange : Display.fg)
         }
       }
     }

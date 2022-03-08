@@ -44,6 +44,41 @@ class GameEndCheck {
   }
 }
 
+class Fraction {
+  construct new(value) {
+    if (value is Fraction) {
+      init(value.numerator, value.denominator)
+    } else {
+      init(value, null)
+    }
+  }
+  construct new(numerator, denominator) {
+    init(numerator, denominator)
+  }
+  init(numerator, denominator) {
+    _num = numerator || 0
+    _denom = denominator || 1
+  }
+
+  toString { "Fraction(%(numerator), %(denominator))"}
+  numerator { _num }
+  denominator { _denom }
+
+  floor { (_num / _denom).floor }
+  ceil { (_num / _denom).ceil }
+  round { (_num / _denom).round }
+  round(n) {
+    var str = (_num / _denom).toString
+    var point = str.indexOf(".")
+    if (point != -1) {
+      return str.take(point + n + 1).toList.join()
+    }
+    return str
+  }
+}
+System.print(Fraction.new(234).round(5))
+System.print(Fraction.new(1, 3).round(5))
+
 class ShadowLine {
   construct new() {
     _shadows = []

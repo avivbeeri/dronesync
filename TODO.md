@@ -5,8 +5,8 @@ TODO for DroneSync
 
 * Items for manipulating the state of the world and influencing guard behavior
   - Smoke grenades
-    * Select an item to use (based on capability and inventory)
     * DONE: Select a target square for use (based on range)
+    * Select an item to use (based on capability and inventory)
     * cause a lingering environmental effect which blocks vision
     * ensure AI responds accordingly
   - ???

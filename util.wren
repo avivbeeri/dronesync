@@ -1,6 +1,7 @@
 import "math" for Vec
 
 class GridWalk {
+  static getLine(p0, p1) { getLine_Interpolate(p0, p1) }
   static getLine_Bresenham_low(p0, p1) {
     var points = []
 
@@ -67,7 +68,6 @@ class GridWalk {
 
   }
 
-  static getLine(p0, p1) { getLine_Interpolate(p0, p1) }
 
   static getLine_Interpolate(p0, p1) {
     var dx = p1.x - p0.x
