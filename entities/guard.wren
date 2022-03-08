@@ -1,4 +1,5 @@
 import "math" for Vec
+import "util" for GridWalk
 import "entities/creature" for Creature
 import "entities/behaviour" for
   Awareness,
@@ -42,7 +43,12 @@ class Guard is Creature {
 
   endTurn() {
     super.endTurn()
-    Awareness.new(this).evaluate()
+    // Recompute awareness
+    var player = ctx.getEntityByTag("player")
+    var visible = GridWalk.checkLoS(ctx.map, pos, player.pos)
+    if (visible && this["awareness"] == 0) {
+      this["awareness"] = 1
+    }
   }
 }
 

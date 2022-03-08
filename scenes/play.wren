@@ -185,14 +185,16 @@ class PlayState is State {
           } else if (InputAction.down.firing) {
             current.action = MoveAction.new(Vec.new(0, 1))
           } else if (InputAction.next.firing) {
-            // Get info about item
-            var item = {
-              "id": "smokebomb",
-              "range": 4,
-              "splash": 4
-            }
+            if (player["active"]) {
+              // Get info about item
+              var item = {
+                "id": "smokebomb",
+                "range": 4,
+                "splash": 4
+              }
 
-            return RangeSelectorState.new(_ctx, _view, item, item["range"], item["splash"])
+              return RangeSelectorState.new(_ctx, _view, item, item["range"], item["splash"])
+            }
           } else if (drone && InputAction.swap.firing) {
             player["active"] = !player["active"]
             var aIndex = _ctx.active.entities.indexOf(player)

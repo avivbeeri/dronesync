@@ -60,7 +60,7 @@ class Window is View {
       _hoverX = false
     }
 
-    if (Mouse["left"].justPressed && pos.x >= x - 4 && pos.x < x + width  + 8 && pos.y >= y - 10 && pos.y < y + height) {
+    if (Mouse["left"].justPressed && pos.x >= x - 4 && pos.x < x + width  + 8 && pos.y >= y - 10 && pos.y < y) {
       _held = true
       _lastMouse = pos
     }
@@ -127,7 +127,9 @@ class InventoryWindow is Window {
     title = "Inventory"
     var Sub
     Sub = top.store.subscribe {
-      if (top.store.state["inventoryOpen"] == false) {
+
+      if (!top.store.state["window"]["inventory"]) {
+        onClose()
         parent.removeViewChild(this)
         Sub.call()
       }
@@ -136,6 +138,9 @@ class InventoryWindow is Window {
 
   update() {
     super.update()
+  }
+  onRequestClose() {
+    this.top.store.dispatch({ "type": "window", "mode": "close", "id": "inventory" })
   }
   onDrop() {
     storePref("inventory")
