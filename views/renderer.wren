@@ -13,9 +13,14 @@ class WorldRenderer is View {
     _ctx = ctx
     _x = x
     _y = y
+    _selection = []
+    parent.top.store.subscribe {
+      _selection = parent.top.store.state["selection"]
+    }
   }
 
   update() {
+
 
   }
 
@@ -89,6 +94,11 @@ class WorldRenderer is View {
         Canvas.print(symbol, entity.pos.x * tileWidth, entity.pos.y * tileHeight, color)
       }
     }
+
+    for (tile in _selection) {
+      Canvas.rect(tile.x * tileWidth, tile.y * tileHeight, tileWidth, tileHeight, PAL[10])
+    }
+
     Canvas.offset()
   }
 

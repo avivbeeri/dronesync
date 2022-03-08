@@ -53,7 +53,7 @@ class Window is View {
       _hoverX = true
       if (Mouse["left"].justPressed) {
         // TODO: handle window ids for closing and opening stuff like this
-        this.top.store.dispatch({ "type": "close" })
+        this.top.store.dispatch({ "type": "logOpen", "mode": "close" })
       }
       // TODO check click
     } else {

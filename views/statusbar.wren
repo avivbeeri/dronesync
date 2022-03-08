@@ -30,10 +30,10 @@ class StatusBar is View {
       var top = 2
       if (pos.x >= left && pos.x < left + width && pos.y >= top && pos.y < top + height) {
         if (this.top.store.state["logOpen"] == false) {
-          this.top.store.dispatch({ "type": "open" })
+          this.top.store.dispatch({ "type": "logOpen", "mode": "open" })
           parent.addViewChild(LogWindow.new(parent, _ctx))
         } else {
-          this.top.store.dispatch({ "type": "close" })
+          this.top.store.dispatch({ "type": "logOpen", "mode": "close" })
         }
       }
     }

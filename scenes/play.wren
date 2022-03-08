@@ -6,7 +6,7 @@ import "core/dataobject" for Store, Reducer
 import "core/entity" for StackEntity
 import "core/action" for Action
 import "extra/actions" for RestAction
-import "core/scene" for Scene, View
+import "core/scene" for Scene, View, State
 import "core/display" for Display
 import "core/config" for Config
 import "core/world" for World, Zone
@@ -28,46 +28,90 @@ import "./views/renderer" for WorldRenderer
 import "./views/tooltip" for Tooltip
 
 import "./generator" for StaticGenerator
+class TestReducer is Reducer {
+  call(x, y) { reduce(x, y) }
 
-class LogReducer is Reducer {
+}
+class SelectionReducer is TestReducer {
   construct new() {}
   reduce(state, action) {
-    if (action["type"] == "open") {
-      state["logOpen"] = true
-    }
-    if (action["type"] == "close") {
-      state["logOpen"] = false
+    if (action["type"] == "selection") {
+      state = action["tiles"]
     }
     return state
   }
 }
 
-class PlayScene is Scene {
-  construct new(args) {
-    super()
-    _log = Log.new()
-    _store = Store.create({
-      "logOpen": false
-    }, LogReducer.new())
-    _store.subscribe {
-      System.print(_store.state)
+class LogReducer is TestReducer {
+  construct new() {}
+  reduce(state, action) {
+    System.print(state)
+    System.print(action)
+    if (action["type"] == "logOpen") {
+      state = action["mode"] == "open"
     }
+    return state
+  }
+}
 
-    _world = StaticGenerator.createWorld()
-
-    addViewChild(WorldRenderer.new(this, _world.active, 0, 21))
-    addViewChild(StatusBar.new(this, _world.active))
-    addViewChild(Tooltip.new(this, "BEGIN!"))
+class RangeSelectorState is State {
+  construct new(ctx, view, range) {
+    _ctx = ctx
+    _view = view
+    _range = range + 1
   }
 
-  store { _store }
-  log { _log }
+  onEnter() {
+    var player = _ctx.active.getEntityByTag("player")
+    _selection = player.pos
+    _tileList = []
+    for (dy in -_range..._range) {
+      for (dx in -_range..._range) {
+        if (Vec.new(dx, dy).manhattan >= _range) {
+        // if ((dx.abs + dy.abs) > _range) {
+          continue
+        }
+        _tileList.add(player.pos + Vec.new(dx, dy))
+      }
+    }
+    _view.top.store.dispatch({ "type": "selection", "tiles": [ _selection ] })
+  }
+
+  onExit() {
+    _view.top.store.dispatch({ "type": "selection", "tiles": [] })
+  }
 
   update() {
-    super.update()
+    // TODO: handle mouse or keyboard input
+    var destination = null
+    if (InputAction.right.firing) {
+      destination = _selection + Vec.new(1, 0)
+    } else if (InputAction.left.firing) {
+      destination = _selection + Vec.new(-1, 0)
+    } else if (InputAction.up.firing) {
+      destination = _selection + Vec.new(0, -1)
+    } else if (InputAction.down.firing) {
+      destination = _selection + Vec.new(0, 1)
+    } else if (InputAction.cancel.firing) {
+      return PlayState.new(_ctx, _view)
+    }
+    if (destination && _tileList.contains(destination)) {
+      _selection = destination
+      _view.top.store.dispatch({ "type": "selection", "tiles": [ _selection ] })
+    }
+    return this
+  }
+}
 
-    var player = _world.active.getEntityByTag("player")
-    var drone = _world.active.getEntityByTag("drone")
+class PlayState is State {
+  construct new(ctx, view) {
+    _ctx = ctx
+    _view = view
+  }
+
+  update() {
+    var player = _ctx.active.getEntityByTag("player")
+    var drone = _ctx.active.getEntityByTag("drone")
     if (player) {
       var current = player
       if (!player["active"] && drone) {
@@ -83,19 +127,65 @@ class PlayScene is Scene {
           current.action = MoveAction.new(Vec.new(0, -1))
         } else if (InputAction.down.firing) {
           current.action = MoveAction.new(Vec.new(0, 1))
+        } else if (InputAction.next.firing) {
+          return RangeSelectorState.new(_ctx, _view, 3)
         } else if (drone && InputAction.swap.firing) {
           player["active"] = !player["active"]
           var aIndex = _world.active.entities.indexOf(player)
           var bIndex = _world.active.entities.indexOf(drone)
-          _world.active.entities.swap(aIndex, bIndex)
+          _ctx.active.entities.swap(aIndex, bIndex)
           drone.priority = 12
           player.priority = 12
-          return
+          return this
         } else if (InputAction.rest.firing) {
           current.action = RestAction.new()
         }
       }
     }
+    return this
+
+  }
+
+}
+
+class PlayScene is Scene {
+  construct new(args) {
+    super()
+    _log = Log.new()
+    var logReducer = LogReducer.new()
+    var reducer = Store.combineReducers({
+      "logOpen": logReducer,
+      "selection": SelectionReducer.new()
+    })
+    _store = Store.create({
+      "logOpen": false,
+      "selection": []
+    }, reducer)
+
+    _world = StaticGenerator.createWorld()
+    _state = PlayState.new(_world, this)
+
+    addViewChild(WorldRenderer.new(this, _world.active, 0, 21))
+    addViewChild(StatusBar.new(this, _world.active))
+    addViewChild(Tooltip.new(this, "BEGIN!"))
+  }
+
+  store { _store }
+  log { _log }
+
+  update() {
+    super.update()
+
+    var state = _state.update()
+    if (state != _state) {
+      changeState(state)
+    }
+    /*
+    if (!state.tickWorld) {
+      return
+    }
+    */
+
     if (!_world.gameover) {
       _world.update()
 
@@ -110,6 +200,12 @@ class PlayScene is Scene {
         }
       }
     }
+  }
+
+  changeState(newState) {
+    _state.onExit()
+    _state = newState
+    _state.onEnter()
   }
 
   draw() {
