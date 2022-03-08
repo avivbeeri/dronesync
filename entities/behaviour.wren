@@ -22,7 +22,10 @@ class EnemyWeightedZone is WeightedZone {
 
   cost(a, b) {
     var pos = Elegant.unpair(b)
-    var ok = _zone.getEntitiesAtTile(pos).any {|entity| entity is PlayerEntity }
+    var entities = _zone.getEntitiesAtTile(pos).toList
+    var hasOther = !entities.isEmpty && entities.any {|entity| !entity is PlayerEntity }
+    var hasPlayer = !entities.isEmpty && entities.any {|entity| entity is PlayerEntity }
+    var ok = entities.isEmpty || (hasPlayer && !hasOther)
     return ok ? 1 : 10
   }
 }
@@ -140,10 +143,12 @@ class Patrol is Behaviour {
     _search = SEARCH.search(_graph, self.pos, _points[_index])
     var path = SEARCH.reconstruct(_search[0], self.pos, _points[_index])
     if (path == null || path.count <= 1) {
+      System.print("no path")
       return Action.none
     }
 
     if (isOccupied(path[1])) {
+      System.print("occupied")
       _attempts = _attempts + 1
       if (_attempts < 2) {
         return null

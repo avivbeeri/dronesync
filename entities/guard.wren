@@ -42,7 +42,7 @@ class Guard is Creature {
 
   endTurn() {
     super.endTurn()
-    Awareness.new(this).evaluate()
+    // Awareness.new(this).evaluate()
   }
 }
 
