@@ -3,22 +3,19 @@ TODO for DroneSync
 
 # Day 5:
 
-* Items for manipulating the state of the world and influencing guard behavior
-  - Smoke grenades
-    * DONE: Select a target square for use (based on range)
-    * DONE: cause a lingering environmental effect which blocks vision
-    * DONE Select an item to use (based on capability and inventory)
-    * Ensure AI responds accordingly to smoke
-  - Noise maker?
-  - jammer? (only makes sense if guards can talk to each other
-  - 
-  - ???
 
 * procedural map generation
   - Create layout
   - populate with guards
   - add objective(s)
   - lock-key systems
+
+Items:
+  - Noise maker?
+  - jammer? (only makes sense if guards can talk to each other
+  - 
+  - ???
+
 * Enhanced The guard detection AI 
   - Directional awareness
   - Points-of-interest
@@ -71,3 +68,4 @@ TODO for DroneSync
 ## Day 5
 * Smoke grenades
     * DONE Select an item to use (based on capability and inventory)
+    * DONE: Ensure AI responds accordingly to smoke

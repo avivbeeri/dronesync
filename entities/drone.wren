@@ -6,13 +6,11 @@ import "logic" for UpdateVision
 
 class DroneEntity is Creature {
   construct new(config) {
-    super()
-    init(config)
+    super(config)
   }
 
   construct new() {
     super()
-    init({})
   }
 
   init(config) {

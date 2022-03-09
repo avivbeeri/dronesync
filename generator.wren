@@ -1,5 +1,7 @@
+import "math" for Vec
 import "json" for JSON
 import "io" for FileSystem
+import "core/rng" for RNG
 import "core/entity" for StackEntity
 import "core/display" for Display
 import "core/config" for Config
@@ -10,6 +12,116 @@ import "./logic" for RemoveDefeated, GameEndCheck, UpdateVision, CompressLightMa
 import "./entities/player" for PlayerEntity
 import "./entities/drone" for DroneEntity
 import "./entities/guard" for Guard
+import "./roomGenerator" for GrowthRoomGenerator
+
+class RoomGenerator {
+  static generate() {
+    return RoomGenerator.init().generate()
+  }
+
+  construct init() {}
+  createWorld() {
+    var strategy = EnergyStrategy.new()
+    var map = TileMap.init()
+    map.default = { "OOB": true, "solid": true }
+
+    var world = World.new(strategy)
+    world["objective"] = false
+    world.pushZone(Zone.new(map))
+    world.active.postUpdate.add(RemoveDefeated)
+    world.active.postUpdate.add(CompressLightMap)
+    world.active.postUpdate.add(GameEndCheck)
+    var zone = world.active
+    return world
+  }
+  newTile(room, solid) {
+    return Tile.new({
+      "room": room,
+      "solid": solid,
+      "blockSight": solid,
+      "visible": "unknown",
+      "kind": solid ? "wall" : "floor",
+      "activeEffects": []
+    })
+  }
+  generate() {
+    var world = createWorld()
+    var zone = world.active
+    var generated = GrowthRoomGenerator.generate()
+    var rooms = generated[0]
+    var doors = generated[1]
+
+    var candidates = []
+    for (room in rooms) {
+      if (room.neighbours.count == 1) {
+        candidates.add(room)
+      }
+    }
+    var start = RNG.sample(candidates)
+
+    var player = zone.addEntity("player", PlayerEntity.new())
+    player.pos = Vec.new(start.x + 1, start.y + 1)
+
+    var enemyCount = 0
+    for (room in rooms) {
+      var wx = room.x
+      var wy = room.y
+      var width = wx + room.z
+      var height = wy + room.w
+      for (y in wy...height) {
+        for (x in wx...width) {
+          if (x == wx || x == width - 1 || y == wy || y == height - 1) {
+            zone.map[x, y] = newTile(room, true)
+          } else {
+            zone.map[x, y] = newTile(room, false)
+          }
+        }
+      }
+    }
+    for (door in doors) {
+      // room?
+      zone.map[door.x, door.y] = newTile(null, false)
+    }
+
+    var guardStart = getRandomWorldPosition(rooms)
+    var guardEnd = getRandomWorldPosition(rooms)
+    var guard = zone.addEntity(Guard.new({
+      "patrol": [
+        guardStart,
+        guardEnd
+      ]
+    }))
+    guard.pos = guardStart * 1
+    /*
+    guard.pos.x = start.x + start.z - 3
+    guard.pos.y = start.y + start.w - 3
+    */
+
+    var drone = zone.addEntity("drone", DroneEntity.new())
+    drone.pos.x = player.pos.x + 1
+    drone.pos.y = player.pos.y
+
+
+    var lightMaps = [
+      UpdateVision.update(zone),
+      UpdateVision.update(zone, drone, 4)
+    ]
+    CompressLightMap.update(zone)
+    return world
+  }
+
+  getRandomWorldPosition(rooms) {
+    var targetRoom = RNG.sample(rooms)
+    var wx = targetRoom.x
+    var wy = targetRoom.y
+    var width = wx + targetRoom.z
+    var height = wy + targetRoom.w
+
+    var tile = null
+    tile = Vec.new(RNG.int(wx + 1, width - 2), RNG.int(wy + 1, height - 2))
+    return tile
+  }
+}
 
 class StaticGenerator {
   static createWorld() {
@@ -111,13 +223,6 @@ class StaticGenerator {
       player.pos.x = 2
       player.pos.y = 6
     }
-
-
-    var lightMaps = [
-      UpdateVision.update(zone),
-      UpdateVision.update(zone, drone, 4)
-    ]
-    CompressLightMap.update(zone)
     return world
   }
 

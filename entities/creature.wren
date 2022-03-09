@@ -2,17 +2,15 @@ import "core/entity" for StackEntity
 import "extra/stats" for StatGroup
 
 class Creature is StackEntity {
-  construct new(config) {
-    super()
-    init(config)
-  }
-
   construct new() {
     super()
-    init({})
+  }
+  construct new(config) {
+    super(config)
   }
 
   init(config) {
+    super.init(config)
     this["awareness"] = 0
     this["targetGroup"] = ["creature"]
     this["inventory"] = []

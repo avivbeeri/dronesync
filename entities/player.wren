@@ -6,13 +6,11 @@ import "logic" for UpdateVision, UpdateMapEffects
 
 class PlayerEntity is Creature {
   construct new(config) {
-    super()
-    init(config)
+    super(config)
   }
 
   construct new() {
     super()
-    init({})
   }
 
   init(config) {

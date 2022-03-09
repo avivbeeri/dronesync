@@ -29,7 +29,7 @@ import "./log" for Log
 import "./views/renderer" for WorldRenderer
 import "./views/tooltip" for Tooltip
 
-import "./generator" for StaticGenerator
+import "./generator" for StaticGenerator, RoomGenerator
 import "core/graph" for DijkstraMap
 
 class TestReducer is Reducer {
@@ -240,7 +240,7 @@ class PlayScene is Scene {
       }
     }, reducer)
 
-    _world = StaticGenerator.createWorld()
+    _world = RoomGenerator.generate()
     _state = PlayState.new(_world, this)
 
     addViewChild(WorldRenderer.new(this, _world.active, 0, 21))
