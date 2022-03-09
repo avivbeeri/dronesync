@@ -82,6 +82,12 @@ class RoomGenerator {
       // room?
       zone.map[door.x, door.y] = newTile(null, false)
     }
+    zone.map[player.pos] = Tile.new({
+      "solid": false,
+      "visible": "unknown",
+      "activeEffects": [],
+      "kind": "exit"
+    })
 
     var guardStart = getRandomWorldPosition(rooms)
     var guardEnd = getRandomWorldPosition(rooms)
