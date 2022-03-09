@@ -143,15 +143,27 @@ class RoomGenerator {
       "kind": "exit"
     })
 
-    var guardStart = getRandomWorldPosition(rooms)
-    var guardEnd = getRandomWorldPosition(rooms)
-    var guard = zone.addEntity(Guard.new({
-      "patrol": [
-        guardStart,
-        guardEnd
-      ]
-    }))
-    guard.pos = guardStart * 1
+    for (room in rooms) {
+      if (room == start) {
+        continue
+      }
+
+      for (i in 0...RNG.int(3)) {
+        var target = room
+        if (RNG.float(1) < 0.5) {
+          target = RNG.sample(room.neighbours)
+        }
+        var guardStart = getRandomRoomPosition(room)
+        var guardEnd = getRandomRoomPosition(target)
+        var guard = zone.addEntity(Guard.new({
+          "patrol": [
+            guardStart,
+            guardEnd
+          ]
+        }))
+        guard.pos = guardStart * 1
+      }
+    }
 
     var drone = zone.addEntity("drone", DroneEntity.new())
     drone.pos.x = player.pos.x + 1
