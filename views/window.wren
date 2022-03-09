@@ -1,6 +1,6 @@
 import "graphics" for Canvas
 import "math" for Vec, M
-import "input" for Mouse
+import "input" for Mouse, Keyboard
 
 import "core/config" for Config
 import "core/display" for Display
@@ -156,7 +156,16 @@ class InventoryWindow is Window {
       _hover = ((((pos.y) - (y+4))) / 8).floor
       _hover = M.max(0, _hover)
     }
-    if (Mouse["left"].justPressed && _hover != -1 && _hover < _contents.count) {
+    var activate = Mouse["left"].justPressed
+    for (key in 0..9) {
+      var i = (key + 9) % 10
+      if (Keyboard[key.toString].justPressed && i < _contents.count) {
+        _hover = i
+        activate = true
+        break
+      }
+    }
+    if (activate && _hover != -1 && _hover < _contents.count) {
       this.top.store.dispatch({ "type": "item", "data": _contents[_hover] })
     }
   }
@@ -180,7 +189,12 @@ class InventoryWindow is Window {
       }
 
       Canvas.rectfill(0, y-2, width, 8, bg)
-      Canvas.print(entry["displayName"], 2, y, color, "m3x6")
+      var name = entry["displayName"]
+      var label = name
+      if (i < 10) {
+        label = "%(i+1)) %(label)"
+      }
+      Canvas.print(label, 2, y, color, "m3x6")
       var quantity = "x" + entry["quantity"].toString
       Canvas.print(quantity, width - quantity.count*7, y, color, "m3x6")
       y = y + 8
