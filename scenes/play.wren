@@ -170,7 +170,6 @@ class PlayState is State {
       if (current) {
         if (_view.store.state["action"]["data"]) {
           var action = _view.store.state["action"]
-          System.print(action)
           if (action["data"]["id"] == "smokebomb") {
             current.action = SmokeAction.new(action["selection"])
           }

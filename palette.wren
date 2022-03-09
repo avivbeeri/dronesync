@@ -1,8 +1,6 @@
 import "graphics" for Color
 import "core/display" for Display
 
-System.print(Display.bg)
-
 // UI palette - swappable!
 var Palette = [
   Color.hex("#000000"), // -

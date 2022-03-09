@@ -47,4 +47,5 @@ TODO for DroneSync
 
 ## Day 4
 * Fixed LoS issues
+* Fixed Path finding
 * Text display underflow fixed
