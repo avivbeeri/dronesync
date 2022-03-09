@@ -46,17 +46,6 @@ class WorldRenderer is View {
     var player = _ctx.getEntityByTag("player", true)
     // var xOff = (Canvas.width - 8 - 12) / 2 + 1
     // Canvas.offset(xOff - player.pos.x * 8, 20 - player.pos.y * 8)
-    for (tile in _range) {
-      // Canvas.rectfill(tile.x * tileWidth, tile.y * tileHeight, tileWidth, tileHeight, PAL[2])
-      Canvas.rect(tile.x * tileWidth - 1, tile.y * tileHeight - 1, tileWidth+1, tileHeight+1, PAL[2])
-    }
-    for (tile in _selection) {
-      Canvas.rectfill(tile.x * tileWidth, tile.y * tileHeight, tileWidth - 1, tileHeight - 1, PAL[6])
-    }
-    if (_center) {
-      var tile = _center
-      Canvas.rectfill(tile.x * tileWidth, tile.y * tileHeight, tileWidth - 1, tileHeight - 1, PAL[2])
-    }
 
     for (y in 0...mapHeight) {
       for (x in 0...mapWidth) {
@@ -101,6 +90,18 @@ class WorldRenderer is View {
         }
       }
     }
+    for (tile in _range) {
+      // Canvas.rectfill(tile.x * tileWidth, tile.y * tileHeight, tileWidth, tileHeight, PAL[2])
+      Canvas.rect(tile.x * tileWidth - 1, tile.y * tileHeight - 1, tileWidth+1, tileHeight+1, PAL[2])
+    }
+    for (tile in _selection) {
+      Canvas.rectfill(tile.x * tileWidth, tile.y * tileHeight, tileWidth - 1, tileHeight - 1, PAL[6])
+    }
+    if (_center) {
+      var tile = _center
+      Canvas.rectfill(tile.x * tileWidth, tile.y * tileHeight, tileWidth - 1, tileHeight - 1, PAL[2])
+    }
+
     for (entity in _ctx.entities) {
       // TODO: handle larger entities
       var tile = _ctx.map[entity.pos]
@@ -111,7 +112,10 @@ class WorldRenderer is View {
       if (entity.has("stunTimer") && entity["stunTimer"] > 0) {
         color = PAL[4]
       }
+
+      // TODO: figure out what background color to use here
       Canvas.rectfill(entity.pos.x * tileWidth, entity.pos.y * tileHeight, tileWidth - 1, tileHeight - 1, color)
+
       if (entity is PlayerEntity) {
         Canvas.print("@", entity.pos.x * tileWidth,  entity.pos.y * tileHeight, player["active"] ? PAL[7] : PAL[8])
       } else if (entity is DroneEntity) {

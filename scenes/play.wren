@@ -96,7 +96,7 @@ class RangeSelectorState is State {
         if (d.manhattan >= range) {
           continue
         }
-        var visible = GridWalk.checkLoS(_ctx.active.map, pos, point)
+        var visible = GridWalk.checkReach(_ctx.active.map, pos, point)
         if (!visible) {
           continue
         }

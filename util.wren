@@ -1,25 +1,31 @@
 import "math" for Vec
 
 class GridWalk {
-  static checkLoS(map, p0, p1) {
+  static checkPath(map, p0, p1, prop) {
     var line = GridWalk.getLine(p0, p1)
     var visible = true
     var previous = null
     for (point in line) {
       // Prevent tunnelling
       if (previous && (previous - point).manhattan > 1) {
-        if (map[previous.x, point.y]["blockSight"] &&
-            map[point.x, previous.y]["blockSight"]) {
+        if (map[previous.x, point.y][prop] &&
+            map[point.x, previous.y][prop]) {
           visible = false
           break
         }
       }
-      if (map[point]["blockSight"]) {
+      if (map[point][prop]) {
         visible = false
         break
       }
     }
     return visible
+  }
+  static checkReach(map, p0, p1) {
+    return GridWalk.checkPath(map, p0, p1, "solid")
+  }
+  static checkLoS(map, p0, p1) {
+    return GridWalk.checkPath(map, p0, p1, "blockSight")
   }
 
   static getLine(p0, p1) { getLine_Interpolate(p0, p1) }
