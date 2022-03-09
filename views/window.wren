@@ -156,6 +156,9 @@ class InventoryWindow is Window {
       _hover = ((((pos.y) - (y+4))) / 8).floor
       _hover = M.max(0, _hover)
     }
+    if (Mouse["left"].justPressed && _hover != -1 && _hover < _contents.count) {
+      this.top.store.dispatch({ "type": "item", "data": _contents[_hover] })
+    }
   }
   onRequestClose() {
     this.top.store.dispatch({ "type": "window", "mode": "close", "id": "inventory" })

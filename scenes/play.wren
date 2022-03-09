@@ -19,7 +19,7 @@ import "core/tilesheet" for Tilesheet
 
 import "extra/events" for GameEndEvent
 import "./events" for LogEvent
-import "./actions" for MoveAction, SmokeAction
+import "./actions" for MoveAction, SmokeAction, UseItemAction
 import "./entities/player" for PlayerEntity
 import "./inputs" for InputAction
 import "./log" for Log
@@ -34,6 +34,15 @@ import "core/graph" for DijkstraMap
 
 class TestReducer is Reducer {
   call(x, y) { reduce(x, y) }
+}
+class ItemReducer is TestReducer {
+  construct new() {}
+  reduce(state, action) {
+    if (action["type"] == "item") {
+      state["data"] = action["data"]
+    }
+    return state
+  }
 }
 class ActionReducer is TestReducer {
   construct new() {}
@@ -170,11 +179,17 @@ class PlayState is State {
 
 
       if (current) {
+        if (_view.store.state["item"]["data"]) {
+          var item = _view.store.state["item"]["data"]
+          _view.store.dispatch({ "type": "item", "data": null })
+          if (player["active"]) {
+            // Get info about item
+            return RangeSelectorState.new(_ctx, _view, item, item["range"], item["splash"])
+          }
+        }
         if (_view.store.state["action"]["data"]) {
           var action = _view.store.state["action"]
-          if (action["data"]["id"] == "smokebomb") {
-            current.action = SmokeAction.new(action["selection"])
-          }
+          current.action = UseItemAction.new(action["data"]["id"], action)
           _view.store.dispatch({ "type": "action", "data": null, "selection": null })
         } else {
           if (InputAction.right.firing) {
@@ -185,17 +200,6 @@ class PlayState is State {
             current.action = MoveAction.new(Vec.new(0, -1))
           } else if (InputAction.down.firing) {
             current.action = MoveAction.new(Vec.new(0, 1))
-          } else if (InputAction.next.firing) {
-            if (player["active"]) {
-              // Get info about item
-              var item = {
-                "id": "smokebomb",
-                "range": 7,
-                "splash": 4
-              }
-
-              return RangeSelectorState.new(_ctx, _view, item, item["range"], item["splash"])
-            }
           } else if (drone && InputAction.swap.firing) {
             player["active"] = !player["active"]
             var aIndex = _ctx.active.entities.indexOf(player)
@@ -223,11 +227,13 @@ class PlayScene is Scene {
     var reducer = Store.combineReducers({
       "window": WindowReducer.new(),
       "selection": SelectionReducer.new(),
-      "action": ActionReducer.new()
+      "action": ActionReducer.new(),
+      "item": ItemReducer.new()
     })
     _store = Store.create({
       "window": {},
       "action": {},
+      "item": {},
       "selection": {
         "tiles": [],
         "range": []

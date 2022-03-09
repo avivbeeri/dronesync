@@ -26,6 +26,61 @@ class EscapeAction is Action {
     return ActionResult.success
   }
 }
+class UseItemAction is Action {
+  construct new(itemId, args) {
+    super()
+    _itemId = itemId
+    _args = args
+  }
+
+  getItemAction(data) {
+    if (_itemId == "smokebomb") {
+      System.print(_args)
+      return SmokeAction.new(_args["selection"])
+    }
+    return null
+  }
+
+  perform() {
+    var inventory = source["inventory"]
+    if (!inventory) {
+      return ActionResult.failure
+    }
+    var itemIndex = -1
+    for (index in 0...inventory.count) {
+      if (inventory[index]["id"] == _itemId) {
+        itemIndex = index
+        break
+      }
+    }
+    if (itemIndex == -1) {
+      return ActionResult.failure
+    }
+    var item = inventory[itemIndex]
+    if (!item["quantity"] || item["quantity"] > 0) {
+      // Execute item
+      var itemAction = getItemAction(item)
+      if (!itemAction) {
+        Fiber.abort("Attempted to execute invalid action %(_itemId)")
+      }
+      itemAction.bind(source)
+      var result = itemAction.perform()
+      if (result.succeeded) {
+        if (item["quantity"] > 0) {
+          item["quantity"] = item["quantity"] - 1
+          if (item["quantity"] <= 0) {
+            inventory.removeAt(itemIndex)
+          }
+        }
+        if (result.alternate) {
+          return result
+        }
+        return ActionResult.success
+      }
+      return ActionResult.failure
+    }
+  }
+}
 class SmokeAction is Action {
   construct new(tiles) {
     super()
