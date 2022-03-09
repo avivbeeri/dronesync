@@ -41,7 +41,7 @@ class SmokeAction is Action {
       tile["visible"] = "hidden"
       tile["activeEffects"].add({
         "id": "smoke",
-        "duration": 5,
+        "duration": 15,
         "onComplete": Fn.new {
           ctx.map[pos]["blockSight"] = original
         }

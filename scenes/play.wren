@@ -51,6 +51,7 @@ class SelectionReducer is TestReducer {
     if (action["type"] == "selection") {
       state["tiles"] = action["tiles"]
       state["range"] = action["range"]
+      state["center"] = action["center"]
     }
     return state
   }
@@ -111,11 +112,11 @@ class RangeSelectorState is State {
     _center = player.pos
     _tileList = getRangeFromPoint(_center, _range)
     _selection = getRangeFromPoint(_center, _splash)
-    _view.top.store.dispatch({ "type": "selection", "tiles": _selection, "range": _tileList })
+    _view.top.store.dispatch({ "type": "selection", "tiles": _selection, "range": _tileList, "center": _center })
   }
 
   onExit() {
-    _view.top.store.dispatch({ "type": "selection", "tiles": [], "range": [] })
+    _view.top.store.dispatch({ "type": "selection", "tiles": [], "range": [], "center": null })
   }
 
   update() {
@@ -135,7 +136,7 @@ class RangeSelectorState is State {
     } else if (InputAction.cancel.firing) {
       return PlayState.new(_ctx, _view)
     } else if (InputAction.confirm.firing) {
-      _view.top.store.dispatch({ "type": "action", "data": _data, "selection": _selection })
+      _view.top.store.dispatch({ "type": "action", "data": _data, "selection": _selection, "center": _center })
       return PlayState.new(_ctx, _view)
     }
     if (destination && _tileList.contains(destination)) {
@@ -145,6 +146,7 @@ class RangeSelectorState is State {
         "type": "selection",
         "tiles": _selection,
         "range": _tileList,
+        "center": _center
       })
     }
     return this
@@ -188,7 +190,7 @@ class PlayState is State {
               // Get info about item
               var item = {
                 "id": "smokebomb",
-                "range": 4,
+                "range": 7,
                 "splash": 4
               }
 

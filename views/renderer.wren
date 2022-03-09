@@ -18,8 +18,10 @@ class WorldRenderer is View {
     _y = y
     _selection = []
     _range = []
+    _center = null
     parent.top.store.subscribe {
       _selection = parent.top.store.state["selection"]["tiles"]
+      _center = parent.top.store.state["selection"]["center"]
       _range = parent.top.store.state["selection"]["range"]
     }
   }
@@ -45,10 +47,15 @@ class WorldRenderer is View {
     // var xOff = (Canvas.width - 8 - 12) / 2 + 1
     // Canvas.offset(xOff - player.pos.x * 8, 20 - player.pos.y * 8)
     for (tile in _range) {
-      Canvas.rectfill(tile.x * tileWidth, tile.y * tileHeight, tileWidth, tileHeight, PAL[2])
+      // Canvas.rectfill(tile.x * tileWidth, tile.y * tileHeight, tileWidth, tileHeight, PAL[2])
+      Canvas.rect(tile.x * tileWidth - 1, tile.y * tileHeight - 1, tileWidth+1, tileHeight+1, PAL[2])
     }
     for (tile in _selection) {
-      Canvas.rectfill(tile.x * tileWidth, tile.y * tileHeight, tileWidth, tileHeight, PAL[6])
+      Canvas.rectfill(tile.x * tileWidth, tile.y * tileHeight, tileWidth - 1, tileHeight - 1, PAL[6])
+    }
+    if (_center) {
+      var tile = _center
+      Canvas.rectfill(tile.x * tileWidth, tile.y * tileHeight, tileWidth - 1, tileHeight - 1, PAL[2])
     }
 
     for (y in 0...mapHeight) {
@@ -69,7 +76,7 @@ class WorldRenderer is View {
             }
           }
           if (symbol) {
-            Canvas.print(".", x * tileWidth, y * tileHeight, color)
+            Canvas.print(".", x * tileWidth, y * tileHeight - 2, color)
           } else {
             Canvas.rectfill(x * tileWidth, y * tileHeight, tileWidth, tileHeight, color)
 
