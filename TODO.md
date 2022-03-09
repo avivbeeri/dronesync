@@ -1,17 +1,32 @@
 TODO for DroneSync
 ===============
 
-# Day 4:
+# Day 5:
 
 * Items for manipulating the state of the world and influencing guard behavior
   - Smoke grenades
     * DONE: Select a target square for use (based on range)
     * DONE: cause a lingering environmental effect which blocks vision
     * CLOSE: Select an item to use (based on capability and inventory)
-    * ensure AI responds accordingly
+    * ensure AI responds accordingly to smoke
+  - Noise maker?
+  - jammer? (only makes sense if guards can talk to each other
+  - 
   - ???
 
+* procedural map generation
+  - Create layout
+  - populate with guards
+  - add objective(s)
+  - lock-key systems
 * Enhanced The guard detection AI 
+  - Directional awareness
+  - Points-of-interest
+
+* Drone mechanics
+  - Range of operation
+  - Awareness
+* Contraption interactions
 
 
 # Completed:
@@ -49,3 +64,8 @@ TODO for DroneSync
 * Fixed LoS issues
 * Fixed Path finding
 * Text display underflow fixed
+* Smoke grenades
+  - DONE: Select a target square for use (based on range)
+  - DONE: cause a lingering environmental effect which blocks vision
+
+## Day 5
