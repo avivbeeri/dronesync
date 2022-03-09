@@ -15,6 +15,8 @@ import "./entities/drone" for DroneEntity
 import "./entities/guard" for Guard
 import "./roomGenerator" for GrowthRoomGenerator
 
+var SPAWN_DIST = [ 0, 0, 1, 1, 1, 1, 2 ]
+
 class RoomGraph is Graph {
   construct new(rooms) {
     _rooms = {}
@@ -148,13 +150,21 @@ class RoomGenerator {
         continue
       }
 
-      for (i in 0...RNG.int(3)) {
+      var spawnTotal = RNG.sample(SPAWN_DIST)
+      for (i in 0...spawnTotal) {
         var target = room
         if (RNG.float(1) < 0.5) {
           target = RNG.sample(room.neighbours)
+          if (target == start) {
+            target = room
+          }
         }
         var guardStart = getRandomRoomPosition(room)
         var guardEnd = getRandomRoomPosition(target)
+        if ((guardStart - guardEnd).manhattan < 3) {
+          i = i - 1
+          continue
+        }
         var guard = zone.addEntity(Guard.new({
           "patrol": [
             guardStart,

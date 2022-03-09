@@ -4,8 +4,6 @@ TODO for DroneSync
 # Day 5:
 
 * procedural map generation
-  - add objective(s)
-  - populate with guards
   - lock-key systems
 
 Items:
@@ -17,6 +15,7 @@ Items:
 * Enhanced The guard detection AI 
   - Directional awareness
   - Points-of-interest
+* Enhanced Enemy abilites
 
 * Drone mechanics
   - Range of operation
@@ -69,3 +68,5 @@ Items:
     * DONE: Ensure AI responds accordingly to smoke
 * Procedural Map Generation
   - Create layout
+  - add objective(s)
+  - populate with guards

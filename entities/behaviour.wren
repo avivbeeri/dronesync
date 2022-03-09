@@ -157,15 +157,18 @@ class Patrol is Behaviour {
       return null
     }
     if (self.pos == _points[_index]) {
-      System.print("%(self.pos) vs %(_points[_index])")
       _index = (_index + 1) % _points.count
-      System.print(_points[_index])
+      _search = null
     }
     _graph = EnemyWeightedZone.new(ctx)
-    _search = SEARCH.search(_graph, self.pos, _points[_index])
+    if (!_search) {
+      System.print("%(self) recalculating")
+      _search = SEARCH.search(_graph, self.pos, _points[_index])
+    }
     var path = SEARCH.reconstruct(_search[0], self.pos, _points[_index])
     if (path == null || path.count <= 1) {
       System.print("no path: %(_points)")
+      _search = null
       return Action.none
     }
 
@@ -180,6 +183,7 @@ class Patrol is Behaviour {
         var available = NSEW.values.where{|dir| !isOccupied(self.pos + dir)}.toList
         var dir = RNG.sample(available)
         if (dir != null) {
+          _search = null
           return MoveAction.new(dir, true, Action.none)
         }
         return null
