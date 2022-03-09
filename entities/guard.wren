@@ -3,6 +3,7 @@ import "util" for GridWalk
 import "entities/creature" for Creature
 import "entities/behaviour" for
   Awareness,
+  Confusion,
   Patrol,
   Seek,
   State,
@@ -32,6 +33,7 @@ class Guard is Creature {
 
     push(Stunnable)
     push(Awareness)
+    push(Confusion)
     push(State.new(this, "state", {
       "alert": Seek,
       "patrol": Patrol.new(this, [ Vec.new(10, 4), Vec.new(10, 16) ])

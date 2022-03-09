@@ -23,6 +23,7 @@ class EnemyWeightedZone is WeightedZone {
   cost(a, b) {
     var pos = Elegant.unpair(b)
     var entities = _zone.getEntitiesAtTile(pos).toList
+
     var hasOther = !entities.isEmpty && entities.any {|entity| !entity is PlayerEntity }
     var hasPlayer = !entities.isEmpty && entities.any {|entity| entity is PlayerEntity }
     var ok = entities.isEmpty || (hasPlayer && !hasOther)
@@ -48,6 +49,29 @@ class State is Behaviour {
     }
     return _map[self[_key]].evaluate()
   }
+}
+
+class Confusion is Behaviour {
+  construct new(self) {
+    super(self)
+  }
+  notify(event) {}
+
+  isOccupied(dest) {
+    return ctx.getEntitiesAtTile(dest.x, dest.y).where {|entity| entity != self && !(entity is PlayerEntity) }.count > 0
+  }
+
+  evaluate() {
+    if (ctx.map[self.pos]["blockSight"]) {
+      var available = NSEW.values.where{|dir| !isOccupied(self.pos + dir)}.toList
+      var dir = RNG.sample(available)
+      if (dir != null) {
+        return MoveAction.new(dir, true, Action.none)
+      }
+      return Action.none
+    }
+  }
+
 }
 
 class Awareness is Behaviour {
