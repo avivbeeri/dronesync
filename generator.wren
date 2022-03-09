@@ -8,11 +8,30 @@ import "core/config" for Config
 import "core/world" for World, Zone
 import "core/director" for EnergyStrategy
 import "core/map" for TileMap, Tile
+import "core/graph" for BFSNeutral, Graph
 import "./logic" for RemoveDefeated, GameEndCheck, UpdateVision, CompressLightMap
 import "./entities/player" for PlayerEntity
 import "./entities/drone" for DroneEntity
 import "./entities/guard" for Guard
 import "./roomGenerator" for GrowthRoomGenerator
+
+class RoomGraph is Graph {
+  construct new(rooms) {
+    _rooms = {}
+    for (room in rooms) {
+      _rooms[room.id] = room
+    }
+  }
+  [location] {
+    return _rooms[location]
+  }
+  neighbours(location) {
+    var room = _rooms[location]
+    return room.neighbours.map {|room|
+      return room.id
+    }.toList
+  }
+}
 
 class RoomGenerator {
   static generate() {
@@ -20,6 +39,7 @@ class RoomGenerator {
   }
 
   construct init() {}
+
   createWorld() {
     var strategy = EnergyStrategy.new()
     var map = TileMap.init()
@@ -34,6 +54,7 @@ class RoomGenerator {
     var zone = world.active
     return world
   }
+
   newTile(room, solid) {
     return Tile.new({
       "room": room,
@@ -44,6 +65,39 @@ class RoomGenerator {
       "activeEffects": []
     })
   }
+
+  getCriticalPath(rooms, start) {
+    var graph = RoomGraph.new(rooms)
+    var search = BFSNeutral.search(graph, start.id)
+    var maxId = -1
+    var endPath
+    var dist = 0
+    for (room in rooms) {
+      if (room.id == start.id) {
+        continue
+      }
+      var path = BFSNeutral.reconstruct(search[0], start.id, room.id)
+      if (path.count > dist) {
+        dist = path.count
+        maxId = room.id
+        endPath = path
+      }
+    }
+
+    var end = graph[maxId]
+
+    // NOTE: endPath is in room IDs
+    return endPath.map {|id| graph[id] }.toList
+    // Pick end node
+    // further point from the start ?
+    // or min-distance?
+
+    // Compute critical path to end point
+
+    // Maybe do stuff with extra rooms
+  }
+
+
   generate() {
     var world = createWorld()
     var zone = world.active
@@ -98,14 +152,20 @@ class RoomGenerator {
       ]
     }))
     guard.pos = guardStart * 1
-    /*
-    guard.pos.x = start.x + start.z - 3
-    guard.pos.y = start.y + start.w - 3
-    */
 
     var drone = zone.addEntity("drone", DroneEntity.new())
     drone.pos.x = player.pos.x + 1
     drone.pos.y = player.pos.y
+
+    var path = getCriticalPath(rooms, start)
+    var console = getRandomRoomPosition(path[-1])
+    zone.map[console] = Tile.new({
+      "solid": true,
+      "visible": "unknown",
+      "blockSight": false,
+      "activeEffects": [],
+      "kind": "goal"
+    })
 
 
     var lightMaps = [
@@ -116,8 +176,7 @@ class RoomGenerator {
     return world
   }
 
-  getRandomWorldPosition(rooms) {
-    var targetRoom = RNG.sample(rooms)
+  getRandomRoomPosition(targetRoom) {
     var wx = targetRoom.x
     var wy = targetRoom.y
     var width = wx + targetRoom.z
@@ -126,6 +185,11 @@ class RoomGenerator {
     var tile = null
     tile = Vec.new(RNG.int(wx + 1, width - 2), RNG.int(wy + 1, height - 2))
     return tile
+
+  }
+  getRandomWorldPosition(rooms) {
+    var targetRoom = RNG.sample(rooms)
+    return getRandomRoomPosition(targetRoom)
   }
 }
 

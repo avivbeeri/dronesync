@@ -14,7 +14,7 @@ class GrowthRoomGenerator {
   generate() {
     // Level dimensions in tiles
     // 1-2) General constraints
-    var maxRoomSize = 13
+    var maxRoomSize = 20
     var minRoomSize = 6
     var minRooms = 4
     var totalRooms = RNG.int(minRooms, MAX_ROOM_COUNT) + 1
@@ -42,7 +42,6 @@ class GrowthRoomGenerator {
         RNG.int(minRoomSize, maxRoomSize),
         RNG.int(minRoomSize, maxRoomSize)
       )
-      System.print("%(attempts): %(newRoom)")
 
       // 7) Place the room on the wall of the base
       if (dir == 0) {

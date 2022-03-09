@@ -3,11 +3,9 @@ TODO for DroneSync
 
 # Day 5:
 
-
 * procedural map generation
-  - Create layout
-  - populate with guards
   - add objective(s)
+  - populate with guards
   - lock-key systems
 
 Items:
@@ -69,3 +67,5 @@ Items:
 * Smoke grenades
     * DONE Select an item to use (based on capability and inventory)
     * DONE: Ensure AI responds accordingly to smoke
+* Procedural Map Generation
+  - Create layout
