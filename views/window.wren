@@ -124,8 +124,10 @@ class InventoryWindow is Window {
   construct new(parent, ctx) {
     // Assuming default font
     super(parent, ctx, Vec.new(8 * 20, 8 * 6))
-    restorePref("inventory")
     title = "Inventory"
+    y = 32
+    x = Canvas.width - width - 8
+    restorePref("inventory")
     var Sub
     Sub = top.store.subscribe {
 
@@ -207,6 +209,7 @@ class LogWindow is Window {
   construct new(parent, ctx) {
     // Assuming default font
     super(parent, ctx, Vec.new(8 * 40, 8 * 3))
+    y = Canvas.height - height - 16
     restorePref("log")
     title = "Log"
     var Sub
