@@ -7,7 +7,7 @@ TODO for DroneSync
   - Smoke grenades
     * DONE: Select a target square for use (based on range)
     * DONE: cause a lingering environmental effect which blocks vision
-    * CLOSE: Select an item to use (based on capability and inventory)
+    * DONE Select an item to use (based on capability and inventory)
     * ensure AI responds accordingly to smoke
   - Noise maker?
   - jammer? (only makes sense if guards can talk to each other
@@ -69,3 +69,5 @@ TODO for DroneSync
   - DONE: cause a lingering environmental effect which blocks vision
 
 ## Day 5
+* Smoke grenades
+    * DONE Select an item to use (based on capability and inventory)

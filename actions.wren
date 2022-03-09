@@ -35,7 +35,6 @@ class UseItemAction is Action {
 
   getItemAction(data) {
     if (_itemId == "smokebomb") {
-      System.print(_args)
       return SmokeAction.new(_args["selection"])
     }
     return null
