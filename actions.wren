@@ -17,7 +17,8 @@ class SwapAction is Action {
   perform() {
     var player = ctx.getEntityByTag("player")
     var drone = ctx.getEntityByTag("drone")
-    if (!_force && (player.pos - drone.pos).length > 8) {
+    if ((player.pos - drone.pos).length > drone["range"] && !_force) {
+      System.print("out of range, no swap")
       return ActionResult.failure
     }
 

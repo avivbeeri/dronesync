@@ -136,7 +136,16 @@ class RoomGenerator {
     }
     for (door in doors) {
       // room?
-      zone.map[door.x, door.y] = newTile(null, false)
+      // zone.map[door.x, door.y] = newTile(null, false)
+      zone.map[door.x, door.y] = Tile.new({
+        "solid": false,
+        "blockSight": true,
+        "visible": "unknown",
+        "activeEffects": [],
+        "kind": "door",
+        "level": 0,
+        "locked": false
+      })
     }
     zone.map[player.pos] = Tile.new({
       "solid": false,

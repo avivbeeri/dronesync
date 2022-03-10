@@ -85,8 +85,12 @@ class WorldRenderer is View {
           Canvas.print(">", x * tileWidth, y * tileHeight, seen ? Display.fg : PAL[3])
         }
         if (tile["kind"] == "door") {
-          Canvas.rectfill(x * tileWidth, y * tileHeight, tileWidth, tileHeight, Display.bg)
-          Canvas.print("1", x * tileWidth, y * tileHeight, seen ? Display.fg : PAL[3])
+          var color = Display.fg
+          if (tile["locked"] || tile["level"] > 0) {
+            color = PAL[7]
+          }
+          Canvas.rectfill(x * tileWidth, y * tileHeight, tileWidth - 1, tileHeight - 1, seen ? color : PAL[3])
+          Canvas.print("+", x * tileWidth, y * tileHeight, PAL[0])
         }
       }
     }

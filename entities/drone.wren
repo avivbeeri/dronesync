@@ -17,6 +17,7 @@ class DroneEntity is Creature {
   init(config) {
     super.init(config)
     this["active"] = true
+    this["range"] = 16
   }
 
   action { _action }
@@ -35,7 +36,7 @@ class DroneEntity is Creature {
 
   endTurn() {
     super.endTurn()
-    if ((pos - _player.pos).length > 16) {
+    if ((pos - _player.pos).length > this["range"]) {
       this["lightMap"] = UpdateVision.update(ctx, this, 1)
       if (!_player["active"]) {
         System.print("Out of range")
