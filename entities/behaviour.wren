@@ -162,18 +162,15 @@ class Patrol is Behaviour {
     }
     _graph = EnemyWeightedZone.new(ctx)
     if (!_search) {
-      System.print("%(self) recalculating")
       _search = SEARCH.search(_graph, self.pos, _points[_index])
     }
     var path = SEARCH.reconstruct(_search[0], self.pos, _points[_index])
     if (path == null || path.count <= 1) {
-      System.print("no path: %(_points)")
       _search = null
       return Action.none
     }
 
     if (isOccupied(path[1])) {
-      System.print("occupied")
       _attempts = _attempts + 1
       if (_attempts < 2) {
         return null

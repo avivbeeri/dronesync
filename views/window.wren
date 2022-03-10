@@ -30,12 +30,15 @@ class Window is View {
     _rect.x = (Canvas.width - _rect.w) / 2
     _rect.y = (Canvas.height - _rect.z) / 2
     _title = ""
+    _closable = false
 
     z = 1
   }
 
   title { _title }
   title=(v) { _title = v }
+  closable { _closable }
+  closable=(v) { _closable = v }
   ctx { _ctx }
 
   x { _rect.x }
@@ -111,7 +114,9 @@ class Window is View {
     if (_hoverX) {
       color = PAL[5]
     }
-    Canvas.print("X", _rect.w - 8, -9, color)
+    if (_closable) {
+      Canvas.print("X", _rect.w - 8, -9, color)
+    }
     Canvas.clip(_rect.x, _rect.y, _rect.w, _rect.z)
     // Draw window contents
     drawContent()
@@ -125,6 +130,7 @@ class InventoryWindow is Window {
     // Assuming default font
     super(parent, ctx, Vec.new(8 * 20, 8 * 6))
     title = "Inventory"
+    closable = true
     y = 32
     x = Canvas.width - width - 8
     restorePref("inventory")
@@ -212,6 +218,7 @@ class LogWindow is Window {
     y = Canvas.height - height - 16
     restorePref("log")
     title = "Log"
+    closable = true
     var Sub
     Sub = top.store.subscribe {
 

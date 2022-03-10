@@ -19,7 +19,7 @@ var CANCEL_KEY = InputGroup.new([
 ])
 
 var CONFIRM_KEY = InputGroup.new([
-  Keyboard["z"], Keyboard["x"], Keyboard["e"], Keyboard["return"]
+  Keyboard["z"], Keyboard["x"], Keyboard["e"], Keyboard["return"], Keyboard["space"]
 ])
 
 var INVENTORY_KEY = InputGroup.new([
