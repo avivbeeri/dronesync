@@ -4,6 +4,7 @@ import "./core/map" for Room
 import "core/config" for Config
 
 var MAX_ROOM_COUNT = 10
+var SIZES = [ 8,9,9,9,10,10,10, 11, 11,11,12, 12,12,13, 13,13,14,15,16,17,18 ]
 
 class GrowthRoomGenerator {
   static generate() {
@@ -14,9 +15,9 @@ class GrowthRoomGenerator {
   generate() {
     // Level dimensions in tiles
     // 1-2) General constraints
-    var maxRoomSize = 20
-    var minRoomSize = 6
-    var minRooms = 4
+    var maxRoomSize = 18
+    var minRoomSize = 8
+    var minRooms = 8
     var totalRooms = RNG.int(minRooms, MAX_ROOM_COUNT) + 1
 
     var mapHeight = Config["map"]["height"]
@@ -25,11 +26,11 @@ class GrowthRoomGenerator {
     var doors = []
 
     // 3) A single room in the world (Library)
-    var rooms = [ Room.new((mapWidth / 2).round, (mapHeight / 2).round, 7, 7) ]
+    var rooms = [ Room.new((mapWidth / 2).round, (mapHeight / 2).round, RNG.sample(SIZES), RNG.sample(SIZES)) ]
     var door = null
 
     var attempts = 0
-    while(rooms.count < totalRooms && attempts < 20) {
+    while(rooms.count < minRooms && attempts < 100) {
       attempts = attempts + 1
 
       // 4) Pass begins: Pick a base for this pass at random from existing rooms.
@@ -39,8 +40,8 @@ class GrowthRoomGenerator {
       // 6)Make a new room
       var newRoom = Room.new(
         0, 0,
-        RNG.int(minRoomSize, maxRoomSize),
-        RNG.int(minRoomSize, maxRoomSize)
+        RNG.sample(SIZES) + 2,
+        RNG.sample(SIZES) + 2
       )
 
       // 7) Place the room on the wall of the base

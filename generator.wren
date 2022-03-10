@@ -120,19 +120,7 @@ class RoomGenerator {
 
     var enemyCount = 0
     for (room in rooms) {
-      var wx = room.x
-      var wy = room.y
-      var width = wx + room.z
-      var height = wy + room.w
-      for (y in wy...height) {
-        for (x in wx...width) {
-          if (x == wx || x == width - 1 || y == wy || y == height - 1) {
-            zone.map[x, y] = newTile(room, true)
-          } else {
-            zone.map[x, y] = newTile(room, false)
-          }
-        }
-      }
+      generateRoom(zone, room, start)
     }
     for (door in doors) {
       // room?
@@ -153,36 +141,6 @@ class RoomGenerator {
       "activeEffects": [],
       "kind": "exit"
     })
-
-    for (room in rooms) {
-      if (room == start) {
-        continue
-      }
-
-      var spawnTotal = RNG.sample(SPAWN_DIST)
-      for (i in 0...spawnTotal) {
-        var target = room
-        if (RNG.float(1) < 0.5) {
-          target = RNG.sample(room.neighbours)
-          if (target == start) {
-            target = room
-          }
-        }
-        var guardStart = getRandomRoomPosition(room)
-        var guardEnd = getRandomRoomPosition(target)
-        if ((guardStart - guardEnd).manhattan < 3) {
-          i = i - 1
-          continue
-        }
-        var guard = zone.addEntity(Guard.new({
-          "patrol": [
-            guardStart,
-            guardEnd
-          ]
-        }))
-        guard.pos = guardStart * 1
-      }
-    }
 
     var drone = zone.addEntity("drone", DroneEntity.new())
     drone.pos.x = player.pos.x + 1
@@ -207,6 +165,63 @@ class RoomGenerator {
     return world
   }
 
+  generateRoom(zone, room, start) {
+    var wx = room.x
+    var wy = room.y
+    var width = wx + room.z
+    var height = wy + room.w
+    var type = "empty"
+    // Generate room walls
+    for (y in wy...height) {
+      for (x in wx...width) {
+        if (x == wx || x == width - 1 || y == wy || y == height - 1) {
+          zone.map[x, y] = newTile(room, true)
+        } else {
+          // zone.map[x, y] = newTile(room, false)
+        }
+      }
+    }
+
+    if (type == "empty") {
+      for (y in wy...height) {
+        for (x in wx...width) {
+          if (x > wx && x < width - 1 && y > wy && y < height - 1) {
+            zone.map[x, y] = newTile(room, false)
+          }
+        }
+      }
+    }
+    if (type == "cargo") {
+
+    }
+    var spawnTotal = RNG.sample(SPAWN_DIST)
+    for (i in 0...spawnTotal) {
+      if (room == start) {
+        break
+      }
+      var target = room
+      if (RNG.float(1) < 0.5) {
+        target = RNG.sample(room.neighbours)
+        if (target == start) {
+          target = room
+        }
+      }
+      var guardStart = getRandomRoomPosition(room)
+      var guardEnd = getRandomRoomPosition(target)
+      if ((guardStart - guardEnd).manhattan < 3) {
+        i = i - 1
+        continue
+      }
+      var guard = zone.addEntity(Guard.new({
+        "patrol": [
+          guardStart,
+          guardEnd
+        ]
+      }))
+      guard.pos = guardStart * 1
+    }
+  }
+
   getRandomRoomPosition(targetRoom) {
     var wx = targetRoom.x
     var wy = targetRoom.y
@@ -225,7 +240,7 @@ class RoomGenerator {
 }
 
 class StaticGenerator {
-  static createWorld() {
+  static generate() {
     var strategy = EnergyStrategy.new()
     var map = TileMap.init()
     map.default = { "OOB": true, "solid": true, "blockSight": true }

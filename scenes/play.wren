@@ -235,11 +235,11 @@ class PlayScene is Scene {
     }, reducer)
 
     _world = RoomGenerator.generate()
+    // _world = StaticGenerator.generate()
     _state = PlayState.new(_world, this)
 
-    addViewChild(WorldRenderer.new(this, _world.active, 0, 21))
+    addViewChild(WorldRenderer.new(this, _world.active, 0, 9))
     addViewChild(StatusBar.new(this, _world.active))
-    addViewChild(Tooltip.new(this, "BEGIN!"))
   }
 
   store { _store }
