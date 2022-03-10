@@ -19,7 +19,7 @@ import "core/tilesheet" for Tilesheet
 
 import "extra/events" for GameEndEvent
 import "./events" for LogEvent
-import "./actions" for MoveAction, SmokeAction, UseItemAction
+import "./actions" for MoveAction, SmokeAction, UseItemAction, SwapAction
 import "./entities/player" for PlayerEntity
 import "./inputs" for InputAction
 import "./log" for Log
@@ -201,13 +201,7 @@ class PlayState is State {
           } else if (InputAction.down.firing) {
             current.action = MoveAction.new(Vec.new(0, 1))
           } else if (drone && InputAction.swap.firing) {
-            player["active"] = !player["active"]
-            var aIndex = _ctx.active.entities.indexOf(player)
-            var bIndex = _ctx.active.entities.indexOf(drone)
-            _ctx.active.entities.swap(aIndex, bIndex)
-            drone.priority = 12
-            player.priority = 12
-            return this
+            current.action = SwapAction.new()
           } else if (InputAction.rest.firing) {
             current.action = RestAction.new()
           }

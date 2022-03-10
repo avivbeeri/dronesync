@@ -1,26 +1,30 @@
 TODO for DroneSync
 ===============
 
-# Day 5:
+# Day 6:
 
+* Drone mechanics
+  - Range of operation
+  - Awareness
 * procedural map generation
+  - Interesting rooms
   - lock-key systems
 
+
+* Contraption interactions
+
+
+* Enhanced The guard detection AI 
+  - Directional awareness
+  - Points-of-interest
+* Enhanced Enemy abilites
 Items:
   - Noise maker?
   - jammer? (only makes sense if guards can talk to each other
   - 
   - ???
 
-* Enhanced The guard detection AI 
-  - Directional awareness
-  - Points-of-interest
-* Enhanced Enemy abilites
 
-* Drone mechanics
-  - Range of operation
-  - Awareness
-* Contraption interactions
 
 
 # Completed:

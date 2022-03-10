@@ -5,6 +5,35 @@ import "./events" for LogEvent, AttackEvent, EscapeEvent, GoalEvent
 import "./extra/combat" for Attack, AttackType, AttackResult
 import "./entities/player" for PlayerEntity
 
+class SwapAction is Action {
+  construct new() {
+    super()
+    _force = false
+  }
+  construct new(force) {
+    super()
+    _force = force
+  }
+  perform() {
+    var player = ctx.getEntityByTag("player")
+    var drone = ctx.getEntityByTag("drone")
+    if (!_force && (player.pos - drone.pos).length > 8) {
+      return ActionResult.failure
+    }
+
+    var primary = player["active"] ? player : drone
+    player["active"] = !player["active"]
+    var aIndex = ctx.entities.indexOf(player)
+    var bIndex = ctx.entities.indexOf(drone)
+    ctx.entities.swap(aIndex, bIndex)
+    drone.priority = primary.priority
+    player.priority = primary.priority
+    // We fail here because this doesn't advance
+    return ActionResult.failure
+  }
+
+}
+
 class ObjectiveAction is Action {
   construct new() {
     super()

@@ -1,4 +1,5 @@
 import "core/action" for Action
+import "actions" for SwapAction
 import "entities/creature" for Creature
 import "extra/combat" for Attack
 import "core/graph" for WeightedZone, BFS, AStar, DijkstraMap
@@ -22,8 +23,8 @@ class DroneEntity is Creature {
   action=(v) { _action = v }
 
   update() {
-    var player = ctx.getEntityByTag("player")
-    if (!player["active"]) {
+    _player = ctx.getEntityByTag("player")
+    if (!_player["active"]) {
       var action = _action
       _action = null
       return action
@@ -34,7 +35,15 @@ class DroneEntity is Creature {
 
   endTurn() {
     super.endTurn()
-    this["lightMap"] = UpdateVision.update(ctx, this, 4)
+    if ((pos - _player.pos).length > 16) {
+      this["lightMap"] = UpdateVision.update(ctx, this, 1)
+      if (!_player["active"]) {
+        System.print("Out of range")
+        SwapAction.new(true).bind(this).perform()
+      }
+    } else {
+      this["lightMap"] = UpdateVision.update(ctx, this, 4)
+    }
   }
 }
 

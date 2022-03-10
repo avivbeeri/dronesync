@@ -213,7 +213,6 @@ class UpdateVision {
       var fullShadow = false
       var row = 1
       while (distance == -1 || row < distance) {
-        System.print(line)
         var pos = start + transformOctant(row, 0, octant)
         if (tiles[pos]["OOB"]) {
           break
