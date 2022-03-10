@@ -93,7 +93,7 @@ class Awareness is Behaviour {
     var aware = self["awareness"]
     self["los"] = visible
 
-    System.print("%(self): %(visible) - %(aware)")
+    // System.print("%(self): %(visible) - %(aware)")
     if (self["state"] == "patrol") {
       if (visible) {
         self["awareness"] = self["awareness"] + 1

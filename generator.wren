@@ -16,6 +16,8 @@ import "./entities/guard" for Guard
 import "./roomGenerator" for GrowthRoomGenerator
 
 var SPAWN_DIST = [ 0, 0, 1, 1, 1, 1, 2 ]
+// var CRATES = (0...9).map {|i| String.fromCodePoint(9622 + i) }.toList
+var CRATES = [ " ", String.fromCodePoint(0x2588)]
 
 class RoomGraph is Graph {
   construct new(rooms) {
@@ -135,19 +137,23 @@ class RoomGenerator {
         "locked": false
       })
     }
-    zone.map[player.pos] = Tile.new({
+
+    var pos = getRandomRoomPosition(zone, start)
+    zone.map[pos] = Tile.new({
       "solid": false,
       "visible": "unknown",
       "activeEffects": [],
       "kind": "exit"
     })
+    player.pos.x = pos.x
+    player.pos.y = pos.y
 
-    var drone = zone.addEntity("drone", DroneEntity.new())
+    var drone = zone.addEntity("drone", DroneEntity.new({ "stats": { "speed": 12 } }))
     drone.pos.x = player.pos.x + 1
     drone.pos.y = player.pos.y
 
     var path = getCriticalPath(rooms, start)
-    var console = getRandomRoomPosition(path[-1])
+    var console = getRandomRoomPosition(zone, path[-1])
     zone.map[console] = Tile.new({
       "solid": true,
       "visible": "unknown",
@@ -164,20 +170,30 @@ class RoomGenerator {
     CompressLightMap.update(zone)
     return world
   }
+  placeHorizontal(y, start, length, place) {
+    for (x in start...(start + length)) {
+      place.call(x, y)
+    }
+  }
+  placeVertical(x, start, length, place) {
+    for (y in start...(start + length)) {
+      place.call(x, y)
+    }
+  }
 
   generateRoom(zone, room, start) {
     var wx = room.x
     var wy = room.y
     var width = wx + room.z
     var height = wy + room.w
-    var type = "empty"
+    var type = RNG.sample(["empty", "cargo", "island", "island"])
     // Generate room walls
     for (y in wy...height) {
       for (x in wx...width) {
         if (x == wx || x == width - 1 || y == wy || y == height - 1) {
           zone.map[x, y] = newTile(room, true)
         } else {
-          // zone.map[x, y] = newTile(room, false)
+          zone.map[x, y] = newTile(room, false)
         }
       }
     }
@@ -191,8 +207,53 @@ class RoomGenerator {
         }
       }
     }
-    if (type == "cargo") {
+    if (type == "bridge") {
 
+    }
+    if (type == "island") {
+      var dimX = RNG.int(4, (room.z - 2)) - 1
+      var dimY = RNG.int(4, (room.w - 2)) - 1
+      var setX = ((room.z - dimX) / 2).floor
+      var setY = ((room.w - dimY) / 2).floor
+
+      if (RNG.float() < 0.5) {
+        placeVertical(wx + setX, wy + setY, dimY) {|x, y|
+          zone.map[x, y] = newTile(room, true)
+        }
+        placeVertical(wx + room.z - setX - 1, wy + setY, dimY) {|x, y|
+          zone.map[x, y] = newTile(room, true)
+        }
+      } else {
+        placeHorizontal(wy + setY, wx + setX, dimX) {|x, y|
+          zone.map[x, y] = newTile(room, true)
+        }
+        placeHorizontal(wy + room.w - setY - 1, wx + setX, dimX) {|x, y|
+          zone.map[x, y] = newTile(room, true)
+        }
+      }
+    }
+    if (type == "cargo") {
+      var modW = ((room.z - 2) % 4)
+      var modH = ((room.w - 2) % 4)
+      var crateW = ((room.z - 2) / 4).floor
+      var crateH = ((room.w - 2) / 4).floor
+
+      for (j in 0...crateH) {
+        var offY = RNG.int(modH + 1)
+        for (i in 0...crateW) {
+          var offX = RNG.int(modW + 1)
+          for (dy in 0...2) {
+            for (dx in 0...2) {
+              var x = 2 + wx + i * 4 + dx + offX
+              var y = 2 + wy + j * 4 + dy + offY
+              zone.map[x, y] = newTile(room, true)
+              zone.map[x, y]["kind"] = "crate"
+              zone.map[x, y]["symbol"] = RNG.sample(CRATES)
+            }
+          }
+        }
+      }
+      // test accessibilities
     }
     var spawnTotal = RNG.sample(SPAWN_DIST)
     for (i in 0...spawnTotal) {
@@ -206,8 +267,9 @@ class RoomGenerator {
           target = room
         }
       }
-      var guardStart = getRandomRoomPosition(room)
-      var guardEnd = getRandomRoomPosition(target)
+
+      var guardStart = getRandomRoomPosition(zone, room)
+      var guardEnd = getRandomRoomPosition(zone, target)
       if ((guardStart - guardEnd).manhattan < 3) {
         i = i - 1
         continue
@@ -222,15 +284,50 @@ class RoomGenerator {
     }
   }
 
-  getRandomRoomPosition(targetRoom) {
+  getRandomRoomPosition(zone, targetRoom) { getRandomRoomPosition(zone, targetRoom, false) }
+  getRandomRoomPosition(zone, targetRoom, allowSolid) {
+    var wx = targetRoom.x
+    var wy = targetRoom.y
+    var width = wx + targetRoom.z
+    var height = wy + targetRoom.w
+    if (allowSolid) {
+      return Vec.new(RNG.int(wx + 1, width - 2), RNG.int(wy + 1, height - 2))
+    } else {
+      var roomTiles = []
+      for (y in wy...height) {
+        for (x in wx...width) {
+          if (x == wx || x == (width - 1) || y == wy || y == height - 1) {
+            continue
+          }
+          roomTiles.add(Vec.new(x, y))
+        }
+      }
+      return RNG.sample(roomTiles)
+    }
+/*
+
+
+
     var wx = targetRoom.x
     var wy = targetRoom.y
     var width = wx + targetRoom.z
     var height = wy + targetRoom.w
 
     var tile = null
-    tile = Vec.new(RNG.int(wx + 1, width - 2), RNG.int(wy + 1, height - 2))
+    var attempts = 0
+    while (attempts < 50 && (tile == null || zone.map[tile]["solid"])) {
+      attempts = attempts + 1
+      tile = Vec.new(RNG.int(wx + 1, width - 2), RNG.int(wy + 1, height - 2))
+      System.print(tile)
+      if (allowSolid) {
+        break
+      }
+    }
+    if (zone.map[tile]["solid"]) {
+      return null
+    }
     return tile
+    */
 
   }
   getRandomWorldPosition(rooms) {

@@ -14,6 +14,7 @@ TODO for DroneSync
 * Contraption interactions
 
 * Enhanced The guard detection AI 
+  - Performance optimization for the start of the game
   - Directional awareness
   - Points-of-interest
 * Enhanced Enemy abilites

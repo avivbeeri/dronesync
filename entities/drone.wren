@@ -39,7 +39,6 @@ class DroneEntity is Creature {
     if ((pos - _player.pos).length > this["range"]) {
       this["lightMap"] = UpdateVision.update(ctx, this, 1)
       if (!_player["active"]) {
-        System.print("Out of range")
         SwapAction.new(true).bind(this).perform()
       }
     } else {

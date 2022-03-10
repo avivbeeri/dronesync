@@ -68,11 +68,14 @@ class WorldRenderer is View {
             Canvas.print(".", x * tileWidth, y * tileHeight - 2, color)
           } else {
             Canvas.rectfill(x * tileWidth, y * tileHeight, tileWidth, tileHeight, color)
-
           }
         }
         if (tile["kind"] == "wall") {
           Canvas.print("#", x * tileWidth, y * tileHeight, seen ? Display.fg : PAL[3])
+        }
+        if (tile["kind"] == "crate") {
+          Canvas.rectfill(x * tileWidth, y * tileHeight, tileWidth, tileHeight, seen ? PAL[13] : PAL[3])
+          Canvas.print(tile["symbol"], x * tileWidth, y * tileHeight, seen ? PAL[12] : PAL[3])
         }
         if (tile["kind"] == "goal") {
           var color = seen ? Display.fg : PAL[3]
