@@ -45,7 +45,7 @@ class RoomGenerator {
   createWorld() {
     var strategy = EnergyStrategy.new()
     var map = TileMap.init()
-    map.default = { "OOB": true, "solid": true }
+    map.default = { "OOB": true, "solid": true, "blockSight": true }
 
     var world = World.new(strategy)
     world["objective"] = false
@@ -219,7 +219,7 @@ class StaticGenerator {
   static createWorld() {
     var strategy = EnergyStrategy.new()
     var map = TileMap.init()
-    map.default = { "OOB": true, "solid": true }
+    map.default = { "OOB": true, "solid": true, "blockSight": true }
 
     var world = World.new(strategy)
     world["objective"] = false

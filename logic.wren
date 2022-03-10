@@ -82,6 +82,7 @@ class ShadowLine {
     _shadows = []
   }
   shadows { _shadows }
+  toString { _shadows.toString }
 
   /// Creates a [Shadow] that corresponds to the projected
   /// silhouette of the tile at [row], [col].
@@ -133,7 +134,7 @@ class ShadowLine {
         _shadows.removeAt(index)
       } else {
         // Overlaps the next one, so unify it with that.
-        overlappingNext.start = M.max(_shadows[index].start, shadow.start)
+        overlappingNext.start = M.min(_shadows[index].start, shadow.start)
       }
     } else {
       if (overlappingPrevious != null) {
@@ -212,6 +213,7 @@ class UpdateVision {
       var fullShadow = false
       var row = 1
       while (distance == -1 || row < distance) {
+        System.print(line)
         var pos = start + transformOctant(row, 0, octant)
         if (tiles[pos]["OOB"]) {
           break
