@@ -17,15 +17,23 @@ class Common {
   static isOccupied(self, dest) {
     return self.ctx.getEntitiesAtTile(dest.x, dest.y).where {|entity| entity != self && !(entity is PlayerEntity) }.count > 0
   }
-  static moveRandom(self) {
+  static moveRandom(self) { moveRandom(self, true) }
+  static moveRandom(self, allowSolid) {
     var available = NSEW.values.where{|dir| !Common.isOccupied(self, self.pos + dir)}.toList
-    var dir = RNG.sample(available)
+    var directions = RNG.shuffle(available)
+    var dir = null
+    for (d in directions) {
+      dir = d
+      var tile = self.ctx.map[self.pos + d]
+      if (allowSolid || !tile["solid"]) {
+        break
+      }
+      dir = null
+    }
     if (dir != null) {
       return MoveAction.new(dir, true, Action.none)
     }
-
   }
-
 }
 
 class Curiosity is Behaviour {
@@ -37,7 +45,7 @@ class Curiosity is Behaviour {
   evaluate() {
     // Get noticed events
     // D
-    if (self["state"] == "investigate" && self["focus"] == self.pos) {
+    if (self["focus"] == self.pos) {
       self["focus"] = null
     }
 
@@ -165,6 +173,7 @@ class Awareness is Behaviour {
     } else if (self["state"] == "alert") {
       if (!visible && !self["focus"]) {
         self["awareness"] = 8
+        self["focus"] = self["senses"]["player"]
         self["state"] = "investigate"
       } else if (near) {
         self["focus"] = self["senses"]["player"]
