@@ -137,6 +137,8 @@ class WorldRenderer is View {
         var color = Display.fg
         if (entity["state"] == "alert") {
           color = PAL[6]
+        } else if (entity["state"] == "investigate") {
+          color = PAL[8]
         } else if (entity["awareness"] > 0)  {
           color = PAL[5]
         }

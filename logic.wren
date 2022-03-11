@@ -247,6 +247,13 @@ class UpdateVision {
   }
 }
 
+class LightEverything {
+  static update(ctx) {
+    for (tile in ctx.map.tiles.values) {
+      tile["visible"] = "visible"
+    }
+  }
+}
 class CompressLightMap {
   static update(ctx) {
     var player = ctx.getEntityByTag("player", true)

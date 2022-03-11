@@ -13,6 +13,29 @@ import "util" for GridWalk
 
 var SEARCH = AStar
 
+class Curiosity is Behaviour {
+  construct new(self) {
+    super(self)
+  }
+  notify(event) {}
+
+  isOccupied(dest) {
+    return ctx.getEntitiesAtTile(dest.x, dest.y).where {|entity| entity != self && !(entity is PlayerEntity) }.count > 0
+  }
+
+  evaluate() {
+    // Get noticed events
+    // D
+    if (self["focus"] == self.pos) {
+      System.print("POI reached")
+      self["focus"] = null
+    }
+
+    return null
+  }
+
+}
+
 // Defining this lets us define our own priorities
 class EnemyWeightedZone is WeightedZone {
   construct new(zone) {
@@ -77,6 +100,7 @@ class Confusion is Behaviour {
 class Awareness is Behaviour {
   construct new(self) {
     super(self)
+    self["senses"]["lastSawPlayer"] = 1
   }
   notify(event) {}
   evaluate() {
@@ -90,26 +114,72 @@ class Awareness is Behaviour {
     // Can we see the player?
     var player = ctx.getEntityByTag("player")
     var visible = GridWalk.checkLoS(ctx.map, self.pos, player.pos)
+    if (visible) {
+      self["senses"]["player"] = player.pos * 1
+      self["senses"]["lastSawPlayer"] = 0
+    } else {
+      self["senses"]["lastSawPlayer"] = (self["senses"]["lastSawPlayer"] + 1)
+    }
+    var dist = (self.pos - player.pos).length.round
+    var near = dist < 20
+    var close = dist < 8
+    var veryClose = dist < 4
     var aware = self["awareness"]
     self["los"] = visible
 
     // System.print("%(self): %(visible) - %(aware)")
+
+    // while patrolling - if player is far away, awareness grows slowly
+
+
+
     if (self["state"] == "patrol") {
       if (visible) {
-        self["awareness"] = self["awareness"] + 1
-        if (self["awareness"] > 2) {
-          System.print("%(self) went on alert")
-          self["state"] = "alert"
+        if (near) {
+          self["awareness"] = self["awareness"] + (close ? 2 : 1)
+          System.print("seeing")
+          if (self["awareness"] >= 6) {
+            System.print("%(self) went on alert")
+            self["state"] = "alert"
+          }
+        }
+        System.print("out of range %(aware)")
+      } else if (self["awareness"] > 3 && self["senses"]["lastSawPlayer"] < 2){
+        self["state"] = "investigate"
+        self["focus"] = self["senses"]["player"]
+        System.print("%(self) begins investigating...")
+      } else if (self["awareness"] > 0) {
+        self["awareness"] = M.max(0, (self["awareness"] - 1))
+        self["focus"] = null
+        if (self["awareness"] == 0) {
+          System.print("%(self): 'Probably nothing.'")
         }
       } else {
+        self["focus"] = null
+      }
+    } else if (self["state"] == "investigate") {
+      if (visible && near) {
+        self["awareness"] = 6
+        self["state"] = "alert"
+      } else if (self["focus"]) {
+
+      } else if (!visible) {
         self["awareness"] = M.max(0, (self["awareness"] - 1))
+        if (self["awareness"] == 0) {
+          self["state"] = "patrol"
+          self["awareness"] = 3
+          System.print("%(self) relaxes")
+        }
       }
     } else if (self["state"] == "alert") {
       if (!visible) {
         self["awareness"] = M.max(0, (self["awareness"] - 1))
         if (self["awareness"] == 0) {
-          self["state"] = "patrol"
+          self["awareness"] = 4
+          self["state"] = "investigate"
         }
+      } else if (near) {
+        self["awareness"] = 6
       }
     }
 
@@ -117,13 +187,39 @@ class Awareness is Behaviour {
   }
 }
 
-class Seek is Behaviour {
+class SeekFocus is Behaviour {
   construct new(self) {
     super(self)
   }
+
+  getFocus() {
+    if (self["focus"]) {
+      return self["focus"]
+    }
+  }
+
   notify(event) {}
   evaluate() {
-    var map = ctx.map
+    _graph = EnemyWeightedZone.new(ctx)
+    var focus = getFocus()
+    if (focus) {
+      _search = SEARCH.search(_graph, self.pos, focus)
+      var path = SEARCH.reconstruct(_search[0], self.pos, focus)
+      if (path == null || path.count <= 1) {
+        return Action.none
+      }
+      return MoveAction.new(path[1] - self.pos, true)
+    }
+    return null
+  }
+}
+class SeekPlayer is Behaviour {
+  construct new(self) {
+    super(self)
+  }
+
+  notify(event) {}
+  evaluate() {
     // TODO: Make this behaviour generic by indicating a point of interest
     // rather than homing on the player
     var player = ctx.getEntityByTag("player")
@@ -161,9 +257,7 @@ class Patrol is Behaviour {
       _search = null
     }
     _graph = EnemyWeightedZone.new(ctx)
-    if (!_search) {
-      _search = SEARCH.search(_graph, self.pos, _points[_index])
-    }
+    _search = SEARCH.search(_graph, self.pos, _points[_index])
     var path = SEARCH.reconstruct(_search[0], self.pos, _points[_index])
     if (path == null || path.count <= 1) {
       _search = null

@@ -9,7 +9,7 @@ import "core/world" for World, Zone
 import "core/director" for EnergyStrategy
 import "core/map" for TileMap, Tile
 import "core/graph" for BFSNeutral, Graph
-import "./logic" for RemoveDefeated, GameEndCheck, UpdateVision, CompressLightMap
+import "./logic" for RemoveDefeated, GameEndCheck, UpdateVision, CompressLightMap, LightEverything
 import "./entities/player" for PlayerEntity
 import "./entities/drone" for DroneEntity
 import "./entities/guard" for Guard
@@ -346,96 +346,55 @@ class StaticGenerator {
     world["objective"] = false
     world.pushZone(Zone.new(map))
     world.active.postUpdate.add(RemoveDefeated)
-    world.active.postUpdate.add(CompressLightMap)
     world.active.postUpdate.add(GameEndCheck)
     var zone = world.active
 
     var player = zone.addEntity("player", PlayerEntity.new())
     var guard
-    /*
-    guard = zone.addEntity(Guard.new())
-    guard.pos.x = 1
-    guard.pos.y = 1
-    */
-    guard = zone.addEntity(Guard.new())
-    guard.pos.x = 18
-    guard.pos.y = 1
-    guard = zone.addEntity(Guard.new())
-    guard.pos.x = 18
-    guard.pos.y = 18
 
 
-    var drone = zone.addEntity("drone", DroneEntity.new())
-    drone.pos.x = 15
-    drone.pos.y = 15
-/*
-    // Is there a save.json?
-    var save = Fiber.new {
-      var path = FileSystem.prefPath("avivbeeri", "dronesync")
-      var result = FileSystem.load("%(path)save.json")
-      return JSON.decode(result)
-    }.try()
-      }
-      */
-      var save = null
-    if (save is Map) {
-      for (key in save["map"].keys) {
-        zone.map.tiles[Num.fromString(key)] = Tile.new(save["map"][key])
-      }
-      player.pos.x = save["player"]["x"]
-      player.pos.y = save["player"]["y"]
-      for (key in save["player"].keys) {
-        if (key != "x" && key != "y") {
-          player.data[key] = save["player"][key]
-        }
-      }
-    } else {
-      // else do the generate
-      var mapHeight = Config["map"]["height"]
-      var mapWidth = Config["map"]["width"]
-      for (y in 0...mapHeight) {
-        for (x in 0...mapWidth) {
-          var solid = x == 0 || y == 0 || x == mapWidth - 1 || y == mapHeight - 1
-          map[x, y] = Tile.new({
-            "solid": solid,
-            "blockSight": solid,
-            "visible": "unknown",
-            "kind": solid ? "wall" : "floor",
-            "activeEffects": []
-          })
-        }
-      }
 
-      var size = 3
-      var startX = (mapWidth - size) / 2
-      var startY = (mapHeight - size) / 2
-      for (dy in 0...size) {
-        for (dx in 0...size) {
-          map[startX + dx, startY + dy] = Tile.new({
-            "solid": true,
-            "blockSight": true,
-            "kind": "wall",
-            "activeEffects": []
-          })
-        }
+    // else do the generate
+    var mapHeight = 8
+    var mapWidth = 24
+    for (y in 0...mapHeight) {
+      for (x in 0...mapWidth) {
+        var solid = x == 0 || y == 0 || x == mapWidth - 1 || y == mapHeight - 1
+        map[x, y] = Tile.new({
+          "solid": solid,
+          "blockSight": solid,
+          "visible": "unknown",
+          "kind": solid ? "wall" : "floor",
+          "activeEffects": []
+        })
       }
-      map[2, 2] = Tile.new({
-        "solid": false,
-        "visible": "unknown",
-        "activeEffects": [],
-        "kind": "exit"
-      })
-      map[mapWidth - 2, mapHeight - 2] = Tile.new({
-        "solid": true,
-        "visible": "unknown",
-        "blockSight": false,
-        "activeEffects": [],
-        "kind": "goal"
-      })
-
-      player.pos.x = 2
-      player.pos.y = 6
     }
+
+
+    guard = zone.addEntity(Guard.new({ "patrol": [ Vec.new(mapWidth - 2, (mapHeight / 2). floor) ] }))
+    guard.pos.x = mapWidth - 2
+    guard.pos.y = (mapHeight / 2).floor
+
+    for (y in 4..6) {
+      map[18, y] = Tile.new({
+        "solid": true,
+        "blockSight": true,
+        "kind": "wall",
+        "activeEffects": []
+      })
+    for (y in 3..5) {
+      map[16, y] = Tile.new({
+        "solid": true,
+        "blockSight": true,
+        "kind": "wall",
+        "activeEffects": []
+      })
+    }
+    }
+
+    player.pos.x = 1
+    player.pos.y = (mapHeight / 2).floor
+    LightEverything.update(zone)
     return world
   }
 

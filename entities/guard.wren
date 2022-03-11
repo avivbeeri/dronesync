@@ -4,8 +4,10 @@ import "entities/creature" for Creature
 import "entities/behaviour" for
   Awareness,
   Confusion,
+  Curiosity,
   Patrol,
-  Seek,
+  SeekPlayer,
+  SeekFocus,
   State,
   Stunnable,
   Wait
@@ -28,12 +30,15 @@ class Guard is Creature {
     this["melee"] = Attack.direct(this)
     this["targetGroup"].add("enemy")
     this["state"] = "patrol"
+    this["senses"] = {}
 
     push(Stunnable)
     push(Awareness)
+    push(Curiosity)
     push(Confusion)
     push(State.new(this, "state", {
-      "alert": Seek,
+      "alert": SeekPlayer,
+      "investigate": SeekFocus,
       "patrol": Patrol.new(this, config["patrol"] || [])
     }))
     push(Wait)
@@ -42,11 +47,13 @@ class Guard is Creature {
   endTurn() {
     super.endTurn()
     // Recompute awareness
+    /*
     var player = ctx.getEntityByTag("player")
     var visible = GridWalk.checkLoS(ctx.map, pos, player.pos)
-    if (visible && this["awareness"] == 0) {
+    if (visible && (player.pos - this.pos).length < 20 && this["awareness"] == 0) {
       this["awareness"] = 1
     }
+    */
   }
 }
 
