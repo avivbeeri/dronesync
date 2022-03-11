@@ -2,7 +2,7 @@ import "math" for Vec, M
 
 import "core/elegant" for Elegant
 import "core/action" for Action
-import "actions" for MoveAction
+import "actions" for MoveAction, WakeAction
 import "core/behaviour" for Behaviour
 import "core/graph" for WeightedZone, BFS, AStar, DijkstraMap, DijkstraSearch
 import "core/dir" for Directions, NSEW
@@ -209,7 +209,7 @@ class Stunnable is Behaviour {
   notify(event) {}
   evaluate() {
     if (self["stunTimer"] > 0) {
-      return Action.none
+      return WakeAction.new()
     }
     return null
   }

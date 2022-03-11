@@ -1,5 +1,8 @@
 import "math" for Vec, M
 import "core/action" for Action, ActionResult, MultiAction
+import "core/rng" for RNG
+import "core/dir" for NSEW
+import "core/dataobject" for DataObject
 import "./extra/events" for MoveEvent
 import "./events" for LogEvent, AttackEvent, EscapeEvent, GoalEvent
 import "./extra/combat" for Attack, AttackType, AttackResult
@@ -164,6 +167,47 @@ class UseItemAction is Action {
     return ActionResult.failure
   }
 }
+
+class WakeAction is Action {
+  construct new() {
+    super()
+  }
+
+  getOccupying(pos) {
+    return ctx.getEntitiesAtTile(pos.x, pos.y).where {|entity| entity != source }
+  }
+
+  perform() {
+    source["stunTimer"] = source["stunTimer"] - 1
+    if (source["stunTimer"] == 0) {
+      ctx.events.add(LogEvent.new("%(source) woke up!"))
+      // Throw the player
+      var player = ctx.getEntityByTag("player")
+      if (player.pos == source.pos) {
+        var dir = RNG.shuffle(DataObject.copyValue(NSEW.values.toList))
+        for (d in dir) {
+          var tile = ctx.map[player.pos + d]
+          if (!tile["solid"]) {
+            var targets = getOccupying(player.pos + d).where {|entity| entity.has("stats") && entity["stunTimer"] == 0 }.toList
+            player.pos = player.pos + d
+            for (target in targets) {
+              target["stunTimer"] = 2
+            }
+            if (targets.count == 0) {
+              ctx.events.add(LogEvent.new("%(source) threw you off them."))
+            } else {
+              ctx.events.add(LogEvent.new("%(source) threw you into %(targets)"))
+            }
+
+            break
+          }
+        }
+      }
+    }
+    return ActionResult.success
+  }
+}
+
 class SmokeAction is Action {
   construct new(tiles) {
     super()
@@ -220,15 +264,16 @@ class MoveAction is Action {
 
     var result
 
+    var occupying = []
     if (source.pos != old) {
       var solid = ctx.isSolidAt(source.pos)
       var target = false
       var collectible = false
       if (!solid) {
-        var occupying = getOccupying(source.pos)
+        occupying = getOccupying(source.pos)
         if (occupying.count > 0) {
           solid = solid || occupying.any {|entity| entity.has("solid") }
-          target = occupying.any {|entity| entity.has("stats") }
+          target = occupying.any {|entity| entity.has("stats") && entity["stunTimer"] == 0 }
           collectible = occupying.any {|entity| entity.has("loot") }
         }
         if (source is PlayerEntity && ctx.map[source.pos]["kind"] == "exit") {

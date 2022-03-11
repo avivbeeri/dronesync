@@ -32,10 +32,6 @@ class Creature is StackEntity {
 
   endTurn() {
     super.endTurn()
-    if (this["stunTimer"] > 0) {
-      this["stunTimer"] = this["stunTimer"] - 1
-      System.print(this["stunTimer"])
-    }
   }
 }
 
