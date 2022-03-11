@@ -1,5 +1,17 @@
 import "math" for Vec
 
+class Find {
+  static inList(list, predicate) {
+    for (entry in list) {
+      if (predicate.call(entry)) {
+        return entry
+      }
+    }
+    return null
+  }
+
+}
+
 class GridWalk {
   static checkPath(map, p0, p1, prop) {
     var line = GridWalk.getLine(p0, p1)

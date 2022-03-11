@@ -15,6 +15,7 @@ class DroneEntity is Creature {
 
   init(config) {
     super.init(config)
+    name = "drone"
     this["active"] = true
     this["loot"] = {}
     this["range"] = 16

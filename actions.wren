@@ -3,6 +3,7 @@ import "core/action" for Action, ActionResult, MultiAction
 import "core/rng" for RNG
 import "core/dir" for NSEW
 import "core/dataobject" for DataObject
+import "util" for Find
 import "./extra/events" for MoveEvent
 import "./events" for LogEvent, AttackEvent, EscapeEvent, GoalEvent
 import "./extra/combat" for Attack, AttackType, AttackResult
@@ -14,14 +15,50 @@ class PickupAction is Action {
     _pos = pos
   }
   perform() {
+    if (!source.has("inventory")) {
+      return ActionResult.success
+    }
     var entities = ctx.getEntitiesAtTile(_pos)
     for (target in entities) {
       if (source is PlayerEntity && target is DroneEntity) {
         source["inventory"][0]["quantity"] = 1
+        ctx.events.add(LogEvent.new("%(source) picked up the drone"))
         ctx.removeEntity(target)
       }
     }
+    var loot = ctx.map[source.pos]["item"]
+    if (loot) {
+      ctx.map[source.pos]["item"] = null
+
+      var item = Find.inList(source["inventory"]) {|entry| entry["id"] == loot }
+      if (item) {
+        item["quantity"] = item["quantity"] + 1
+      } else {
+        item = factory(loot)
+        source["inventory"].add(item)
+      }
+      var displayName = item["displayName"]
+      ctx.events.add(LogEvent.new("%(source) picked up a %(displayName)"))
+    }
     return ActionResult.success
+  }
+  factory(id) {
+    return {
+      "coin": {
+        "id": "coin",
+        "displayName": "Coin",
+        "quantity": 5,
+        "range": 10,
+        "splash": 4
+      },
+      "smokebomb": {
+        "id": "smokebomb",
+        "displayName": "Smoke Bombs",
+        "quantity": 3,
+        "range": 4,
+        "splash": 4
+      }
+    }[id]
   }
 }
 
@@ -52,6 +89,7 @@ class SpawnAction is Action {
     }
     entity.pos.x = _pos.x
     entity.pos.y = _pos.y
+    ctx.events.add(LogEvent.new("%(source) deployed the %(entity)"))
     return ActionResult.success
   }
 
@@ -294,11 +332,13 @@ class MoveAction is Action {
           solid = solid || occupying.any {|entity| entity.has("solid") }
           target = occupying.any {|entity| entity.has("stats") && entity["stunTimer"] == 0 }
           collectible = occupying.any {|entity| entity.has("loot") }
+          System.print(collectible)
         }
         if (source is PlayerEntity && ctx.map[source.pos]["kind"] == "exit") {
           result = ActionResult.alternate(EscapeAction.new())
         }
       }
+      collectible = collectible || ctx.map[source.pos]["item"]
 
       if (solid || (target && !collectible)) {
         source.pos = old

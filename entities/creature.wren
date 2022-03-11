@@ -13,7 +13,6 @@ class Creature is StackEntity {
     super.init(config)
     this["awareness"] = 0
     this["targetGroup"] = ["creature"]
-    this["inventory"] = []
     this["stunTimer"] = 0
     this["stats"] = StatGroup.new({
       "atk": 1,

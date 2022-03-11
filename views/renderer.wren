@@ -59,16 +59,23 @@ class WorldRenderer is View {
         var seen = tile["visible"] == "visible"
         if (tile["kind"] == "floor") {
           var symbol = "."
-          var color = seen ? PAL[2] : PAL[3]
+          var offset = -2
+          var color = PAL[2]
+          if (tile["item"]) {
+            symbol = String.fromCodePoint(0x00B0)
+            offset = 1
+            color = PAL[5]
+          }
           if (!tile["activeEffects"].isEmpty) {
             var effect = tile["activeEffects"][0]
             if (effect["id"] == "smoke") {
-              color = seen ? PAL[5] : PAL[3]
+              color = PAL[8]
               symbol = null
             }
           }
+          color = seen ? color : PAL[3]
           if (symbol) {
-            Canvas.print(".", x * tileWidth, y * tileHeight - 2, color)
+            Canvas.print(symbol, x * tileWidth, y * tileHeight + offset, color)
           } else {
             Canvas.rectfill(x * tileWidth, y * tileHeight, tileWidth, tileHeight, color)
           }

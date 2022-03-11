@@ -209,7 +209,7 @@ class InventoryWindow is Window {
           Canvas.rect(width - 14, y-1, 7, 7, color)
         } else {
           var quantity = "x" + entry["quantity"].toString
-          Canvas.print(quantity, width - quantity.count*7, y, color, "m3x6")
+          Canvas.print(quantity, width - (quantity.count * 4) - 7, y, color, "m3x6")
         }
       }
       y = y + 8
@@ -253,7 +253,7 @@ class LogWindow is Window {
     var y = 1
     if (_text) {
       for (line in _text) {
-        Canvas.print(line, 0, y, Display.fg, "m3x6")
+        Canvas.print(line, 2, y, Display.fg, "m3x6")
         y = y + 8
       }
     }

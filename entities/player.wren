@@ -15,6 +15,7 @@ class PlayerEntity is Creature {
 
   init(config) {
     super.init(config)
+    name = "you"
     this["targetGroup"].add("enemy")
     this["melee"] = Attack.stun(this)
     this["active"] = true
@@ -39,9 +40,9 @@ class PlayerEntity is Creature {
       {
         "id": "coin",
         "displayName": "Coin",
-        "quantity": 5,
+        "quantity": 1,
         "range": 10,
-        "splash": 1
+        "splash": 4
       }
     ]
   }

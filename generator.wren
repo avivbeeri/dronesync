@@ -260,6 +260,7 @@ class RoomGenerator {
       }
       // test accessibilities
     }
+    zone.map[getRandomRoomPosition(zone, room)]["item"] = "coin"
   }
   spawnGuardsInRoom(zone, room, start) {
     var spawnTotal = RNG.sample(SPAWN_DIST)
