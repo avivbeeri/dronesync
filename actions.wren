@@ -4,6 +4,7 @@ import "core/rng" for RNG
 import "core/dir" for NSEW
 import "core/dataobject" for DataObject
 import "util" for Find
+import "items" for ItemFactory
 import "./extra/events" for MoveEvent
 import "./events" for LogEvent, AttackEvent, EscapeEvent, GoalEvent
 import "./extra/combat" for Attack, AttackType, AttackResult
@@ -43,22 +44,7 @@ class PickupAction is Action {
     return ActionResult.success
   }
   factory(id) {
-    return {
-      "coin": {
-        "id": "coin",
-        "displayName": "Coin",
-        "quantity": 5,
-        "range": 10,
-        "splash": 4
-      },
-      "smokebomb": {
-        "id": "smokebomb",
-        "displayName": "Smoke Bombs",
-        "quantity": 3,
-        "range": 4,
-        "splash": 4
-      }
-    }[id]
+    return ItemFactory.get(id)
   }
 }
 

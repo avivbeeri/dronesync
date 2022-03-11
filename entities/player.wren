@@ -1,3 +1,4 @@
+import "items" for ItemFactory
 import "core/action" for Action
 import "entities/creature" for Creature
 import "extra/combat" for Attack
@@ -20,30 +21,9 @@ class PlayerEntity is Creature {
     this["melee"] = Attack.stun(this)
     this["active"] = true
     this["inventory"] = [
-      {
-        "id": "drone",
-        "displayName": "Drone",
-        "range": 1,
-        "splash": 0,
-        "useCenter": false,
-        "quantity": 1,
-        "binary": true,
-        "eternal": true
-      },
-      {
-        "id": "smokebomb",
-        "displayName": "Smoke Bombs",
-        "quantity": 3,
-        "range": 4,
-        "splash": 4
-      },
-      {
-        "id": "coin",
-        "displayName": "Coin",
-        "quantity": 1,
-        "range": 10,
-        "splash": 4
-      }
+      ItemFactory.get("drone"),
+      ItemFactory.get("coin", 1),
+      ItemFactory.get("smokebomb", 3)
     ]
   }
 

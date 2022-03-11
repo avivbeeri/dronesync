@@ -107,3 +107,7 @@ Items:
 
 ## Day 7
 * Stunned guards can be walked over
+* Enhanced AI with investigation phase
+* Coin to throw, makes noise
+* Enemies investigate noise
+* coins generate in level
