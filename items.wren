@@ -3,7 +3,7 @@ import "core/dataobject" for DataObject
 var Items = {
   "drone": {
     "id": "drone",
-    "displayName": "Drone",
+    "displayName": "drone",
     "range": 1,
     "splash": 0,
     "useCenter": false,
@@ -12,13 +12,13 @@ var Items = {
   },
   "smokebomb":    {
     "id": "smokebomb",
-    "displayName": "Smoke Bombs",
+    "displayName": "smoke bomb",
     "range": 4,
     "splash": 4
   },
   "coin":   {
     "id": "coin",
-    "displayName": "Coin",
+    "displayName": "coin",
     "range": 10,
     "splash": 4
   }

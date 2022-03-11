@@ -62,9 +62,15 @@ class WorldRenderer is View {
           var offset = -2
           var color = PAL[2]
           if (tile["item"]) {
-            symbol = String.fromCodePoint(0x00B0)
-            offset = 1
-            color = PAL[5]
+            if (tile["item"] == "coin") {
+              symbol = String.fromCodePoint(0x00B0)
+              offset = 1
+              color = PAL[5]
+            } else if (tile["item"] == "smokebomb") {
+              symbol = String.fromCodePoint(0x00F8)
+              offset = 0
+              color = PAL[5]
+            }
           }
           if (!tile["activeEffects"].isEmpty) {
             var effect = tile["activeEffects"][0]
