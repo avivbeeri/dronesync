@@ -44,6 +44,12 @@ class Curiosity is Behaviour {
   evaluate() {
     // Get noticed events
     // D
+    if (self["senses"]["noise"]) {
+      self["awareness"] = 3
+      self["focus"] = self["senses"]["noise"]
+      self["state"] = "investigate-noise"
+      self["senses"]["noise"] = null
+    }
     if (self["focus"] == self.pos) {
       self["focus"] = null
     }
@@ -125,7 +131,7 @@ class Awareness is Behaviour {
     var dist = (self.pos - player.pos).length.round
     var near = dist < 20
     var close = dist < 8
-    var veryClose = dist < 4
+    var veryClose = dist < 3
     var aware = self["awareness"]
     self["los"] = visible
 
@@ -149,6 +155,19 @@ class Awareness is Behaviour {
         }
       } else {
         self["focus"] = null
+      }
+    } else if (self["state"] == "investigate-noise") {
+      if (!self["focus"]) {
+        self["awareness"] = M.max(0, (self["awareness"] - 1))
+        self["focus"] = null
+        if (self["awareness"] == 0) {
+          self["state"] = "patrol"
+          self["awareness"] = 3
+        }
+      }
+      if (visible && veryClose) {
+        self["state"] = "alert"
+        self["focus"] = self["senses"]["player"]
       }
     } else if (self["state"] == "investigate") {
       if (visible && near) {

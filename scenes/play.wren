@@ -49,6 +49,7 @@ class ActionReducer is TestReducer {
   reduce(state, action) {
     if (action["type"] == "action") {
       state["data"] = action["data"]
+      state["center"] = action["center"]
       state["selection"] = action["selection"]
     }
     return state

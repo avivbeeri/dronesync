@@ -97,6 +97,22 @@ class ObjectiveAction is Action {
     return ActionResult.success
   }
 }
+class NoiseAction is Action {
+  construct new(pos, range) {
+    super()
+    _pos = pos
+    _range = range
+  }
+  perform() {
+    for (entity in ctx.entities) {
+      if (entity.has("senses") && (_pos - entity.pos).length <= _range) {
+        entity["senses"]["noise"] = _pos
+      }
+    }
+
+    return ActionResult.success
+  }
+}
 class EscapeAction is Action {
   construct new() {
     super()
@@ -115,6 +131,9 @@ class UseItemAction is Action {
   }
 
   getItemAction(data) {
+    if (_itemId == "coin") {
+      return NoiseAction.new(_args["center"], 4)
+    }
     if (_itemId == "smokebomb") {
       return SmokeAction.new(_args["selection"])
     }

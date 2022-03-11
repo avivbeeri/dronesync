@@ -37,11 +37,11 @@ class PlayerEntity is Creature {
         "splash": 4
       },
       {
-        "id": "water",
-        "displayName": "Water",
-        "quantity": 1,
+        "id": "coin",
+        "displayName": "Coin",
+        "quantity": 5,
         "range": 10,
-        "splash": 2
+        "splash": 1
       }
     ]
   }

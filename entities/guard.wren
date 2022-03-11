@@ -39,6 +39,7 @@ class Guard is Creature {
     push(State.new(this, "state", {
       "alert": SeekFocus,
       "investigate": SeekFocus,
+      "investigate-noise": SeekFocus,
       "patrol": Patrol.new(this, config["patrol"] || [])
     }))
     push(Wait)
