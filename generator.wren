@@ -270,10 +270,9 @@ class RoomGenerator {
       }
 
       var guardStart = getRandomRoomPosition(zone, room)
-      var guardEnd = getRandomRoomPosition(zone, target)
-      if ((guardStart - guardEnd).manhattan < 3) {
-        i = i - 1
-        continue
+      var guardEnd = null
+      while (guardEnd == null || (guardStart - guardEnd).manhattan < 3) {
+        guardEnd = getRandomRoomPosition(zone, target)
       }
       var guard = zone.addEntity(Guard.new({
         "patrol": [

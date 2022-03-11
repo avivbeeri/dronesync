@@ -8,7 +8,6 @@ TODO for DroneSync
   - lock-key systems
 * Drone mechanics
   - Awareness
-  - Pickup
 
 * Contraption interactions
 
@@ -76,5 +75,8 @@ Items:
   - populate with guards
 
 ## Day 6
+* Procedural Map Generation
+  - "Interesting" rooms
 * Drone
   - Range of operation
+  - Pickup

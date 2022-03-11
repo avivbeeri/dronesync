@@ -1,5 +1,5 @@
 import "math" for Vec, M
-import "core/action" for Action, ActionResult
+import "core/action" for Action, ActionResult, MultiAction
 import "./extra/events" for MoveEvent
 import "./events" for LogEvent, AttackEvent, EscapeEvent, GoalEvent
 import "./extra/combat" for Attack, AttackType, AttackResult
@@ -116,7 +116,10 @@ class UseItemAction is Action {
       return SmokeAction.new(_args["selection"])
     }
     if (_itemId == "drone") {
-      return SpawnAction.new("drone", _args["selection"][0], "drone")
+      return MultiAction.new([
+        SpawnAction.new("drone", _args["selection"][0], "drone"),
+        SwapAction.new()
+      ], true)
     }
     return null
   }
@@ -234,7 +237,6 @@ class MoveAction is Action {
       }
 
       if (solid || (target && !collectible)) {
-        System.print("here")
         source.pos = old
         if (source is PlayerEntity && ctx.map[source.pos + source.vel]["kind"] == "goal") {
           result = ActionResult.alternate(ObjectiveAction.new())
@@ -303,7 +305,7 @@ class AttackAction is Action {
       if (_attack.attackType == AttackType.stun) {
         if (target["awareness"] < 10) {
           // Attack succeeds and target is stunned
-          target["stunTimer"] = 5
+          target["stunTimer"] = target["awareness"] > 2 ? 5 : 10
           ctx.events.add(LogEvent.new("%(source) stunned %(target)"))
         } else {
           //
