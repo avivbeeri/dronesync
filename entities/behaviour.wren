@@ -13,21 +13,31 @@ import "util" for GridWalk
 
 var SEARCH = AStar
 
+class Common {
+  static isOccupied(self, dest) {
+    return self.ctx.getEntitiesAtTile(dest.x, dest.y).where {|entity| entity != self && !(entity is PlayerEntity) }.count > 0
+  }
+  static moveRandom(self) {
+    var available = NSEW.values.where{|dir| !Common.isOccupied(self, self.pos + dir)}.toList
+    var dir = RNG.sample(available)
+    if (dir != null) {
+      return MoveAction.new(dir, true, Action.none)
+    }
+
+  }
+
+}
+
 class Curiosity is Behaviour {
   construct new(self) {
     super(self)
   }
   notify(event) {}
 
-  isOccupied(dest) {
-    return ctx.getEntitiesAtTile(dest.x, dest.y).where {|entity| entity != self && !(entity is PlayerEntity) }.count > 0
-  }
-
   evaluate() {
     // Get noticed events
     // D
-    if (self["focus"] == self.pos) {
-      System.print("POI reached")
+    if (self["state"] == "investigate" && self["focus"] == self.pos) {
       self["focus"] = null
     }
 
@@ -80,13 +90,10 @@ class Confusion is Behaviour {
   }
   notify(event) {}
 
-  isOccupied(dest) {
-    return ctx.getEntitiesAtTile(dest.x, dest.y).where {|entity| entity != self && !(entity is PlayerEntity) }.count > 0
-  }
-
   evaluate() {
     if (ctx.map[self.pos]["blockSight"]) {
-      var available = NSEW.values.where{|dir| !isOccupied(self.pos + dir)}.toList
+
+      var available = NSEW.values.where{|dir| !Common.isOccupied(self, self.pos + dir)}.toList
       var dir = RNG.sample(available)
       if (dir != null) {
         return MoveAction.new(dir, true, Action.none)
@@ -104,12 +111,6 @@ class Awareness is Behaviour {
   }
   notify(event) {}
   evaluate() {
-    /*
-    if (self["state"] == "alert") {
-      return null
-    }
-    */
-
     // Is our square visible?
     // Can we see the player?
     var player = ctx.getEntityByTag("player")
@@ -127,59 +128,46 @@ class Awareness is Behaviour {
     var aware = self["awareness"]
     self["los"] = visible
 
-    // System.print("%(self): %(visible) - %(aware)")
-
     // while patrolling - if player is far away, awareness grows slowly
-
-
-
     if (self["state"] == "patrol") {
       if (visible) {
         if (near) {
           self["awareness"] = self["awareness"] + (close ? 2 : 1)
-          System.print("seeing")
           if (self["awareness"] >= 6) {
-            System.print("%(self) went on alert")
             self["state"] = "alert"
+            self["focus"] = self["senses"]["player"]
           }
         }
-        System.print("out of range %(aware)")
       } else if (self["awareness"] > 3 && self["senses"]["lastSawPlayer"] < 2){
         self["state"] = "investigate"
         self["focus"] = self["senses"]["player"]
-        System.print("%(self) begins investigating...")
       } else if (self["awareness"] > 0) {
         self["awareness"] = M.max(0, (self["awareness"] - 1))
         self["focus"] = null
         if (self["awareness"] == 0) {
-          System.print("%(self): 'Probably nothing.'")
         }
       } else {
         self["focus"] = null
       }
     } else if (self["state"] == "investigate") {
       if (visible && near) {
-        self["awareness"] = 6
         self["state"] = "alert"
+        self["awareness"] = 8
+        self["focus"] = self["senses"]["player"]
       } else if (self["focus"]) {
-
       } else if (!visible) {
         self["awareness"] = M.max(0, (self["awareness"] - 1))
         if (self["awareness"] == 0) {
           self["state"] = "patrol"
           self["awareness"] = 3
-          System.print("%(self) relaxes")
         }
       }
     } else if (self["state"] == "alert") {
-      if (!visible) {
-        self["awareness"] = M.max(0, (self["awareness"] - 1))
-        if (self["awareness"] == 0) {
-          self["awareness"] = 4
-          self["state"] = "investigate"
-        }
+      if (!visible && !self["focus"]) {
+        self["awareness"] = 8
+        self["state"] = "investigate"
       } else if (near) {
-        self["awareness"] = 6
+        self["focus"] = self["senses"]["player"]
       }
     }
 
@@ -210,7 +198,7 @@ class SeekFocus is Behaviour {
       }
       return MoveAction.new(path[1] - self.pos, true)
     }
-    return null
+    return Common.moveRandom(self)
   }
 }
 class SeekPlayer is Behaviour {

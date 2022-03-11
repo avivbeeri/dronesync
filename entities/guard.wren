@@ -33,11 +33,11 @@ class Guard is Creature {
     this["senses"] = {}
 
     push(Stunnable)
-    push(Awareness)
     push(Curiosity)
+    push(Awareness)
     push(Confusion)
     push(State.new(this, "state", {
-      "alert": SeekPlayer,
+      "alert": SeekFocus,
       "investigate": SeekFocus,
       "patrol": Patrol.new(this, config["patrol"] || [])
     }))
