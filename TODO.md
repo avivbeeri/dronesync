@@ -1,7 +1,29 @@
 TODO for DroneSync
 ===============
 
-# Day 6:
+# Day 7:
+
+## Guard Points-of-interest system
+  Scan for the player. If we moved away from them, awareness is much lower.
+  Make a queue of events that occur in the world
+    * Movement
+    * vision
+    * noise?
+  Priority queue of points to investigate, as well as suspicion levels.
+  Take highest priority, pathfind to the point of it happening or last point seen.
+  Re-evaluate and resolve.
+  If there are no priority points, then return to patrol paths.
+
+## Map Generation
+  An extra room type or two would make the game play more varied.
+
+  * Bridge - A room split in half, with a narrow bridge between. Guards patrol _across_ this room.
+  * 
+
+  Features in the rooms: Loot drops, extra exits?
+
+
+# Nice to Have
 
 * procedural map generation
   - Minimum enemy for challenge
@@ -15,7 +37,9 @@ TODO for DroneSync
   - Performance optimization for the start of the game
   - Directional awareness
   - Points-of-interest
+
 * Enhanced Enemy abilites
+
 Items:
   - Optical Camo
   - Noise maker?
@@ -80,3 +104,6 @@ Items:
 * Drone
   - Range of operation
   - Pickup
+
+## Day 7
+* Stunned guards can be walked over
