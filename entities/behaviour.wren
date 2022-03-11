@@ -250,14 +250,18 @@ class Patrol is Behaviour {
     _search = SEARCH.search(_graph, self.pos, _points[_index])
     var path = SEARCH.reconstruct(_search[0], self.pos, _points[_index])
     if (path == null || path.count <= 1) {
-      return Action.none
+      System.print("%(self.pos) -> %(path)")
+      System.print("no path")
+      return null
     }
 
     if (Common.isOccupied(self, path[1])) {
       _attempts = _attempts + 1
       if (_attempts < 2) {
+        System.print("obstructed path")
         return null
       } else {
+        System.print("random move")
         _attempts = 0
         // scan for empty space?
         return Common.moveRandom(self, false)

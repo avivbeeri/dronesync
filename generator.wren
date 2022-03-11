@@ -148,6 +148,10 @@ class RoomGenerator {
     player.pos.x = pos.x
     player.pos.y = pos.y
 
+    for (room in rooms) {
+      spawnGuardsInRoom(zone, room, start)
+    }
+
 /*
     var drone = zone.addEntity("drone", DroneEntity.new({ "stats": { "speed": 12 } }))
     drone.pos.x = player.pos.x + 1
@@ -256,6 +260,8 @@ class RoomGenerator {
       }
       // test accessibilities
     }
+  }
+  spawnGuardsInRoom(zone, room, start) {
     var spawnTotal = RNG.sample(SPAWN_DIST)
     for (i in 0...spawnTotal) {
       if (room == start) {
@@ -299,37 +305,16 @@ class RoomGenerator {
           if (x == wx || x == (width - 1) || y == wy || y == height - 1) {
             continue
           }
+          if (zone.map[x, y]["solid"]) {
+            continue
+          }
           roomTiles.add(Vec.new(x, y))
         }
       }
       return RNG.sample(roomTiles)
     }
-/*
-
-
-
-    var wx = targetRoom.x
-    var wy = targetRoom.y
-    var width = wx + targetRoom.z
-    var height = wy + targetRoom.w
-
-    var tile = null
-    var attempts = 0
-    while (attempts < 50 && (tile == null || zone.map[tile]["solid"])) {
-      attempts = attempts + 1
-      tile = Vec.new(RNG.int(wx + 1, width - 2), RNG.int(wy + 1, height - 2))
-      System.print(tile)
-      if (allowSolid) {
-        break
-      }
-    }
-    if (zone.map[tile]["solid"]) {
-      return null
-    }
-    return tile
-    */
-
   }
+
   getRandomWorldPosition(rooms) {
     var targetRoom = RNG.sample(rooms)
     return getRandomRoomPosition(targetRoom)
