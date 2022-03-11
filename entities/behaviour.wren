@@ -236,32 +236,30 @@ class Patrol is Behaviour {
 
   evaluate() {
     var player = ctx.getEntityByTag("player")
-    if ((self.pos - player.pos).length > 20) {
-      return null
-    }
     if (_points.count == 0) {
       return null
     }
     if (self.pos == _points[_index]) {
       _index = (_index + 1) % _points.count
+      _search = null
     }
 
-    _graph = EnemyWeightedZone.new(ctx)
-    _search = SEARCH.search(_graph, self.pos, _points[_index])
+    if (!_search || (self.pos - player.pos).length < 16) {
+      _graph = EnemyWeightedZone.new(ctx)
+      _search = SEARCH.search(_graph, self.pos, _points[_index])
+    }
     var path = SEARCH.reconstruct(_search[0], self.pos, _points[_index])
     if (path == null || path.count <= 1) {
-      System.print("%(self.pos) -> %(path)")
-      System.print("no path")
+      _search = null
       return null
     }
 
     if (Common.isOccupied(self, path[1])) {
       _attempts = _attempts + 1
       if (_attempts < 2) {
-        System.print("obstructed path")
         return null
       } else {
-        System.print("random move")
+        _search = null
         _attempts = 0
         // scan for empty space?
         return Common.moveRandom(self, false)

@@ -302,9 +302,6 @@ class RoomGenerator {
       var roomTiles = []
       for (y in wy...height) {
         for (x in wx...width) {
-          if (x == wx || x == (width - 1) || y == wy || y == height - 1) {
-            continue
-          }
           if (zone.map[x, y]["solid"]) {
             continue
           }
