@@ -148,9 +148,11 @@ class RoomGenerator {
     player.pos.x = pos.x
     player.pos.y = pos.y
 
+/*
     var drone = zone.addEntity("drone", DroneEntity.new({ "stats": { "speed": 12 } }))
     drone.pos.x = player.pos.x + 1
     drone.pos.y = player.pos.y
+    */
 
     var path = getCriticalPath(rooms, start)
     var console = getRandomRoomPosition(zone, path[-1])
@@ -165,7 +167,6 @@ class RoomGenerator {
 
     var lightMaps = [
       UpdateVision.update(zone),
-      UpdateVision.update(zone, drone, 4)
     ]
     CompressLightMap.update(zone)
     return world

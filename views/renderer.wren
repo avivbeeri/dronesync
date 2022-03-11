@@ -19,10 +19,13 @@ class WorldRenderer is View {
     _selection = []
     _range = []
     _center = null
+    _valid = true
     parent.top.store.subscribe {
-      _selection = parent.top.store.state["selection"]["tiles"]
-      _center = parent.top.store.state["selection"]["center"]
-      _range = parent.top.store.state["selection"]["range"]
+      var state = parent.top.store.state["selection"]
+      _selection = state["tiles"]
+      _center = state["center"]
+      _range = state["range"]
+      _valid = state["valid"]
     }
   }
 
@@ -101,12 +104,10 @@ class WorldRenderer is View {
       // Canvas.rectfill(tile.x * tileWidth, tile.y * tileHeight, tileWidth, tileHeight, PAL[2])
       Canvas.rect(tile.x * tileWidth - 1, tile.y * tileHeight - 1, tileWidth+1, tileHeight+1, PAL[2])
     }
-    for (tile in _selection) {
-      Canvas.rectfill(tile.x * tileWidth, tile.y * tileHeight, tileWidth - 1, tileHeight - 1, PAL[6])
-    }
-    if (_center) {
-      var tile = _center
-      Canvas.rectfill(tile.x * tileWidth, tile.y * tileHeight, tileWidth - 1, tileHeight - 1, PAL[2])
+    if (_valid) {
+      for (tile in _selection) {
+        Canvas.rectfill(tile.x * tileWidth, tile.y * tileHeight, tileWidth - 1, tileHeight - 1, PAL[6])
+      }
     }
 
     for (entity in _ctx.entities) {
@@ -162,6 +163,14 @@ class WorldRenderer is View {
             Canvas.print(symbol, entity.pos.x * tileWidth, entity.pos.y * tileHeight, entity["los"] ? Color.orange : Display.fg)
           }
         }
+      }
+    }
+    if (_center) {
+      var tile = _center
+      if (_valid) {
+        Canvas.rectfill(tile.x * tileWidth, tile.y * tileHeight, tileWidth - 1, tileHeight - 1, PAL[2])
+      } else {
+        Canvas.rectfill(tile.x * tileWidth + 1, tile.y * tileHeight + 1, tileWidth - 3, tileHeight - 3, PAL[6])
       }
     }
 

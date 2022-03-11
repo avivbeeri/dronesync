@@ -5,6 +5,55 @@ import "./events" for LogEvent, AttackEvent, EscapeEvent, GoalEvent
 import "./extra/combat" for Attack, AttackType, AttackResult
 import "./entities/player" for PlayerEntity
 
+class PickupAction is Action {
+  construct new(pos) {
+    super()
+    _pos = pos
+  }
+  perform() {
+    var entities = ctx.getEntitiesAtTile(_pos)
+    for (target in entities) {
+      if (source is PlayerEntity && target is DroneEntity) {
+        source["inventory"][0]["quantity"] = 1
+        ctx.removeEntity(target)
+      }
+    }
+    return ActionResult.success
+  }
+}
+
+class SpawnAction is Action {
+  construct new(spawnable, pos) {
+    super()
+    _spawnable = spawnable
+    _pos = pos
+    _tag = null
+  }
+  construct new(spawnable, pos, tag) {
+    super()
+    _spawnable = spawnable
+    _pos = pos
+    _tag = tag
+  }
+
+  factory(id) {
+    return DroneEntity.new({ "stats": { "speed": 12 } })
+  }
+
+  perform() {
+    var entity = factory(_spawnable)
+    if (_tag) {
+      ctx.addEntity(_tag, entity)
+    } else {
+      ctx.addEntity(null, entity)
+    }
+    entity.pos.x = _pos.x
+    entity.pos.y = _pos.y
+    return ActionResult.success
+  }
+
+}
+
 class SwapAction is Action {
   construct new() {
     super()
@@ -66,6 +115,9 @@ class UseItemAction is Action {
     if (_itemId == "smokebomb") {
       return SmokeAction.new(_args["selection"])
     }
+    if (_itemId == "drone") {
+      return SpawnAction.new("drone", _args["selection"][0], "drone")
+    }
     return null
   }
 
@@ -96,7 +148,7 @@ class UseItemAction is Action {
       if (result.succeeded) {
         if (item["quantity"] > 0) {
           item["quantity"] = item["quantity"] - 1
-          if (item["quantity"] <= 0) {
+          if (item["quantity"] <= 0 && !item["eternal"]) {
             inventory.removeAt(itemIndex)
           }
         }
@@ -105,8 +157,8 @@ class UseItemAction is Action {
         }
         return ActionResult.success
       }
-      return ActionResult.failure
     }
+    return ActionResult.failure
   }
 }
 class SmokeAction is Action {
@@ -168,17 +220,21 @@ class MoveAction is Action {
     if (source.pos != old) {
       var solid = ctx.isSolidAt(source.pos)
       var target = false
+      var collectible = false
       if (!solid) {
         var occupying = getOccupying(source.pos)
         if (occupying.count > 0) {
           solid = solid || occupying.any {|entity| entity.has("solid") }
           target = occupying.any {|entity| entity.has("stats") }
+          collectible = occupying.any {|entity| entity.has("loot") }
         }
         if (source is PlayerEntity && ctx.map[source.pos]["kind"] == "exit") {
           result = ActionResult.alternate(EscapeAction.new())
         }
       }
-      if (solid || target) {
+
+      if (solid || (target && !collectible)) {
+        System.print("here")
         source.pos = old
         if (source is PlayerEntity && ctx.map[source.pos + source.vel]["kind"] == "goal") {
           result = ActionResult.alternate(ObjectiveAction.new())
@@ -188,9 +244,13 @@ class MoveAction is Action {
           }
         }
       }
-      if (!_alt && target) {
-        if (source.has("stats") && source.has("melee")) { // TODO: consider narrowing condition
-          result = ActionResult.alternate(AttackAction.new(source.pos + _dir, source["melee"]))
+      if (!_alt) {
+        if (!solid && collectible) {
+          result = ActionResult.alternate(PickupAction.new(source.pos))
+        } else if (target) {
+          if (source.has("stats") && source.has("melee")) { // TODO: consider narrowing condition
+            result = ActionResult.alternate(AttackAction.new(source.pos + _dir, source["melee"]))
+          }
         }
       }
     }
@@ -277,3 +337,5 @@ class AttackAction is Action {
     return ActionResult.success
   }
 }
+
+import "./entities/drone" for DroneEntity

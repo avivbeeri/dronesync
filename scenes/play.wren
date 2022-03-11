@@ -61,6 +61,7 @@ class SelectionReducer is TestReducer {
       state["tiles"] = action["tiles"]
       state["range"] = action["range"]
       state["center"] = action["center"]
+      state["valid"] = action["valid"]
     }
     return state
   }
@@ -82,18 +83,20 @@ class WindowReducer is TestReducer {
 
 class RangeSelectorState is State {
   construct new(ctx, view, data, range) {
-    init(ctx, view, data, range, 0)
+    init(ctx, view, data, range, 0, true)
   }
-  construct new(ctx, view, data, range, splash) {
-    init(ctx, view, data, range, splash)
+  construct new(ctx, view, data, range, splash, useCenter) {
+    init(ctx, view, data, range, splash, useCenter)
   }
-  init(ctx, view, data, range, splash) {
+  init(ctx, view, data, range, splash, useCenter) {
     _ctx = ctx
     _data = data
     _view = view
     _range = range + 1
     _splash = splash + 1
     _center = null
+    _origin = null
+    _useCenter = useCenter
   }
 
   getRangeFromPoint(point, range) {
@@ -118,7 +121,7 @@ class RangeSelectorState is State {
 
   onEnter() {
     var player = _ctx.active.getEntityByTag("player")
-    _center = player.pos
+    _center = _origin = player.pos
     _tileList = getRangeFromPoint(_center, _range)
     _selection = getRangeFromPoint(_center, _splash)
     _view.top.store.dispatch({ "type": "selection", "tiles": _selection, "range": _tileList, "center": _center })
@@ -133,7 +136,7 @@ class RangeSelectorState is State {
       return
     }
     // TODO: handle mouse or keyboard input
-    var destination = null
+    var destination = _center
     if (InputAction.right.firing) {
       destination = _center + Vec.new(1, 0)
     } else if (InputAction.left.firing) {
@@ -144,18 +147,28 @@ class RangeSelectorState is State {
       destination = _center + Vec.new(0, 1)
     } else if (InputAction.cancel.firing) {
       return PlayState.new(_ctx, _view)
-    } else if (InputAction.confirm.firing) {
-      _view.top.store.dispatch({ "type": "action", "data": _data, "selection": _selection, "center": _center })
-      return PlayState.new(_ctx, _view)
+    }
+
+    var valid = _useCenter || destination != _origin
+    if (InputAction.confirm.firing) {
+      if (valid) {
+        _view.top.store.dispatch({ "type": "action", "data": _data, "selection": _selection, "center": _center })
+        return PlayState.new(_ctx, _view)
+      }
     }
     if (destination && _tileList.contains(destination)) {
       _center = destination
-      _selection = getRangeFromPoint(_center, _splash)
+      if (!valid) {
+        _selection = [_center]
+      } else {
+        _selection = getRangeFromPoint(_center, _splash)
+      }
       _view.top.store.dispatch({
         "type": "selection",
         "tiles": _selection,
         "range": _tileList,
-        "center": _center
+        "center": _center,
+        "valid": valid
       })
     }
     return this
@@ -184,7 +197,7 @@ class PlayState is State {
           _view.store.dispatch({ "type": "item", "data": null })
           if (player["active"]) {
             // Get info about item
-            return RangeSelectorState.new(_ctx, _view, item, item["range"], item["splash"])
+            return RangeSelectorState.new(_ctx, _view, item, item["range"], item["splash"], item.containsKey("useCenter") ? item["useCenter"] : true)
           }
         }
         if (_view.store.state["action"]["data"]) {

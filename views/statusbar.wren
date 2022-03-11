@@ -45,11 +45,13 @@ class StatusBar is View {
   update() {
     super.update()
     var player = _ctx.getEntityByTag("player", true)
-    var drone = _ctx.getEntityByTag("drone", true)
+    var drone = _drone = _ctx.getEntityByTag("drone")
     if (player) {
       _hp = player["stats"]["hp"]
       _maxHp = player["stats"]["hpMax"]
-      _range = M.mid(0, 1 - (player.pos - drone.pos).length / drone["range"], 1)
+      if (player && drone) {
+        _range = M.mid(0, 1 - (player.pos - drone.pos).length / drone["range"], 1)
+      }
     }
 
     var click = Mouse["left"].justPressed
@@ -87,29 +89,31 @@ class StatusBar is View {
       Canvas.print("-", x * tileWidth, 13, Display.fg)
     }
     Canvas.print("HP: %(_hp) / %(_maxHp)", 32, 4, Display.fg)
-    var color = Display.fg
-    var symbol = "█"
-    color = PAL[9]
-    if (_range < 0.75) {
-      symbol = "▆"
+    if (_drone) {
+      var color = Display.fg
+      var symbol = "█"
       color = PAL[9]
-    }
-    if (_range < 0.4) {
-      symbol = "▄"
-      color = PAL[5]
-    }
-    if (_range < 0.1) {
-      symbol = "▂"
-      color = PAL[6]
-    }
-    if (_range == 0) {
-      symbol = " "
-      color = PAL[6]
-    }
+      if (_range < 0.75) {
+        symbol = "▆"
+        color = PAL[9]
+      }
+      if (_range < 0.4) {
+        symbol = "▄"
+        color = PAL[5]
+      }
+      if (_range < 0.1) {
+        symbol = "▂"
+        color = PAL[6]
+      }
+      if (_range == 0) {
+        symbol = " "
+        color = PAL[6]
+      }
 
-    Canvas.print("[█]", 4, 4, PAL[3])
-    Canvas.print("[ ]", 4, 4, Display.fg)
-    Canvas.print(" %(symbol) ", 4, 4, color)
+      Canvas.print("[█]", 4, 4, PAL[3])
+      Canvas.print("[ ]", 4, 4, Display.fg)
+      Canvas.print(" %(symbol) ", 4, 4, color)
+    }
 
 
     // Draw a button

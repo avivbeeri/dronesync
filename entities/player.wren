@@ -20,6 +20,16 @@ class PlayerEntity is Creature {
     this["active"] = true
     this["inventory"] = [
       {
+        "id": "drone",
+        "displayName": "Drone",
+        "range": 1,
+        "splash": 0,
+        "useCenter": false,
+        "quantity": 1,
+        "binary": true,
+        "eternal": true
+      },
+      {
         "id": "smokebomb",
         "displayName": "Smoke Bombs",
         "quantity": 3,

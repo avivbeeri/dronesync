@@ -1,5 +1,4 @@
 import "core/action" for Action
-import "actions" for SwapAction
 import "entities/creature" for Creature
 import "extra/combat" for Attack
 import "core/graph" for WeightedZone, BFS, AStar, DijkstraMap
@@ -17,6 +16,7 @@ class DroneEntity is Creature {
   init(config) {
     super.init(config)
     this["active"] = true
+    this["loot"] = {}
     this["range"] = 16
   }
 
@@ -47,3 +47,4 @@ class DroneEntity is Creature {
   }
 }
 
+import "actions" for SwapAction

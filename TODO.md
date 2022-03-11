@@ -4,7 +4,6 @@ TODO for DroneSync
 # Day 6:
 
 * procedural map generation
-  - Interesting rooms
   - Minimum enemy for challenge
   - lock-key systems
 * Drone mechanics

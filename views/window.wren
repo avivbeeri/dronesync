@@ -203,8 +203,15 @@ class InventoryWindow is Window {
         label = "%(i+1)) %(label)"
       }
       Canvas.print(label, 2, y, color, "m3x6")
-      var quantity = "x" + entry["quantity"].toString
-      Canvas.print(quantity, width - quantity.count*7, y, color, "m3x6")
+      if (entry["quantity"]) {
+        if (entry["binary"]) {
+          Canvas.rectfill(width - 14, y-1, 7, 7, entry["quantity"] == 0 ? Display.bg : PAL[5])
+          Canvas.rect(width - 14, y-1, 7, 7, color)
+        } else {
+          var quantity = "x" + entry["quantity"].toString
+          Canvas.print(quantity, width - quantity.count*7, y, color, "m3x6")
+        }
+      }
       y = y + 8
       i = i + 1
     }
