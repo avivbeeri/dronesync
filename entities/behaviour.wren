@@ -1,5 +1,4 @@
 import "math" for Vec, M
-
 import "core/elegant" for Elegant
 import "core/action" for Action
 import "actions" for MoveAction, WakeAction
@@ -100,13 +99,7 @@ class Confusion is Behaviour {
 
   evaluate() {
     if (ctx.map[self.pos]["blockSight"]) {
-
-      var available = NSEW.values.where{|dir| !Common.isOccupied(self, self.pos + dir)}.toList
-      var dir = RNG.sample(available)
-      if (dir != null) {
-        return MoveAction.new(dir, true, Action.none)
-      }
-      return Action.none
+      return Common.moveRandom(self)
     }
   }
 
@@ -241,40 +234,33 @@ class Patrol is Behaviour {
   }
   notify(event) {}
 
-  isOccupied(dest) {
-    return ctx.getEntitiesAtTile(dest.x, dest.y).where {|entity| entity != self && !(entity is PlayerEntity) }.count > 0
-  }
-
   evaluate() {
+    var player = ctx.getEntityByTag("player")
+    if ((self.pos - player.pos).length > 20) {
+      return null
+    }
     if (_points.count == 0) {
       return null
     }
     if (self.pos == _points[_index]) {
       _index = (_index + 1) % _points.count
-      _search = null
     }
+
     _graph = EnemyWeightedZone.new(ctx)
     _search = SEARCH.search(_graph, self.pos, _points[_index])
     var path = SEARCH.reconstruct(_search[0], self.pos, _points[_index])
     if (path == null || path.count <= 1) {
-      _search = null
       return Action.none
     }
 
-    if (isOccupied(path[1])) {
+    if (Common.isOccupied(self, path[1])) {
       _attempts = _attempts + 1
       if (_attempts < 2) {
         return null
       } else {
         _attempts = 0
         // scan for empty space?
-        var available = NSEW.values.where{|dir| !isOccupied(self.pos + dir)}.toList
-        var dir = RNG.sample(available)
-        if (dir != null) {
-          _search = null
-          return MoveAction.new(dir, true, Action.none)
-        }
-        return null
+        return Common.moveRandom(self, false)
       }
     }
     _attempts = 0

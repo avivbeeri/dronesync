@@ -7,6 +7,9 @@ class GridWalk {
     var previous = null
     for (point in line) {
       // Prevent tunnelling
+      if (point == p1) {
+        break
+      }
       if (previous && (previous - point).manhattan > 1) {
         if (map[previous.x, point.y][prop] &&
             map[point.x, previous.y][prop]) {
