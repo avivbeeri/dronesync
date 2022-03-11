@@ -212,13 +212,17 @@ class SeekFocus is Behaviour {
     _graph = EnemyWeightedZone.new(ctx)
     var focus = getFocus()
     if (focus) {
-      _search = SEARCH.search(_graph, self.pos, focus)
+      if (!_search) {
+        _search = SEARCH.search(_graph, self.pos, focus)
+      }
       var path = SEARCH.reconstruct(_search[0], self.pos, focus)
       if (path == null || path.count <= 1) {
+        _search = null
         return Action.none
       }
       return MoveAction.new(path[1] - self.pos, true)
     }
+    _search = null
     return Common.moveRandom(self)
   }
 }
@@ -264,6 +268,7 @@ class Patrol is Behaviour {
     }
 
     if (!_search || (self.pos - player.pos).length < 16) {
+      System.print("searching...")
       _graph = EnemyWeightedZone.new(ctx)
       _search = SEARCH.search(_graph, self.pos, _points[_index])
     }
