@@ -189,6 +189,16 @@ class WorldRenderer is View {
       }
     }
 
+    var entity = _ctx.getEntityByTag("player")
+    var tile = _ctx.map[entity.pos]
+    var color = Display.bg
+
+    // TODO: figure out what background color to use here
+    Canvas.rectfill(entity.pos.x * tileWidth, entity.pos.y * tileHeight, tileWidth - 1, tileHeight - 1, color)
+
+    if (entity is PlayerEntity) {
+      Canvas.print("@", entity.pos.x * tileWidth,  entity.pos.y * tileHeight, player["active"] ? PAL[7] : PAL[8])
+    }
 
 
     Canvas.offset()
