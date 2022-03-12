@@ -268,7 +268,6 @@ class Patrol is Behaviour {
     }
 
     if (!_search || (self.pos - player.pos).length < 16) {
-      System.print("searching...")
       _graph = EnemyWeightedZone.new(ctx)
       _search = SEARCH.search(_graph, self.pos, _points[_index])
     }
