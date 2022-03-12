@@ -14,6 +14,9 @@ TODO for DroneSync
   Re-evaluate and resolve.
   If there are no priority points, then return to patrol paths.
 
+
+# Nice to Have
+
 ## Map Generation
   An extra room type or two would make the game play more varied.
 
@@ -21,9 +24,6 @@ TODO for DroneSync
   * 
 
   Features in the rooms: Loot drops, extra exits?
-
-
-# Nice to Have
 
 * procedural map generation
   - Minimum enemy for challenge
