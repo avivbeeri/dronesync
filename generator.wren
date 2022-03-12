@@ -8,7 +8,7 @@ import "core/config" for Config
 import "core/world" for World, Zone
 import "core/director" for EnergyStrategy
 import "core/map" for TileMap, Tile
-import "core/graph" for BFSNeutral, Graph
+import "core/graph" for BFSNeutral, Graph, AStar, SquareGrid
 import "./logic" for RemoveDefeated, GameEndCheck, UpdateVision, CompressLightMap, LightEverything
 import "./entities/player" for PlayerEntity
 import "./entities/drone" for DroneEntity
@@ -51,6 +51,8 @@ class RoomGenerator {
 
     var world = World.new(strategy)
     world["objective"] = false
+    world["time"] = 0
+    world["alerts"] = 0
     world.pushZone(Zone.new(map))
     world.active.postUpdate.add(RemoveDefeated)
     world.active.postUpdate.add(CompressLightMap)
@@ -161,12 +163,19 @@ class RoomGenerator {
     var path = getCriticalPath(rooms, start)
     var console = getRandomRoomPosition(zone, path[-1])
     zone.map[console] = Tile.new({
-      "solid": true,
+      "solid": false,
       "visible": "unknown",
       "blockSight": false,
       "activeEffects": [],
       "kind": "goal"
     })
+
+    var graph = SquareGrid.new(zone.map)
+    var scoreSearch = AStar.search(graph, player.pos, console)
+    path = AStar.reconstruct(scoreSearch[0], player.pos, console)
+    world["minDistance"] = path.count
+    System.print(path.count)
+    zone.map[console]["solid"] = true
 
 
     var lightMaps = [

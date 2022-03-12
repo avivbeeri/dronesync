@@ -282,7 +282,12 @@ class PlayScene is Scene {
         }
         if (event is GameEndEvent) {
           var message = event.won ? "Mission Successful!" : "Mission Bailed"
-          addViewChild(GameEndWindow.new(this, _world.active, message))
+          var player = _world.active.getEntityByTag("player", true)
+          if (player && player.alive) {
+            addViewChild(ScoreWindow.new(this, _world, message))
+          } else {
+            addViewChild(GameEndWindow.new(this, _world, message))
+          }
         }
       }
     }
@@ -300,5 +305,5 @@ class PlayScene is Scene {
   }
 }
 
-import "./views/window" for GameEndWindow
+import "./views/window" for GameEndWindow, ScoreWindow
 import "./views/statusbar" for StatusBar

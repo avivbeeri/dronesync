@@ -8,6 +8,7 @@ import "core/scene" for Scene, View
 
 import "./palette" for PAL
 import "./inputs" for InputAction
+import "core/rng" for Seed
 
 
 
@@ -272,6 +273,7 @@ class MessageWindow is Window {
   drawContent() {
     super.drawContent()
     Canvas.print(_message, 8, 4, Display.fg)
+
   }
 }
 
@@ -279,12 +281,77 @@ class GameEndWindow is MessageWindow {
   construct new(parent, ctx, message) {
     super(parent, ctx, message)
     z = 2
+    title = "Mission Report"
+    height = 8 * 6
+    width = Canvas.width * 0.5
+    x = (Canvas.width - width) / 2
+    y = (Canvas.height - height) / 2
   }
-
   update() {
     if (InputAction.confirm.justPressed) {
       top.game.push(PlayScene, [])
     }
+  }
+  drawContent() {
+    var text = "You died"
+    var y = 12
+    Canvas.print(text, (width - text.count * 8) / 2, y, Display.fg)
+    text = "Press Enter to play again."
+    y = 28
+    Canvas.print(text, (width - text.count * 8) / 2, y, Display.fg)
+  }
+}
+class ScoreWindow is GameEndWindow {
+  construct new(parent, ctx, message) {
+    super(parent, ctx, message)
+    var v = ctx["time"]
+    System.print("Time: %(v) ")
+    v = ctx["minDistance"]
+    System.print("Min: %(v) ")
+    _score = [
+
+      (ctx["objective"] ?
+        [ "Objective complete", 150 ] :
+        [ "Objective abandoned", 0 ]),
+      [ "Time", (M.max(0, ctx["time"] - ctx["minDistance"]) / 200).floor * 10, -1, "-" ],
+      [ "Alerts", ctx["alerts"] * 17, -1, "-"],
+    ]
+    _total = _score.reduce(0) {|total, line|
+      return total + line[1] * (line.count > 2 ? line[2] : 1)
+    }
+
+    height = _score.count * 8 + 68
+    width = Canvas.width * 0.75
+    x = (Canvas.width - width) / 2
+    y = (Canvas.height - height) / 2
+
+    z = 2
+    title = "Mission Report"
+    System.print(_score)
+    System.print(_total)
+  }
+
+  drawContent() {
+    var y = 10
+    var margin = 2 + width / 4
+    var text = "Seed: %(Seed)"
+    Canvas.print(text, margin, y, Display.fg)
+    y = y + 16
+    for (line in _score) {
+      var text = line[0]
+      var modifier = line.count > 3 ? line[3] : "+"
+      var value = "%(modifier)%(line[1])"
+      Canvas.print(text, margin, y, Display.fg)
+      Canvas.print(value, width - margin - value.count * 8, y, Display.fg)
+      y = y + 8
+    }
+    y = y + 8
+    text = "Total: %(_total)"
+    Canvas.print(text, width - margin - text.count * 8, y, Display.fg)
+    y = y + 16
+
+    text = "Press Enter to play again."
+    Canvas.print(text, (width - text.count * 8) / 2, y, Display.fg)
   }
 }
 

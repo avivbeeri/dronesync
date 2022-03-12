@@ -143,6 +143,7 @@ class Awareness is Behaviour {
           if (self["awareness"] >= 6) {
             self["state"] = "alert"
             self["focus"] = self["senses"]["player"]
+            ctx.parent["alerts"] = ctx.parent["alerts"] + 1
           }
         }
       } else if (self["awareness"] > 3 && self["senses"]["lastSawPlayer"] < 2){
@@ -167,11 +168,13 @@ class Awareness is Behaviour {
       }
       if (visible && veryClose) {
         self["state"] = "alert"
+        ctx.parent["alerts"] = ctx.parent["alerts"] + 1
         self["focus"] = self["senses"]["player"]
       }
     } else if (self["state"] == "investigate") {
       if (visible && near) {
         self["state"] = "alert"
+        ctx.parent["alerts"] = ctx.parent["alerts"] + 1
         self["awareness"] = 8
         self["focus"] = self["senses"]["player"]
       } else if (self["focus"]) {

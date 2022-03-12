@@ -47,6 +47,7 @@ class PlayerEntity is Creature {
 
   endTurn() {
     super.endTurn()
+    ctx.parent["time"] = ctx.parent["time"] + 1
     var graph = WeightedZone.new(ctx)
     UpdateMapEffects.update(ctx)
     this["dijkstra"] = DijkstraMap.search(graph, pos)
