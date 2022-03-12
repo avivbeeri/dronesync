@@ -32,7 +32,7 @@ var NEXT_KEY = InputGroup.new([
   Keyboard["tab"]
 ])
 var SWAP_KEY = InputGroup.new([
-  Keyboard["left shift"], Keyboard["right shift"]
+  Keyboard["left shift"], Keyboard["right shift"], Keyboard["tab"]
 ])
 
 var DIR_KEYS = [ UP_KEY, DOWN_KEY, LEFT_KEY, RIGHT_KEY ]
