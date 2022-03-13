@@ -2,16 +2,16 @@ import "core/inputGroup" for InputGroup
 import "input" for Keyboard, Mouse
 
 var UP_KEY = InputGroup.new([
-  Keyboard["up"], Keyboard["w"], Keyboard["k"]
+  Keyboard["up"], Keyboard["w"], Keyboard["k"], Keyboard["keypad 8"]
 ])
 var DOWN_KEY = InputGroup.new([
-  Keyboard["down"], Keyboard["s"], Keyboard["j"]
+  Keyboard["down"], Keyboard["s"], Keyboard["j"], Keyboard["keypad 2"]
 ])
 var LEFT_KEY = InputGroup.new([
-  Keyboard["left"], Keyboard["a"], Keyboard["h"]
+  Keyboard["left"], Keyboard["a"], Keyboard["h"], Keyboard["keypad 4"]
 ])
 var RIGHT_KEY = InputGroup.new([
-  Keyboard["right"], Keyboard["d"], Keyboard["l"]
+  Keyboard["right"], Keyboard["d"], Keyboard["l"], Keyboard["keypad 6"]
 ])
 
 var CANCEL_KEY = InputGroup.new([
@@ -19,7 +19,7 @@ var CANCEL_KEY = InputGroup.new([
 ])
 
 var CONFIRM_KEY = InputGroup.new([
-  Keyboard["z"], Keyboard["x"], Keyboard["e"], Keyboard["return"], Keyboard["space"]
+  Keyboard["z"], Keyboard["x"], Keyboard["e"], Keyboard["return"], Keyboard["space"], Keyboard["keypad enter"]
 ])
 
 var INVENTORY_KEY = InputGroup.new([
