@@ -35,6 +35,15 @@ import "core/graph" for DijkstraMap
 class TestReducer is Reducer {
   call(x, y) { reduce(x, y) }
 }
+class ModeReducer is TestReducer {
+  construct new() {}
+  reduce(state, action) {
+    if (action["type"] == "mode") {
+      state  = action["mode"]
+    }
+    return state
+  }
+}
 class ItemReducer is TestReducer {
   construct new() {}
   reduce(state, action) {
@@ -126,6 +135,7 @@ class RangeSelectorState is State {
     _tileList = getRangeFromPoint(_center, _range)
     _selection = getRangeFromPoint(_center, _splash)
     _view.top.store.dispatch({ "type": "selection", "tiles": _selection, "range": _tileList, "center": _center })
+    _view.top.store.dispatch({ "type": "mode", "mode": "select" })
   }
 
   onExit() {
@@ -182,6 +192,10 @@ class PlayState is State {
     _view = view
   }
 
+  onEnter() {
+    _view.top.store.dispatch({ "type": "mode", "mode": "play" })
+  }
+
   update() {
     var player = _ctx.active.getEntityByTag("player")
     var drone = _ctx.active.getEntityByTag("drone")
@@ -236,12 +250,14 @@ class PlayScene is Scene {
       "window": WindowReducer.new(),
       "selection": SelectionReducer.new(),
       "action": ActionReducer.new(),
-      "item": ItemReducer.new()
+      "item": ItemReducer.new(),
+      "mode": ModeReducer.new()
     })
     _store = Store.create({
       "window": {},
       "action": {},
       "item": {},
+      "mode": "play",
       "selection": {
         "tiles": [],
         "range": []

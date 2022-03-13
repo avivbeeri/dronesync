@@ -136,7 +136,9 @@ class InventoryWindow is Window {
     x = Canvas.width - width - 8
     restorePref("inventory")
     var Sub
+    _allowInput = true
     Sub = top.store.subscribe {
+      _allowInput = (top.store.state["mode"] == "play")
 
       if (!top.store.state["window"]["inventory"]) {
         onClose()
@@ -159,23 +161,25 @@ class InventoryWindow is Window {
         _contents.add(entry)
       }
     }
-    var pos = Mouse.pos
-    _hover = -1
-    if (pos.x >= x && pos.x < x + width && pos.y >= y && pos.y < y + height) {
-      _hover = ((((pos.y) - (y+4))) / 8).floor
-      _hover = M.max(0, _hover)
-    }
-    var activate = Mouse["left"].justPressed
-    for (key in 0..9) {
-      var i = (key + 9) % 10
-      if (Keyboard[key.toString].justPressed && i < _contents.count) {
-        _hover = i
-        activate = true
-        break
+    if (_allowInput) {
+      var pos = Mouse.pos
+      _hover = -1
+      if (pos.x >= x && pos.x < x + width && pos.y >= y && pos.y < y + height) {
+        _hover = ((((pos.y) - (y+4))) / 8).floor
+        _hover = M.max(0, _hover)
       }
-    }
-    if (activate && _hover != -1 && _hover < _contents.count) {
-      this.top.store.dispatch({ "type": "item", "data": _contents[_hover] })
+      var activate = Mouse["left"].justPressed
+      for (key in 0..9) {
+        var i = (key + 9) % 10
+        if ((Keyboard[key.toString].justPressed || (InputAction.shift.down && Keyboard["keypad %(key)"].justPressed)) && i < _contents.count) {
+          _hover = i
+          activate = true
+          break
+        }
+      }
+      if (activate && _hover != -1 && _hover < _contents.count) {
+        this.top.store.dispatch({ "type": "item", "data": _contents[_hover] })
+      }
     }
   }
   onRequestClose() {
@@ -206,8 +210,8 @@ class InventoryWindow is Window {
       Canvas.print(label, 2, y, color, "m3x6")
       if (entry["quantity"]) {
         if (entry["binary"]) {
-          Canvas.rectfill(width - 14, y-1, 7, 7, entry["quantity"] == 0 ? Display.bg : PAL[5])
-          Canvas.rect(width - 14, y-1, 7, 7, color)
+          Canvas.rectfill(width - 14, y-1, 6, 7, entry["quantity"] == 0 ? Display.bg : PAL[5])
+          Canvas.rect(width - 14, y-1, 6, 6, color)
         } else {
           var quantity = "x" + entry["quantity"].toString
           Canvas.print(quantity, width - (quantity.count * 4) - 7, y, color, "m3x6")

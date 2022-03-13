@@ -26,13 +26,17 @@ var INVENTORY_KEY = InputGroup.new([
   Keyboard["i"]
 ])
 var REST_KEY = InputGroup.new([
-  Keyboard["r"], Keyboard["space"]
+  Keyboard["r"], Keyboard["space"], Keyboard["keypad ."]
 ])
 var NEXT_KEY = InputGroup.new([
   Keyboard["tab"]
 ])
 var SWAP_KEY = InputGroup.new([
-  Keyboard["left shift"], Keyboard["right shift"], Keyboard["tab"]
+  Keyboard["tab"]
+])
+var SHIFT_KEY = InputGroup.new([
+
+  Keyboard["left shift"], Keyboard["right shift"]
 ])
 
 var DIR_KEYS = [ UP_KEY, DOWN_KEY, LEFT_KEY, RIGHT_KEY ]
@@ -53,5 +57,6 @@ class InputAction {
   static inventory { INVENTORY_KEY }
   static confirm { CONFIRM_KEY }
   static swap { SWAP_KEY }
+  static shift { SHIFT_KEY }
   static cancel { CANCEL_KEY }
 }
