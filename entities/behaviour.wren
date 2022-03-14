@@ -223,9 +223,7 @@ class SeekFocus is Behaviour {
     _graph = EnemyWeightedZone.new(ctx)
     var focus = getFocus()
     if (focus) {
-      if (!_search) {
-        _search = SEARCH.search(_graph, self.pos, focus)
-      }
+      _search = SEARCH.search(_graph, self.pos, focus)
       var path = SEARCH.reconstruct(_search[0], self.pos, focus)
       if (path == null || path.count <= 1) {
         _search = null
@@ -237,25 +235,18 @@ class SeekFocus is Behaviour {
     return Common.moveRandom(self)
   }
 }
-class SeekPlayer is Behaviour {
+class SeekPlayer is SeekFocus {
   construct new(self) {
     super(self)
   }
 
-  notify(event) {}
-  evaluate() {
-    // TODO: Make this behaviour generic by indicating a point of interest
-    // rather than homing on the player
+  getFocus() {
     var player = ctx.getEntityByTag("player")
-    if (player) {
-      var search = player["dijkstra"]
-      var path = DijkstraMap.reconstruct(search[0], player.pos, self.pos)
-      if (path == null || path.count <= 1) {
-        return Action.none
-      }
-      return MoveAction.new(path[1] - self.pos, true)
+    var visible = GridWalk.checkLoS(ctx.map, self.pos, player.pos)
+    if (visible) {
+      return player.pos
     }
-    return Action.none
+    return super.getFocus()
   }
 }
 

@@ -37,7 +37,7 @@ class Guard is Creature {
     push(Awareness)
     push(Confusion)
     push(State.new(this, "state", {
-      "alert": SeekFocus,
+      "alert": SeekPlayer,
       "investigate": SeekFocus,
       "investigate-noise": SeekFocus,
       "patrol": Patrol.new(this, config["patrol"] || [])

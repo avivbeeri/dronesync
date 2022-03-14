@@ -293,6 +293,9 @@ class RoomGenerator {
         guardEnd = getRandomRoomPosition(zone, target)
       }
       var guard = zone.addEntity(Guard.new({
+        "stats": {
+          "speed": 9
+        },
         "patrol": [
           guardStart,
           guardEnd
