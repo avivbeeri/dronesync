@@ -65,9 +65,14 @@ class Window is View {
       _hoverX = false
     }
 
-    if (Mouse["left"].justPressed && pos.x >= x - 4 && pos.x < x + width  + 8 && pos.y >= y - 10 && pos.y < y) {
-      _held = true
-      _lastMouse = pos
+    if (pos.x >= x - 4 && pos.x < x + width  + 8 && pos.y >= y - 10 && pos.y < y) {
+      Mouse.cursor = "hand"
+      if (Mouse["left"].justPressed) {
+        _held = true
+        _lastMouse = pos
+      }
+    } else {
+      Mouse.cursor = "arrow"
     }
     if (_held) {
       var diff = pos - _lastMouse
