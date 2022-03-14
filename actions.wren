@@ -118,7 +118,7 @@ class ObjectiveAction is Action {
     super()
   }
   perform() {
-    if (!ctx.parent["objective"]) {
+    if (ctx.parent["objective"]) {
       return ActionResult.failure
     }
     ctx.events.add(LogEvent.new("%(source) completed the objective!"))

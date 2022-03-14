@@ -153,7 +153,7 @@ class WorldRenderer is View {
         } else if (entity["state"] == "investigate" || entity["state"] == "investigate-noise") {
           color = PAL[8]
         } else if (entity["awareness"] > 0)  {
-          color = PAL[5]
+          color = PAL[14]
         }
         Canvas.print(symbol, entity.pos.x * tileWidth, entity.pos.y * tileHeight, color)
 
