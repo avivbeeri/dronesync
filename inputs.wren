@@ -41,7 +41,7 @@ var SHIFT_KEY = InputGroup.new([
 
 var DIR_KEYS = [ UP_KEY, DOWN_KEY, LEFT_KEY, RIGHT_KEY ]
 // Set frequency for smoother tile movement
-DIR_KEYS.each {|key| key.frequency = 8 }
+DIR_KEYS.each {|key| key.frequency = 4 }
 
 class InputAction {
   // Grouped keys

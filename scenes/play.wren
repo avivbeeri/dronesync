@@ -246,6 +246,7 @@ class PlayScene is Scene {
   construct new(args) {
     super()
     _log = Log.new()
+    _log.add("Mission commenced.")
     var reducer = Store.combineReducers({
       "window": WindowReducer.new(),
       "selection": SelectionReducer.new(),

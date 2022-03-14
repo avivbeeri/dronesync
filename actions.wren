@@ -104,6 +104,9 @@ class SwapAction is Action {
     ctx.entities.swap(aIndex, bIndex)
     drone.priority = primary.priority
     player.priority = primary.priority
+
+    var name = player["active"] ? "disabled" : "enabled"
+    ctx.events.add(LogEvent.new("Drone control is %(name)"))
     // We fail here because this doesn't advance
     return ActionResult.failure
   }
@@ -115,6 +118,9 @@ class ObjectiveAction is Action {
     super()
   }
   perform() {
+    if (!ctx.parent["objective"]) {
+      return ActionResult.failure
+    }
     ctx.events.add(LogEvent.new("%(source) completed the objective!"))
     ctx.events.add(GoalEvent.new())
     ctx.parent["objective"] = true
@@ -133,6 +139,7 @@ class NoiseAction is Action {
         entity["senses"]["noise"] = _pos
       }
     }
+    ctx.events.add(LogEvent.new("%(source) caused a noise to occur."))
 
     return ActionResult.success
   }
@@ -193,6 +200,8 @@ class UseItemAction is Action {
         Fiber.abort("Attempted to execute invalid action %(_itemId)")
       }
       itemAction.bind(source)
+      var itemName = item["displayName"]
+      ctx.events.add(LogEvent.new("%(source) used %(itemName)"))
       var result = itemAction.perform()
       if (result.succeeded) {
         if (item["quantity"] > 0) {

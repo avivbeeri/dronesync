@@ -9,6 +9,7 @@ import "core/dir" for Directions, NSEW
 import "core/rng" for RNG
 import "entities/player" for PlayerEntity
 import "util" for GridWalk
+import "./events" for LogEvent
 
 var SEARCH = AStar
 
@@ -49,6 +50,7 @@ class Curiosity is Behaviour {
       self["focus"] = self["senses"]["noise"]
       self["state"] = "investigate-noise"
       self["senses"]["noise"] = null
+      ctx.events.add(LogEvent.new("%(self) is investigating..."))
     }
     if (self["focus"] == self.pos) {
       self["focus"] = null
@@ -144,11 +146,14 @@ class Awareness is Behaviour {
             self["state"] = "alert"
             self["focus"] = self["senses"]["player"]
             ctx.parent["alerts"] = ctx.parent["alerts"] + 1
+
+            ctx.events.add(LogEvent.new("%(self) was alerted to your presence!"))
           }
         }
       } else if (self["awareness"] > 3 && self["senses"]["lastSawPlayer"] < 2){
         self["state"] = "investigate"
         self["focus"] = self["senses"]["player"]
+        ctx.events.add(LogEvent.new("%(self) is investigating..."))
       } else if (self["awareness"] > 0) {
         self["awareness"] = M.max(0, (self["awareness"] - 1))
         self["focus"] = null
@@ -168,12 +173,14 @@ class Awareness is Behaviour {
       }
       if (visible && veryClose) {
         self["state"] = "alert"
+        ctx.events.add(LogEvent.new("%(self) was alerted to your presence!"))
         ctx.parent["alerts"] = ctx.parent["alerts"] + 1
         self["focus"] = self["senses"]["player"]
       }
     } else if (self["state"] == "investigate") {
       if (visible && near) {
         self["state"] = "alert"
+        ctx.events.add(LogEvent.new("%(self) was alerted to your presence!"))
         ctx.parent["alerts"] = ctx.parent["alerts"] + 1
         self["awareness"] = 8
         self["focus"] = self["senses"]["player"]
@@ -190,6 +197,7 @@ class Awareness is Behaviour {
         self["awareness"] = 8
         self["focus"] = self["senses"]["player"]
         self["state"] = "investigate"
+        ctx.events.add(LogEvent.new("%(self) is suspicious"))
       } else if (near) {
         self["focus"] = self["senses"]["player"]
       }
