@@ -64,12 +64,12 @@ class WorldRenderer is View {
           if (tile["item"]) {
             if (tile["item"] == "coin") {
               symbol = String.fromCodePoint(0x00B0)
-              offset = 1
-              color = PAL[5]
+              offset = 3
+              color = PAL[15]
             } else if (tile["item"] == "smokebomb") {
               symbol = String.fromCodePoint(0x00F8)
               offset = 0
-              color = PAL[5]
+              color = PAL[15]
             }
           }
           if (!tile["activeEffects"].isEmpty) {
@@ -94,7 +94,7 @@ class WorldRenderer is View {
           Canvas.print(tile["symbol"], x * tileWidth, y * tileHeight, seen ? PAL[12] : PAL[3])
         }
         if (tile["kind"] == "goal") {
-          var color = seen ? Display.fg : PAL[3]
+          var color = seen ? PAL[15] : PAL[3]
           if (_ctx.parent["objective"]) {
             color = seen ? PAL[9] : PAL[3]
           }
@@ -108,6 +108,7 @@ class WorldRenderer is View {
           if (tile["locked"] || tile["level"] > 0) {
             color = PAL[7]
           }
+          color = PAL[15]
           Canvas.rectfill(x * tileWidth, y * tileHeight, tileWidth - 1, tileHeight - 1, seen ? color : PAL[3])
           Canvas.print("+", x * tileWidth, y * tileHeight, PAL[0])
         }
@@ -151,9 +152,9 @@ class WorldRenderer is View {
         if (entity["state"] == "alert") {
           color = PAL[6]
         } else if (entity["state"] == "investigate" || entity["state"] == "investigate-noise") {
-          color = PAL[8]
-        } else if (entity["awareness"] > 0)  {
           color = PAL[14]
+        } else if (entity["awareness"] > 0)  {
+          color = PAL[5]
         }
         Canvas.print(symbol, entity.pos.x * tileWidth, entity.pos.y * tileHeight, color)
 
