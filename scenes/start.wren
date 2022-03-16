@@ -51,6 +51,14 @@ class StartScene is Scene {
       "overflow": true,
       "font": "futile",
     })
+
+    Display.print("v" + Config["version"], {
+      "font": "m3x6",
+      "align": "right",
+      "color": Display.fg,
+      "position": Vec.new(0, Canvas.height - 8),
+      "overflow": true,
+    })
     Display.printCentered("Press any", Canvas.height - 24, Display.fg)
     Display.printCentered("key", Canvas.height - 16, Display.fg)
   }
