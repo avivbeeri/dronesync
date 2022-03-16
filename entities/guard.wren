@@ -45,6 +45,8 @@ class Guard is Creature {
     push(Wait)
   }
 
+  speed { this["state"] == "alert" ? 8 : 6 }
+
   endTurn() {
     super.endTurn()
     // Recompute awareness
