@@ -19,6 +19,9 @@ class GridWalk {
     var previous = null
     for (point in line) {
       // Prevent tunnelling
+      if (point == p0) {
+        continue
+      }
       if (point == p1) {
         break
       }

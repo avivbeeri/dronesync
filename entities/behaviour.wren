@@ -45,12 +45,14 @@ class Curiosity is Behaviour {
   evaluate() {
     // Get noticed events
     // D
-    if (self["senses"]["noise"]) {
+    if (self["senses"]["noise"] && self["state"] != "alert") {
       self["awareness"] = 3
       self["focus"] = self["senses"]["noise"]
       self["state"] = "investigate-noise"
       self["senses"]["noise"] = null
       ctx.events.add(LogEvent.new("%(self) is investigating..."))
+    } else if (self["state"] != "alert") {
+      self["senses"]["noise"] = null
     }
     if (self["focus"] == self.pos) {
       self["focus"] = null
