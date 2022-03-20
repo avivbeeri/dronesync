@@ -1,1 +1,1 @@
-{ "version": "$1", "display": { "width": 480, "height": 320, "title": "DroneSync", "background": "#040404", "foreground": "#AAAAAA" }, "map": { "font": null, "fontSize": 16, "tileWidth": 8, "tileHeight": 8, "width": 60, "height": 37 } }
+{ "version": "0.1.1", "display": { "width": 480, "height": 320, "title": "DroneSync", "background": "#040404", "foreground": "#AAAAAA" }, "map": { "font": null, "fontSize": 16, "tileWidth": 8, "tileHeight": 8, "width": 60, "height": 37 } }
