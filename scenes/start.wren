@@ -77,27 +77,27 @@ class StartScene is Scene {
     if (_progress == 0) {
       Display.printCentered("Press any", Canvas.height - 40, Display.fg)
       Display.printCentered("key", Canvas.height - 32, Display.fg)
+    } else {
+      y = Canvas.height - 80
+      var lines = [
+        "Connection established.",
+        "Mission parameters acquired.",
+        "Commencing..."
+      ]
+      var log = lines.take((_progress / 25).ceil)
+      y = Canvas.height - 80 - 8 * log.count
+
+      for (line in log) {
+        Canvas.print(line, 32, y, Display.fg)
+        y = y + 8
+      }
+
+      y = Canvas.height - 64
+
+      var chunkWidth = ((Canvas.width - 64))
+      var width = _progress * chunkWidth / 100
+      Canvas.rectfill(32, y, Canvas.width - 64, 16, PAL[3])
+      Canvas.rectfill(32, y, width, 16, PAL[2])
     }
-
-    y = Canvas.height - 80
-    var lines = [
-      "Connection established.",
-      "Mission parameters acquired.",
-      "Commencing..."
-    ]
-    var log = lines.take((_progress / 25).ceil)
-    y = Canvas.height - 80 - 8 * log.count
-
-    for (line in log) {
-      Canvas.print(line, 32, y, Display.fg)
-      y = y + 8
-    }
-
-    y = Canvas.height - 64
-
-    var chunkWidth = ((Canvas.width - 64))
-    var width = _progress * chunkWidth / 100
-    Canvas.rectfill(32, y, Canvas.width - 64, 16, PAL[3])
-    Canvas.rectfill(32, y, width, 16, PAL[2])
   }
 }

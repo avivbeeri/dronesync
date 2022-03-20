@@ -101,7 +101,7 @@ class WorldRenderer is View {
           Canvas.print("$", x * tileWidth, y * tileHeight, color)
         }
         if (tile["kind"] == "exit") {
-          Canvas.print(">", x * tileWidth, y * tileHeight, seen ? Display.fg : PAL[3])
+          Canvas.print(">", x * tileWidth, y * tileHeight, seen ? PAL[15] : PAL[3])
         }
         if (tile["kind"] == "door") {
           var color = Display.fg
