@@ -18,8 +18,8 @@ import "core/map" for TileMap, Tile
 import "core/tilesheet" for Tilesheet
 
 import "extra/events" for GameEndEvent
-import "./events" for LogEvent
-import "./actions" for MoveAction, SmokeAction, UseItemAction, SwapAction
+import "./events" for LogEvent, QueryEvent
+import "./actions" for MoveAction, SmokeAction, UseItemAction, SwapAction, EscapeAction
 import "./entities/player" for PlayerEntity
 import "./inputs" for InputAction
 import "./log" for Log
@@ -88,6 +88,34 @@ class WindowReducer is TestReducer {
       }
     }
     return state
+  }
+}
+
+class QueryState is State {
+  construct new(ctx, view, data) {
+    _ctx = ctx
+    _view = view
+    _data = data
+  }
+
+  onEnter() {
+    System.print("awaiting input...")
+  }
+
+  onExit() {
+    System.print("Input received.")
+  }
+
+  update() {
+    if (_data["type"] == "escape") {
+      if (InputAction.confirm.firing) {
+        _view.top.store.dispatch({ "type": "action", "data": _data })
+        return PlayState.new(_ctx, _view)
+      }
+    } else {
+      Fiber.abort("Invalid query data type")
+    }
+    return this
   }
 }
 
@@ -217,7 +245,12 @@ class PlayState is State {
         }
         if (_view.store.state["action"]["data"]) {
           var action = _view.store.state["action"]
-          current.action = UseItemAction.new(action["data"]["id"], action)
+          System.print(action)
+          if (_view.store.state["action"]["data"]["type"] == "escape") {
+            current.action = EscapeAction.new()
+          } else {
+            current.action = UseItemAction.new(action["data"]["id"], action)
+          }
           _view.store.dispatch({ "type": "action", "data": null, "selection": null })
         } else {
           if (InputAction.right.firing) {
@@ -293,6 +326,9 @@ class PlayScene is Scene {
       _world.update()
 
       for (event in _world.active.events) {
+        if (event is QueryEvent) {
+          changeState(QueryState.new(_world, this, event.data))
+        }
         if (event is LogEvent) {
           System.print(event.text)
           _log.add(event.text)

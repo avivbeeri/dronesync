@@ -10,6 +10,15 @@ class EscapeEvent is Event {
     super()
   }
 }
+class QueryEvent is Event {
+  construct new(source, data) {
+    super()
+    _data = data
+    _source = source
+  }
+  data { _data }
+  source { _source }
+}
 class LogEvent is Event {
   construct new(text) {
     super()

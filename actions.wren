@@ -6,9 +6,22 @@ import "core/dataobject" for DataObject
 import "util" for Find
 import "items" for ItemFactory
 import "./extra/events" for MoveEvent
-import "./events" for LogEvent, AttackEvent, EscapeEvent, GoalEvent
+import "./events" for LogEvent, AttackEvent, EscapeEvent, GoalEvent, QueryEvent
 import "./extra/combat" for Attack, AttackType, AttackResult
 import "./entities/player" for PlayerEntity
+
+class QueryAction is Action {
+  construct new(pos) {
+    super()
+    _pos = pos
+  }
+  perform() {
+    if (ctx.map[_pos]["query"]) {
+      ctx.events.add(QueryEvent.new(source, ctx.map[_pos]["query"]))
+    }
+    return ActionResult.failure
+  }
+}
 
 class PickupAction is Action {
   construct new(pos) {
@@ -329,7 +342,9 @@ class MoveAction is Action {
           collectible = occupying.any {|entity| entity.has("loot") }
           System.print(collectible)
         }
-        if (source is PlayerEntity && ctx.map[source.pos]["kind"] == "exit") {
+        if (source is PlayerEntity && ctx.map[source.pos]["query"]) {
+          result = ActionResult.alternate(QueryAction.new(source.pos))
+        } else if (source is PlayerEntity && ctx.map[source.pos]["kind"] == "exit") {
           result = ActionResult.alternate(EscapeAction.new())
         }
       }

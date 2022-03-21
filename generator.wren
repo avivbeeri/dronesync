@@ -145,7 +145,10 @@ class RoomGenerator {
       "solid": false,
       "visible": "unknown",
       "activeEffects": [],
-      "kind": "exit"
+      "kind": "exit",
+      "query": {
+        "type": "escape"
+      }
     })
     player.pos.x = pos.x
     player.pos.y = pos.y

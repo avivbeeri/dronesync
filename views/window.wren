@@ -314,9 +314,7 @@ class ScoreWindow is GameEndWindow {
   construct new(parent, ctx, message) {
     super(parent, ctx, message)
     var v = ctx["time"]
-    System.print("Time: %(v) ")
     v = ctx["minDistance"]
-    System.print("Min: %(v) ")
     _score = [
 
       (ctx["objective"] ?
@@ -336,8 +334,6 @@ class ScoreWindow is GameEndWindow {
 
     z = 2
     title = "Mission Report"
-    System.print(_score)
-    System.print(_total)
   }
 
   drawContent() {
