@@ -4,7 +4,6 @@ import "math" for Vec
 import "./util" for GridWalk
 
 import "core/elegant" for Elegant
-import "core/dataobject" for Store, Reducer
 import "core/entity" for StackEntity
 import "core/action" for Action
 import "extra/actions" for RestAction
@@ -18,6 +17,7 @@ import "core/map" for TileMap, Tile
 import "core/tilesheet" for Tilesheet
 
 import "extra/events" for GameEndEvent
+import "scenes/store" for StoreFactory
 import "./events" for LogEvent, QueryEvent
 import "./actions" for MoveAction, SmokeAction, UseItemAction, SwapAction, EscapeAction
 import "./entities/player" for PlayerEntity
@@ -32,64 +32,6 @@ import "./views/tooltip" for Tooltip
 import "./generator" for StaticGenerator, RoomGenerator
 import "core/graph" for DijkstraMap
 
-class TestReducer is Reducer {
-  call(x, y) { reduce(x, y) }
-}
-class ModeReducer is TestReducer {
-  construct new() {}
-  reduce(state, action) {
-    if (action["type"] == "mode") {
-      state  = action["mode"]
-    }
-    return state
-  }
-}
-class ItemReducer is TestReducer {
-  construct new() {}
-  reduce(state, action) {
-    if (action["type"] == "item") {
-      state["data"] = action["data"]
-    }
-    return state
-  }
-}
-class ActionReducer is TestReducer {
-  construct new() {}
-  reduce(state, action) {
-    if (action["type"] == "action") {
-      state["data"] = action["data"]
-      state["center"] = action["center"]
-      state["selection"] = action["selection"]
-    }
-    return state
-  }
-}
-class SelectionReducer is TestReducer {
-  construct new() {}
-  reduce(state, action) {
-    if (action["type"] == "selection") {
-      state["tiles"] = action["tiles"]
-      state["range"] = action["range"]
-      state["center"] = action["center"]
-      state["valid"] = action["valid"]
-    }
-    return state
-  }
-}
-
-class WindowReducer is TestReducer {
-  construct new() {}
-  reduce(state, action) {
-    if (action["type"] == "window") {
-      if (action["mode"] == "open") {
-        state[action["id"]] = true
-      } else {
-        state[action["id"]] = false
-      }
-    }
-    return state
-  }
-}
 
 class QueryState is State {
   construct new(ctx, view, data) {
@@ -99,17 +41,31 @@ class QueryState is State {
   }
 
   onEnter() {
-    System.print("awaiting input...")
+    if (_data["type"] == "escape") {
+      if (_ctx["objective"]) {
+        _data["message"] = "Exit the facility?"
+      } else {
+        _data["message"] = "Exit early? (The objective hasn't been completed)"
+      }
+      _data["options"] = [
+        [ "Confirm", "confirm" ],
+        [ "Cancel", "cancel" ],
+      ]
+    }
+
+    _view.top.store.dispatch({ "type": "query", "result": null, "config": _data })
+    _view.addViewChild(QueryWindow.new(_view, _ctx))
   }
 
   onExit() {
-    System.print("Input received.")
   }
 
   update() {
     if (_data["type"] == "escape") {
-      if (InputAction.confirm.firing) {
+      if (_view.store.state["query"]["result"] == "confirm") {
         _view.top.store.dispatch({ "type": "action", "data": _data })
+        return PlayState.new(_ctx, _view)
+      } else if (_view.store.state["query"]["result"] == "cancel") {
         return PlayState.new(_ctx, _view)
       }
     } else {
@@ -245,7 +201,6 @@ class PlayState is State {
         }
         if (_view.store.state["action"]["data"]) {
           var action = _view.store.state["action"]
-          System.print(action)
           if (_view.store.state["action"]["data"]["type"] == "escape") {
             current.action = EscapeAction.new()
           } else {
@@ -275,29 +230,13 @@ class PlayState is State {
 
 }
 
+
 class PlayScene is Scene {
   construct new(args) {
     super()
     _log = Log.new()
     _log.add("Mission commenced.")
-    var reducer = Store.combineReducers({
-      "window": WindowReducer.new(),
-      "selection": SelectionReducer.new(),
-      "action": ActionReducer.new(),
-      "item": ItemReducer.new(),
-      "mode": ModeReducer.new()
-    })
-    _store = Store.create({
-      "window": {},
-      "action": {},
-      "item": {},
-      "mode": "play",
-      "selection": {
-        "tiles": [],
-        "range": []
-      }
-    }, reducer)
-
+    _store = StoreFactory.call()
     _world = RoomGenerator.generate()
     // _world = StaticGenerator.generate()
     _state = PlayState.new(_world, this)
@@ -358,5 +297,5 @@ class PlayScene is Scene {
   }
 }
 
-import "./views/window" for GameEndWindow, ScoreWindow
+import "./views/window" for GameEndWindow, ScoreWindow, QueryWindow
 import "./views/statusbar" for StatusBar

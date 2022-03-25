@@ -131,6 +131,87 @@ class Window is View {
     Canvas.offset()
   }
 }
+
+class QueryWindow is Window {
+  construct new(parent, ctx) {
+    // Assuming default font
+    super(parent, ctx, Vec.new(8 * 20, 8 * 6))
+    title = "Query"
+    closable = false
+
+    _config = top.store.state["query"]["config"]
+    _area = Display.print(_config["message"], {
+      "align": "center",
+      "size": Vec.new(Canvas.width / 2, Canvas.height / 2),
+      "overflow": true
+    })
+
+    width = _config["message"].count * 8 + 16
+    height = (_config["options"].count + 2) * 8 + _area.y
+    width = _area.x + 16
+
+    y = (Canvas.height - height) / 2
+    x = (Canvas.width - width) / 2
+  }
+
+  update() {
+    super.update()
+    var pos = Mouse.pos
+    var activate = false
+    _hover = -1
+    if (Mouse["left"].justPressed) {
+      if (pos.x >= x && pos.x < x + width && pos.y >= y && pos.y < y + height) {
+        _hover = (((pos.y) - (y + _area.y + 8)) / 8).floor
+        _hover = M.max(-1, _hover)
+      }
+      activate = true
+    } else {
+      for (key in 0..9) {
+        var i = (key + 9) % 10
+        if ((Keyboard[key.toString].justPressed || (InputAction.shift.down && Keyboard["keypad %(key)"].justPressed)) && i < _config["options"].count) {
+          _hover = i
+          activate = true
+        }
+      }
+    }
+    activate = activate && _hover >= 0 && _hover < _config["options"].count
+    if (activate) {
+      top.store.dispatch({ "type": "query", "result": _config["options"][_hover][1] })
+      parent.removeViewChild(this)
+    }
+    // Accept/fail - should become dynamic options
+    if (InputAction.confirm.firing) {
+      top.store.dispatch({ "type": "query", "result": "confirm" })
+      parent.removeViewChild(this)
+    } else if (InputAction.cancel.firing) {
+      top.store.dispatch({ "type": "query", "result": "cancel" })
+      parent.removeViewChild(this)
+    }
+  }
+
+  drawContent() {
+    super.drawContent()
+    var y = 4
+    Display.print(_config["message"], {
+      "align": "center",
+      "position": Vec.new(0, y),
+      "color": Display.fg,
+      "size": _area,
+      "overflow": true
+    })
+    y = _area.y + 8
+    var i = 0
+    for (option in _config["options"]) {
+      if (i == _hover) {
+        Canvas.rectfill(0, y, width, 8, PAL[6])
+      }
+      Canvas.print("%(i+1)) %(option[0])", 0, y, Display.fg)
+      y = y + 8
+      i = i + 1
+    }
+  }
+}
+
 class InventoryWindow is Window {
   construct new(parent, ctx) {
     // Assuming default font

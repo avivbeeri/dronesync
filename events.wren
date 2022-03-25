@@ -1,5 +1,7 @@
+import "core/dataobject" for DataObject
 import "extra/combat" for AttackResult
 import "core/event" for Event
+
 class GoalEvent is Event {
   construct new() {
     super()
@@ -13,7 +15,7 @@ class EscapeEvent is Event {
 class QueryEvent is Event {
   construct new(source, data) {
     super()
-    _data = data
+    _data = DataObject.copyValue(data)
     _source = source
   }
   data { _data }
